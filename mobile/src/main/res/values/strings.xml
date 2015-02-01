@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GPSHandle Client</string>
+    <string name="title_real_time">Real time</string>
+    <string name="title_historical">Historical</string>
+    <string name="title_reporting">Reports</string>
+    <string name="title_administration">Administration</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_list_groups">Groups List</string>
+    <string name="action_list_devices">Devices List</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="application_loading">Loading ...</string>
+
+
+    <string name="title_activity_maps">V9 Tracking</string>
+    <string name="map_fleet_subtitle">Monitor</string>
+    <string name="updated_str">Updating ...</string>
+    <string name="user_name">User Name</string>
+    <string name="account_name">Account</string>
+    <string name="password">Password</string>
+    <string name="copyright">COPYRIGHT © 2015 UMAPS TECHNOLOGIES</string>
+    <string name="title_activity_login">V9 Login</string>
+    <string name="hint_account_name">Enter account name</string>
+    <string name="hint_user_name">Enter user name</string>
+    <string name="hint_password">Enter password</string>
+    <string name="btnlogin">Login</string>
+    <string name="welcome_login">V9 Tracking Android Client</string>
+    <string name="failure_login">Failed to login</string>
+    <string name="invalid_credent">You must enter correct informations</string>
+    <string name="network_failed">Network Failed!</string>
+    <string name="show_loading">Loading ...</string>
+    <string name="title_addr">Address</string>
+    <string name="title_position">Position</string>
+    <!--Item Popup on map-->
+    <string name="tID">ID</string>
+    <string name="tDesc">Description</string>
+    <string name="tSpeed">Speed</string>
+    <string name="tOdom">Odometter</string>
+    <!--Cluster Popup on map-->
+    <string name="deviceCountText">No. of Device</string>
+    <string name="averageSpeedText">Average speed</string>
+    <string name="deviceRunningCountText">No. of running</string>
+
+
+    <string name="device_list">Devices List</string>
+    <string name="btnclose">Close</string>
+    <string name="gotit">Got it!</string>
+    <string name="settings">Settings</string>
+    <string name="company_name">UMAPS TECHNOLOGIES</string>
+    <string name="company_address">No.1 Alley 49 Lane 28, Huynh Thuc Khang Street, Hanoi</string>
+    <string name="company_tel">(+84) 046 686 5601</string>
+    <string name="getting_group_device_list">Getting devices info</string>
+
+</resources>
