@@ -16,7 +16,7 @@
 
 
     <string name="title_activity_maps">V9 Tracking</string>
-    <string name="map_fleet_subtitle">Monitor</string>
+    <string name="subtitle_real_time">Group: </string>
     <string name="updated_str">Updating ...</string>
     <string name="user_name">User Name</string>
     <string name="account_name">Account</string>
