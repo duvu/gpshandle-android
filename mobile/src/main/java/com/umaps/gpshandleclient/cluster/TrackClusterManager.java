@@ -3,6 +3,7 @@ package com.umaps.gpshandleclient.cluster;
 import android.util.Log;
 
 import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.umaps.gpshandleclient.model.TrackObject;
 

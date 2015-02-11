@@ -2,36 +2,39 @@ package com.umaps.gpshandleclient.activities;
 
 import android.app.ActionBar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 
-import com.google.android.gms.maps.SupportMapFragment;
 import com.umaps.gpshandleclient.R;
+import com.umaps.gpshandleclient.cluster.TrackInfoWindowAdapter;
+import com.umaps.gpshandleclient.fragment.DeviceListDialogFragment;
+import com.umaps.gpshandleclient.fragment.GroupListFragment;
 import com.umaps.gpshandleclient.settings.SessionState;
 import com.umaps.gpshandleclient.fragment.AdministrationFragment;
 import com.umaps.gpshandleclient.fragment.RealTimeFragment;
 import com.umaps.gpshandleclient.fragment.NavigationDrawerFragment;
 import com.umaps.gpshandleclient.fragment.ReportingFragment;
 
+import org.json.JSONException;
+
 
 public class MainActivity extends BaseActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+        GroupListFragment.GroupListCallback, DeviceListDialogFragment.DeviceListCallback,
+//        RealTimeFragment.HistoricalCallback,
+        TrackInfoWindowAdapter.TrackInfoWindowCallback
+{
+    private static final String TAG = "MainActivity";
     String mTitle;
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        showProgressDialog(R.string.application_loading);
         setContentView(R.layout.activity_main);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -39,15 +42,6 @@ public class MainActivity extends BaseActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-
-        //----------------------------------------------------------------------------------------//
-        //-- SETUP APPLICATION-SETTINGS FOR DEBUGGING
-        //-- ApplicationSettings.setsAccount("umaps");
-        //-- ApplicationSettings.setsUser("admin");
-        //-- ApplicationSettings.setsPassword("qwerty123");
-        //-- ApplicationSettings.setLocale("en");
-        //-- ApplicationSettings.setServerURL("http://dev.gpshandle.com/ws");
-        //----------------------------------------------------------------------------------------//
     }
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -58,37 +52,32 @@ public class MainActivity extends BaseActivity
                 //--set Title for Action
                 SessionState.setIsFleet(true);
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, RealTimeFragment.newInstance()).commit();
+                        .replace(R.id.container, RealTimeFragment.newInstance())
+                        .addToBackStack("realTime").commit();
+
                 break;
             case 1:
-                SessionState.setIsFleet(false);
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, SupportMapFragment.newInstance()).commit();
-                break;
-            case 2:
             fragmentManager.beginTransaction()
-                        .replace(R.id.container, ReportingFragment.newInstance()).commit();
+                        .replace(R.id.container, ReportingFragment.newInstance())
+                        .addToBackStack("report").commit();
             break;
-            case 3:
+            case 2:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, AdministrationFragment.newInstance()).commit();
+                        .replace(R.id.container, AdministrationFragment.newInstance())
+                        .addToBackStack("administration").commit();
                 break;
         }
-//        // update the main content by replacing fragments
-//        FragmentManager fragmentManager = getFragmentManager();
-//        fragmentManager.beginTransaction()
-//                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-//                .commit();
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_real_time);
+                mTitle = getString(R.string.title_monitor);
                 SessionState.setSubTitle(getString(R.string.subtitle_real_time));
                 break;
             case 2:
                 mTitle = getString(R.string.title_historical);
+                SessionState.setSubTitle(getString(R.string.subtitle_historical));
                 break;
             case 3:
                 mTitle = getString(R.string.title_reporting);
@@ -103,16 +92,18 @@ public class MainActivity extends BaseActivity
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
-        actionBar.setSubtitle(SessionState.getSubTitle()
-                + ((SessionState.getSelGroup()!=null)? SessionState.getSelGroup():"All"));
+        if (SessionState.isIsFleet()) {
+            actionBar.setSubtitle(SessionState.getSubTitle()
+                    + ((SessionState.getSelGroup() != null) ? SessionState.getSelGroup() : "All"));
+        } else {
+            actionBar.setSubtitle(SessionState.getSubTitle()
+                    + ((SessionState.getSelDevice() != null) ? SessionState.getSelDevice() : ""));
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.main, menu);
             MenuItem actionItem = menu.findItem(R.id.action_list);
             if (SessionState.isIsFleet()) {
@@ -120,6 +111,8 @@ public class MainActivity extends BaseActivity
             } else if (!SessionState.isIsFleet()){
                 actionItem.setTitle(R.string.action_list_devices);
             }
+//            MenuItem settingItem = menu.findItem(R.id.action_settings);
+
             restoreActionBar();
             return true;
         }
@@ -128,19 +121,81 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onGroupItemSelected(String groupId) {
+        Log.i("ABC", "onGroupItemSelected" + groupId);
+        SessionState.setSelGroup(groupId);
+        restoreActionBar();
+        //Update RealTimeFragment here
+        RealTimeFragment realTimeFragment = null;
+        try {
+            realTimeFragment = (RealTimeFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.container);
+        } catch (ClassCastException e){
+            Log.e("ABC", "cannot cast RealTimeFragment");
+        }
 
+        if (realTimeFragment!=null){
+            realTimeFragment.startRealTimeTracking();
+        } else {
+            Log.e("ABC", "___onGroupItemSelected");
+        }
+    }
 
+    @Override
+    public void onDeviceItemSelected(String deviceID) {
+        Log.i("ABC", "onDeviceItemSelected" + deviceID);
+//        SessionState.setSelDevice(deviceID);
+//        restoreActionBar();
+//        //Update RealTimeFragment here
+//        HistoricalFragment historicalFragment = (HistoricalFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.container);
+//
+//        if (historicalFragment!=null){
+//            try {
+//                historicalFragment.startTracking();
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            Log.e("ABC", "___onDeviceItemSelected");
+//        }
+    }
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onTrackInfoWindowButton(String deviceId, long from, long to) {
+        Log.i(TAG, "onTrackInfoWindowButton");
+        restoreActionBar();
+        //Update RealTimeFragment here
+        SessionState.setIsFleet(false);
+        RealTimeFragment realTimeFragment = null;
+        try {
+            realTimeFragment = (RealTimeFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.container);
+        } catch (ClassCastException e){
+            Log.e(TAG, "cannot cast RealTimeFragment");
+        }
+
+        if (realTimeFragment!=null){
+            try {
+                realTimeFragment.startHistoricalTracking(deviceId, from, to);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+        }
+    }
 }

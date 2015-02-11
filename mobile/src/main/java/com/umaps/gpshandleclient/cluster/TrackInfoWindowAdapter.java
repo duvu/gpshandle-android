@@ -4,34 +4,60 @@ import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.ui.IconGenerator;
 import com.umaps.gpshandleclient.R;
+import com.umaps.gpshandleclient.activities.MainActivity;
 import com.umaps.gpshandleclient.model.MapData;
 import com.umaps.gpshandleclient.util.StringTools;
+import com.umaps.gpshandleclient.views.CustomMapLayout;
+import com.umaps.gpshandleclient.views.OnInfoWindowElemTouchListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by beou on 29/10/2014.
  */
 public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+    private static final String TAG = "TrackInfoWindowAdapter";
+    TrackInfoWindowCallback mCallback;
+
     Context context;
     LayoutInflater inflater = null;
     IconGenerator iconFactory = null;
+    CustomMapLayout mapLayout = null;
+    Marker marker;
 
+
+    public TrackInfoWindowAdapter(Context _context, CustomMapLayout customMapLayout){
+        context = _context;
+        mCallback = (MainActivity)_context;
+        mapLayout = customMapLayout;
+        inflater = (LayoutInflater.from(_context));
+        iconFactory = new IconGenerator(_context);
+    }
     public TrackInfoWindowAdapter(Context _context){
         context = _context;
+        try {
+            mCallback = (MainActivity)_context;
+        } catch (ClassCastException e){
+            Log.e(TAG, "Cannot cast to MainActivity");
+        }
         inflater = (LayoutInflater.from(_context));
         iconFactory = new IconGenerator(_context);
     }
 
     @Override
     public View getInfoWindow(Marker marker) {
+        this.marker = marker;
         //--check if cluster or item
         String info = marker.getSnippet();
         if (StringTools.isBlank(info)){
@@ -93,7 +119,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         double latitude     = jsonObject.getDouble(MapData.Point.MD_LATITUDE);
         double longitude    = jsonObject.getDouble(MapData.Point.MD_LONGITUDE);
 
-        String id           = jsonObject.getString(MapData.Point.MD_ID);
+        final String id           = jsonObject.getString(MapData.Point.MD_ID);
         String vin          = jsonObject.getString(MapData.Point.MD_VIN);
         String desc         = jsonObject.getString(MapData.Point.MD_DESC);
         long epoch          = jsonObject.getLong(MapData.Point.MD_EPOCH);
@@ -111,10 +137,10 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         String gpIo         = jsonObject.getString(MapData.Point.MD_GP_IO);
         String address      = jsonObject.getString(MapData.Point.MD_ADDRESS);
 
-        TextView tID = (TextView) view.findViewById(R.id.tID);
+        /*TextView tID = (TextView) view.findViewById(R.id.tID);
         tID.setText(R.string.tID);
         TextView cID = (TextView) view.findViewById(R.id.cID);
-        cID.setText(id);
+        cID.setText(id);*/
 
         TextView tDesc = (TextView) view.findViewById(R.id.tDesc);
         tDesc.setText(R.string.tDesc);
@@ -138,13 +164,91 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         TextView titleAddr = (TextView) view.findViewById(R.id.titleAddr);
         titleAddr.setText(R.string.title_addr);
-        TextView contentAddr = (TextView) view.findViewById(R.id.contentAddr);
+        final TextView contentAddr = (TextView) view.findViewById(R.id.contentAddr);
         contentAddr.setText(address);
+
+        //--Setup listener for historical button
+        //----------------------------------------------------------------------------------------//
+        Button btn30min = (Button) view.findViewById(R.id.btn_historical_30m);
+        btn30min.setOnTouchListener(
+            new OnInfoWindowElemTouchListener(
+                btn30min,
+                context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
+                context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
+            ) {
+            @Override
+            protected void onClickConfirm(View view, Marker marker) {
+                Log.i(TAG, "got clicked on btn30min");
+                //--load 30 min historical data
+                long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
+                long timeFrom = timeTo - 30 * 60;
+                mCallback.onTrackInfoWindowButton(id, timeFrom, timeTo);
+            }
+        });
+        //--
+        Button btn60min = (Button) view.findViewById(R.id.btn_historical_60m);
+        btn60min.setOnTouchListener(
+                new OnInfoWindowElemTouchListener(
+                        btn60min,
+                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
+                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
+                ) {
+                    @Override
+                    protected void onClickConfirm(View view, Marker marker) {
+                        //--load 60 min historical data
+                        Log.i(TAG, "got clicked on btn60min");
+                        long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
+                        long timeFrom = timeTo - 60 * 60;
+                        mCallback.onTrackInfoWindowButton(id, timeFrom, timeTo);
+                    }
+                }
+        );
+        Button btn6h = (Button) view.findViewById(R.id.btn_historical_6h);
+        btn6h.setOnTouchListener(
+                new OnInfoWindowElemTouchListener(
+                        btn6h,
+                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
+                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
+                ) {
+                    @Override
+                    protected void onClickConfirm(View view, Marker marker) {
+                        Log.i(TAG, "got clicked on btn6h");
+                        long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
+                        long timeFrom = timeTo - 6 * 60 * 60;
+                        mCallback.onTrackInfoWindowButton(id, timeFrom, timeTo);
+                    }
+                }
+        );
+        Button btn12h = (Button) view.findViewById(R.id.btn_historical_12h);
+        btn12h.setOnTouchListener(
+                new OnInfoWindowElemTouchListener(
+                        btn12h,
+                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
+                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
+                ) {
+                    @Override
+                    protected void onClickConfirm(View view, Marker marker) {
+                        Log.i(TAG, "got clicked on btn12h");
+                        long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
+                        long timeFrom = timeTo - 12 * 60 * 60;
+                        mCallback.onTrackInfoWindowButton(id, timeFrom, timeTo);
+                    }
+                }
+        );
+        //----------------------------------------------------------------------------------------//
+        if (mapLayout!=null){
+            mapLayout.setMarkerWithWindowInfo(marker, view);
+        }
+
         return view;
     }
 
     @Override
     public View getInfoContents(Marker marker) {
         return null;
+    }
+
+    public interface TrackInfoWindowCallback{
+        public void onTrackInfoWindowButton(String deviceId, long from, long to);
     }
 }

@@ -3,16 +3,17 @@ package com.umaps.gpshandleclient.fragment;
 
 import android.app.Activity;
 import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,55 +23,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.activities.BaseActivity;
-import com.umaps.gpshandleclient.model.Device;
-import com.umaps.gpshandleclient.model.Group;
+import com.umaps.gpshandleclient.activities.SettingsActivity;
 import com.umaps.gpshandleclient.settings.SessionState;
-import com.umaps.gpshandleclient.util.Constants;
-import com.umaps.gpshandleclient.util.GpsHandleHTTPAsyncImpl;
-import com.umaps.gpshandleclient.util.HTTPDelegateInterface;
-import com.umaps.gpshandleclient.views.GroupExpandableListAdapter;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
-public class NavigationDrawerFragment extends BaseFragment implements HTTPDelegateInterface {
+public class NavigationDrawerFragment extends Fragment {
     private static final String TAG = "NavigationDrawerFragment";
-    /**
-     * Remember the position of the selected item.
-     */
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
-
-    /**
-     * Per the design guidelines, you should show the drawer on launch until the user manually
-     * expands it. This shared preference tracks this.
-     */
     private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
-
-    /**
-     * A pointer to the current callbacks instance (the Activity).
-     */
     private NavigationDrawerCallbacks mCallbacks;
-
-    /**
-     * Helper component that ties the action bar to the navigation drawer.
-     */
     private ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
@@ -81,8 +49,20 @@ public class NavigationDrawerFragment extends BaseFragment implements HTTPDelega
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
 
-    public NavigationDrawerFragment() {
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallbacks = (NavigationDrawerCallbacks) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
+        }
     }
+
+    /*@Override
+    public void onAttach(Activity activity){
+
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,8 +103,8 @@ public class NavigationDrawerFragment extends BaseFragment implements HTTPDelega
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.title_real_time),
-                        getString(R.string.title_historical),
+                        getString(R.string.title_monitor),
+//                        getString(R.string.title_historical),
                         getString(R.string.title_reporting),
                         getString(R.string.title_administration),
                 }));
@@ -224,16 +204,6 @@ public class NavigationDrawerFragment extends BaseFragment implements HTTPDelega
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallbacks = (NavigationDrawerCallbacks) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mCallbacks = null;
@@ -268,32 +238,10 @@ public class NavigationDrawerFragment extends BaseFragment implements HTTPDelega
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        GpsHandleHTTPAsyncImpl httpAsync = new GpsHandleHTTPAsyncImpl(NavigationDrawerFragment.this);
+        Log.i(TAG, "Click on action settings");
+
         if (item.getItemId() == R.id.action_list) {
-            SessionState.getProgressDialog().show();
-            //TODO: show list of groups or devices when press on this button
-            if (SessionState.isIsFleet()){
-                try {
-                    httpAsync.getGroups(getActivity().getApplicationContext(),
-                            SessionState.getAccountID(),
-                            SessionState.getUserID(),
-                            SessionState.getPassword(),
-                            Locale.getDefault().getLanguage());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else if (!SessionState.isIsFleet()){
-                try {
-                    httpAsync.getDevices(getActivity().getApplicationContext(),
-                            SessionState.getAccountID(),
-                            SessionState.getUserID(),
-                            SessionState.getPassword(),
-                            Locale.getDefault().getLanguage(),
-                            SessionState.getGroupID());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            showDialogFragment();
             return true;
         }
 
@@ -315,142 +263,23 @@ public class NavigationDrawerFragment extends BaseFragment implements HTTPDelega
         return getActivity().getActionBar();
     }
 
-    @Override
-    public void onFinish(JSONObject output) {
-        if (SessionState.isIsFleet()){
-            //-- Draw list of Groups
-            showListViewOfGroup(output);
-        } else if (!SessionState.isIsFleet()){
-            //-- Draw list of Devices
+
+    private void showDialogFragment(){
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+        Fragment prev = getChildFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            fragmentTransaction.remove(prev);
         }
+        fragmentTransaction.addToBackStack(null);
+//        if (SessionState.isIsFleet()) {
+            DialogFragment newFragment = GroupListFragment.newInstance(R.string.application_loading);
+            newFragment.show(fragmentTransaction, "dialog");
+//        } else {
+//            DialogFragment newFragment = DeviceListDialogFragment.newInstance(R.string.application_loading);
+//            newFragment.show(fragmentTransaction, "dialog");
+//        }
     }
 
-    private void showListViewOfGroup(JSONObject dataGroups){
-        SessionState.getProgressDialog().dismiss();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        View view = (View)getActivity().getLayoutInflater().inflate(R.layout.gpshandle_group_expandable_list_view, null);
-        builder.setView(view);
-
-        TextView textView = (TextView) view.findViewById(R.id.lv_title);
-        textView.setText(R.string.device_list);
-
-        builder.setPositiveButton(R.string.gotit, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //--TODO: implement onclick listener
-                return;
-            }
-        });
-        final AlertDialog dialog = builder.create();
-        //--Init expandable-list-view here
-        ExpandableListView expandableGroupList = (ExpandableListView) view.findViewById(R.id.expandable_group_list);
-        {
-            //getDisplayWidth
-
-            /*SetIndicator right*/
-            DisplayMetrics metrics = new DisplayMetrics();
-            int widthPixels = metrics.widthPixels;
-
-            expandableGroupList.setIndicatorBounds(
-                    widthPixels - ((BaseActivity)getActivity()).getDisplayFromPixel(50),
-                    widthPixels);
-        }
-        expandableGroupList.setClickable(true);
-        //--crete GroupExpandableListAdapter
-        ArrayList<Group> groupsList = null;
-        HashMap<String, ArrayList< Device >> devicesInGroup = null;
-        try {
-            groupsList = createGroupList(dataGroups);
-            devicesInGroup = createDevicesInGroup(dataGroups);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        final GroupExpandableListAdapter groupListAdapter =
-                new GroupExpandableListAdapter(getActivity().getApplicationContext(), groupsList, devicesInGroup);
-        expandableGroupList.setAdapter(groupListAdapter);
-
-        //--setOnclickListener
-        expandableGroupList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                Group group = (Group)groupListAdapter.getGroup(groupPosition);
-                Log.i(TAG, "OnGroupClicked!+"+group.getGroupId());
-                SessionState.setSelGroup(group);
-                dialog.dismiss();
-                return true;
-            }
-        });
-        //-- Add ExpandableListView to Dialog
-        dialog.show();
-        return;
-    }
-    /**
-     * Private functions for preparing data for listView*/
-    private ArrayList<Group> createGroupList(JSONObject dataGroup) throws JSONException {
-        if (dataGroup==null) return null;
-        ArrayList<Group> groupsList = new ArrayList<>();
-        JSONArray dataGroupArray = dataGroup.getJSONArray(Constants.KEY_RESULT);
-        Log.i(TAG, dataGroup.toString());
-        for (int i = 0; i<dataGroupArray.length(); i++) {
-            JSONObject jsonGroup = dataGroupArray.getJSONObject(i);
-            String accountID        = jsonGroup.getString("accountID");
-            String groupID          = jsonGroup.getString("groupID");
-            String pushpinID        = jsonGroup.getString("pushpinID");
-            String groupDescription = jsonGroup.getString("description");
-            String groupDisplay     = jsonGroup.getString("displayName");
-            int deviceCount         = jsonGroup.getInt("deviceCount");
-
-            //--for check if device is online
-            long currentTimestamp = Calendar.getInstance().getTimeInMillis()/1000;
-            int countLive = 0;
-            JSONArray deviceList = null;
-            if (deviceCount>0) {
-                deviceList = jsonGroup.getJSONArray("devicesList");
-            }
-            if (deviceList == null){
-                continue;
-            }
-            for (int j = 0; j<deviceList.length(); j++){
-                JSONObject jsonDevice   = deviceList.getJSONObject(j);
-                boolean isActive        = jsonDevice.getBoolean("isActive");
-                long lastEventTimestamp = jsonDevice.getLong("lastEventTimestamp");
-                if(isActive && (currentTimestamp - lastEventTimestamp < 300)){
-                    countLive++;
-                }
-            }
-            Group group = new Group(groupID, (groupDisplay==null?groupDescription:groupDisplay), pushpinID/*icon*/, countLive/*live*/, deviceCount);
-            groupsList.add(group);
-        }
-        return groupsList;
-    }
-    private HashMap<String, ArrayList<Device>> createDevicesInGroup(JSONObject dataGroup) throws JSONException {
-        if (dataGroup==null) return null;
-        HashMap<String, ArrayList<Device>> hashMapGroupDevices = new HashMap<>();
-        JSONArray dataGroupArray = dataGroup.getJSONArray(Constants.KEY_RESULT);
-        for (int i = 0; i<dataGroupArray.length(); i++) {
-            //--Reset device-list
-            ArrayList<Device> devicesList = new ArrayList<>();
-            JSONObject jsonGroup = dataGroupArray.getJSONObject(i);
-            String groupID          = jsonGroup.getString("groupID");
-            JSONArray jsonArrayDevices = jsonGroup.getJSONArray("devicesList");
-            //--for check if device is online
-            long currentTimestamp = Calendar.getInstance().getTimeInMillis()/1000;
-            for (int j = 0; j<jsonArrayDevices.length(); j++){
-                JSONObject jsonDevice = jsonArrayDevices.getJSONObject(j);
-                boolean isActive        = jsonDevice.getBoolean("isActive");
-                String icon             = jsonDevice.getString("pushpinID");
-                String deviceID         = jsonDevice.getString("deviceID");
-                String description      = jsonDevice.getString("description");
-                long lastEventTimestamp = jsonDevice.getLong("lastEventTimestamp");
-                boolean isLive          = (isActive && (currentTimestamp-lastEventTimestamp<300));
-                //--Create new Device Object Model
-                Device device = new Device(deviceID, description, icon, isLive, lastEventTimestamp);
-                devicesList.add(device);
-            }
-            hashMapGroupDevices.put(groupID, devicesList);
-        }
-        return hashMapGroupDevices;
-    }
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */

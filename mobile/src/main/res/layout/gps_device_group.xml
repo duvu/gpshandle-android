@@ -5,25 +5,24 @@
     android:layout_width="fill_parent"
     android:stretchColumns="1"
     android:paddingTop="0dip"
+    android:descendantFocusability="blocksDescendants"
     android:layout_gravity="top">
-
     <TableRow>
         <ImageView
             android:id="@+id/gpshandle_group_list_image"
             android:layout_width="50dip"
             android:layout_height="50dip"
-            android:layout_marginLeft="10dip"/>
-        <TableLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:stretchColumns="1"
-            android:paddingTop="0dip"
-            android:layout_gravity="top">
+            android:layout_marginLeft="10dip"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/account_name"/>
+        <TableLayout>
             <TableRow>
                 <TextView
                     android:id="@+id/listView_grpDesc"
                     android:layout_marginTop="10dp"
                     android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/wallet_dim_foreground_inverse_disabled_holo_dark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                 </TextView>
@@ -32,13 +31,33 @@
                 <TextView
                     android:id="@+id/listView_grpID"
                     android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginBottom="10dp"
-                    android:textSize="10dip"
+                    android:textSize="12sp"
                     android:textStyle="italic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                 </TextView>
             </TableRow>
         </TableLayout>
+        <FrameLayout
+            android:layout_gravity="center"
+            android:layout_height="40dp"
+            android:layout_width="40dp">
+            <TextView
+                android:id="@+id/gps_group_size"
+                android:textSize="12sp"
+                android:layout_height="40dp"
+                android:layout_width="40dp"
+                android:gravity="center"
+                android:background="@drawable/circle_bg"/>
+        </FrameLayout>
+        <ImageButton
+            android:src="@drawable/ic_expand_more_grey600_36dp"
+            android:id="@+id/btn_group_indicator"
+            android:background="@null"
+            android:focusable="false"
+            android:contentDescription="@string/account_name"
+            android:layout_gravity="center"/>
     </TableRow>
 </TableLayout>

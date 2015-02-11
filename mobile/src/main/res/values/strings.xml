@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">GPSHandle Client</string>
-    <string name="title_real_time">Real time</string>
+    <string name="title_monitor">Monitor</string>
     <string name="title_historical">Historical</string>
     <string name="title_reporting">Reports</string>
     <string name="title_administration">Administration</string>
@@ -17,6 +17,7 @@
 
     <string name="title_activity_maps">V9 Tracking</string>
     <string name="subtitle_real_time">Group: </string>
+    <string name="subtitle_historical">Device: </string>
     <string name="updated_str">Updating ...</string>
     <string name="user_name">User Name</string>
     <string name="account_name">Account</string>
@@ -53,5 +54,7 @@
     <string name="company_address">No.1 Alley 49 Lane 28, Huynh Thuc Khang Street, Hanoi</string>
     <string name="company_tel">(+84) 046 686 5601</string>
     <string name="getting_group_device_list">Getting devices info</string>
+
+    <string name="partners">International Partners</string>
 
 </resources>

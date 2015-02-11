@@ -3,6 +3,7 @@
     tools:context=".MainActivity">
     <item android:id="@+id/action_list"
         android:title="@string/action_list_groups"
+        android:icon="@android:drawable/ic_menu_compass"
         android:showAsAction="withText|ifRoom" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"

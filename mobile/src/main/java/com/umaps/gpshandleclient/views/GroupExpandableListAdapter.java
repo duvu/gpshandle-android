@@ -1,10 +1,15 @@
 package com.umaps.gpshandleclient.views;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
+import android.widget.ExpandableListView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.umaps.gpshandleclient.R;
@@ -22,6 +27,12 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private ArrayList<Group> groups; //Header gpshandle_device_group
     private HashMap<String, ArrayList<Device>> devicesInGroup; //List of devices
+
+    private ExpandableListView expl;
+
+    public void setExpandableListView(ExpandableListView expandableListview){
+        expl = expandableListview;
+    }
 
     public GroupExpandableListAdapter(Context _context, ArrayList<Group> _groups, HashMap<String, ArrayList<Device>> _gDevices){
         context = _context;
@@ -78,10 +89,10 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
 
     //View - Most-Important
     @Override
-    public View getGroupView(int groupPosition, boolean isExpandable, View convertView, ViewGroup parent) {
+    public View getGroupView(final int groupPosition, boolean isExpandable, View convertView, ViewGroup parent) {
         if(convertView==null){
             LayoutInflater inflater = LayoutInflater.from(this.getContext());
-            convertView = inflater.inflate(R.layout.gpshandle_device_group, null);
+            convertView = inflater.inflate(R.layout.gps_device_group, null);
         }
         String groupID          = "";
         String groupDescription = "";
@@ -95,19 +106,28 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
             groupSize        = groups.get(groupPosition).getCount();
             countLive        = groups.get(groupPosition).getLive();
         }
-//        final TextView tvViewThis = (TextView) convertView.findViewById(R.id.listView_viewThis);
-//        tvViewThis.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                //--TODO: expand/collapse
-//                //--TODO: when click on this gpshandle_device_group, show map with all device in gpshandle_device_group
-//            }
-//        });
-
         TextView tvGrpID = (TextView) convertView.findViewById(R.id.listView_grpID);
         TextView tvGrpDesc = (TextView) convertView.findViewById(R.id.listView_grpDesc);
         tvGrpID.setText("["+groupID+"]");
         tvGrpDesc.setText(groupDescription);
+
+        //--set group_size
+        TextView tvGroupSize = (TextView) convertView.findViewById(R.id.gps_group_size);
+        tvGroupSize.setText(countLive+"/"+groupSize);
+
+        final ImageButton btnExpand = (ImageButton) convertView.findViewById(R.id.btn_group_indicator);
+        btnExpand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (expl.isGroupExpanded(groupPosition)){
+                    expl.collapseGroup(groupPosition);
+                    btnExpand.setImageResource(R.drawable.ic_expand_more_grey600_36dp);
+                }else {
+                    expl.expandGroup(groupPosition);
+                    btnExpand.setImageResource(R.drawable.ic_expand_less_grey600_36dp);
+                }
+            }
+        });
         return convertView;
     }
 
@@ -115,7 +135,7 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         if(convertView == null){
             LayoutInflater inflater = LayoutInflater.from(this.getContext());
-            convertView = inflater.inflate(R.layout.gpshandle_device, null);
+            convertView = inflater.inflate(R.layout.gps_device, null);
         }
         //-- deviceID and deviceDescription
         String deviceID     = "";

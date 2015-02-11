@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
 import com.umaps.gpshandleclient.settings.SessionState;
+import com.umaps.gpshandleclient.settings.Utilities;
 import com.umaps.gpshandleclient.util.Constants;
 
 import org.json.JSONException;
@@ -90,7 +91,7 @@ public class BaseActivity extends FragmentActivity {
     public final boolean okResult(JSONObject jsonObject){
         //-- Check return status first
         try {
-            JSONObject jsonStatus = jsonObject.getJSONObject(Constants.KEY_status);
+            JSONObject jsonStatus = jsonObject.getJSONObject(Utilities.KEY_STATUS);
             if (jsonStatus.getString(STATUS_CODE).equalsIgnoreCase(CODE_SUCCESSFUL)) return true;
             else return false;
         } catch (JSONException e) {
@@ -105,4 +106,5 @@ public class BaseActivity extends FragmentActivity {
     public final void launchActivity(){
 
     }
+
 }

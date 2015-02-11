@@ -30,9 +30,9 @@ public class Constants {
 
 
     public static final String FLD_inclTime         = "inclTime";
-    public static final String KEY_status           = "status";
+//    public static final String KEY_status           = "status";
 
-    public static final String KEY_RESULT = "results";
+//    public static final String KEY_RESULT = "results";
     public static final String KEY_fields           = "fields";
 
     public static final String KEY_dfields          = "dfields";

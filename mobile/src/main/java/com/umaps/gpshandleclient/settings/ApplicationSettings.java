@@ -6,26 +6,12 @@ import android.app.Application;
  * Created by vu@umaps.vn on 30/01/2015.
  */
 public class ApplicationSettings extends Application {
-    public static final String KEY_URL          = "keyURL";
-    public static final String KEY_PORT         = "keyPort";
-    public static final String KEY_ACCOUNT      = "keyAccount";
-    public static final String KEY_USER         = "keyUser";
-    public static final String KEY_PASSWORD     = "keyPassword";
-    public static final String KEY_LOCALE       = "keyLocale";
-
-    public static final String KEY_TOKEN        = "keyToken";
-    public static final String KEY_GPS_FILE     = "keyGpsFile";
-    public static final String KEY_FPS_DIR      = "keyGpsDir";
-
-    public static final String NULL_STRING      = "";
-
-    //-- User preferences
-
-
     private static String serverURL; //--Include port
     private static String mappingUrl;
     private static String reportingUrl;
     private static String administrationUrl;
+
+    private static long timeInterval = 20000;
 
     public static String getServerURL() {
         return serverURL;
@@ -60,5 +46,13 @@ public class ApplicationSettings extends Application {
 
     public static void setAdministrationUrl(String administrationUrl) {
         ApplicationSettings.administrationUrl = administrationUrl;
+    }
+
+    public static long getTimeInterval() {
+        return (timeInterval > 10000 ? timeInterval: 20000);
+    }
+
+    public static void setTimeInterval(long timeInterval) {
+        ApplicationSettings.timeInterval = timeInterval;
     }
 }
