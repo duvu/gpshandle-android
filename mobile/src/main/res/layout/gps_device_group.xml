@@ -2,20 +2,22 @@
 <TableLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:stretchColumns="1"
     android:paddingTop="0dip"
     android:descendantFocusability="blocksDescendants"
     android:layout_gravity="top">
     <TableRow>
         <ImageView
-            android:id="@+id/gpshandle_group_list_image"
-            android:layout_width="50dip"
-            android:layout_height="50dip"
+            android:id="@+id/group_list_image"
+            android:layout_width="30dip"
+            android:layout_height="30dip"
             android:layout_marginLeft="10dip"
             android:layout_marginStart="10dp"
+            android:layout_gravity="center_vertical"
             android:contentDescription="@string/account_name"/>
-        <TableLayout>
+        <TableLayout
+            android:stretchColumns="1">
             <TableRow>
                 <TextView
                     android:id="@+id/listView_grpDesc"
@@ -23,7 +25,8 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:textColor="@color/wallet_dim_foreground_inverse_disabled_holo_dark"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content">
                 </TextView>
             </TableRow>
@@ -35,7 +38,8 @@
                     android:layout_marginBottom="10dp"
                     android:textSize="12sp"
                     android:textStyle="italic"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content">
                 </TextView>
             </TableRow>
@@ -50,6 +54,7 @@
                 android:layout_height="40dp"
                 android:layout_width="40dp"
                 android:gravity="center"
+                android:textColor="@android:color/white"
                 android:background="@drawable/circle_bg"/>
         </FrameLayout>
         <ImageButton

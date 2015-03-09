@@ -149,7 +149,6 @@ public class GroupListFragment extends DialogFragment{
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
-
         return dialog;
     }
 
@@ -165,10 +164,11 @@ public class GroupListFragment extends DialogFragment{
             e.printStackTrace();
         }
         final GroupExpandableListAdapter groupListAdapter =
-                new GroupExpandableListAdapter(getActivity().getApplicationContext(), groupsList, devicesInGroup);
-        groupListAdapter.setExpandableListView(expandableGroupList);
-        expandableGroupList.setAdapter(groupListAdapter);
-
+                new GroupExpandableListAdapter(getActivity(), groupsList, devicesInGroup);
+        if (groupListAdapter != null){
+            groupListAdapter.setExpandableListView(expandableGroupList);
+            expandableGroupList.setAdapter(groupListAdapter);
+        }
 
         //--setOnclickListener
         expandableGroupList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -176,7 +176,7 @@ public class GroupListFragment extends DialogFragment{
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 Group group = (Group)groupListAdapter.getGroup(groupPosition);
                 Log.i("ABC", "OnGroupClicked!+" + group.getGroupId());
-                mCallback.onGroupItemSelected(group.getGroupId());
+                mCallback.onGroupItemSelected(group.getGroupId(), group.getDescription());
                 getDialog().dismiss();
                 return true;
             }
@@ -185,7 +185,9 @@ public class GroupListFragment extends DialogFragment{
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 Log.i(TAG, "onChildClick");
-                //-- move to this devices
+                //-- Move to latest position of this devices
+                Device device = (Device)groupListAdapter.getChild(groupPosition, childPosition);
+                mCallback.onChildItemSelected(device.getDeviceID(), device.getDescription());
                 getDialog().dismiss();
                 return true;
             }
@@ -260,6 +262,7 @@ public class GroupListFragment extends DialogFragment{
     }
 
     public interface GroupListCallback{
-        void onGroupItemSelected(String groupId);
+        void onGroupItemSelected(String groupId, String desc);
+        void onChildItemSelected(String deviceId, String desc);
     }
 }

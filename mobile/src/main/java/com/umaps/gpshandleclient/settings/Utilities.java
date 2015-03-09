@@ -45,26 +45,7 @@ public class Utilities {
     public static void populateSettings(Context context){
         //-- populate application-settings
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
         ApplicationSettings.setServerURL(prefs.getString(SERVER_URL, ""));
-
-//        SessionState.setAclAdminAccount(prefs.getInt(ACL_ADMIN_ACCOUNT, 0));
-//        SessionState.setAclAdminDevice(prefs.getInt(ACL_ADMIN_DEVICE, 0));
-//        SessionState.setAclAdminDriver(prefs.getInt(ACL_ADMIN_DRIVER, 0));
-//        SessionState.setAclAdminGeozone(prefs.getInt(ACL_ADMIN_GEOZONE, 0));
-//        SessionState.setAclAdminGroup(prefs.getInt(ACL_ADMIN_GROUP, 0));
-//        SessionState.setAclAdminRole(prefs.getInt(ACL_ADMIN_ROLE, 0));
-//        SessionState.setAclAdminRule(prefs.getInt(ACL_ADMIN_RULE, 0));
-//        SessionState.setAclAdminUser(prefs.getInt(ACL_ADMIN_USER, 0));
-//        SessionState.setAclAdminUserManager(prefs.getInt(ACL_ADMIN_USER_MANAGER, 0));
-//
-//        SessionState.setAclMapHistory(prefs.getInt(ACL_MAP_HISTORY, 0));
-//        SessionState.setAclMapMonitor(prefs.getInt(ACL_MAP_MONITOR, 1));
-//        SessionState.setAclReportDetail(prefs.getInt(ACL_REPORT_DETAIL, 0));
-//        SessionState.setAclReportGeozone(prefs.getInt(ACL_REPORT_GEOZONE, 0));
-//        SessionState.setAclReportParking(prefs.getInt(ACL_REPORT_PARKING, 0));
-//        SessionState.setAclReportSummary(prefs.getInt(ACL_REPORT_SUMMARY, 0));
-
 
         SessionState.setIsFleet(prefs.getBoolean(IS_FLEET, true));
         SessionState.setSubTitle(prefs.getString(SUB_TITLE, ""));
@@ -76,6 +57,21 @@ public class Utilities {
         SessionState.setSelDevice(prefs.getString(SEL_DEVICE, ""));
         SessionState.setSelGroup(prefs.getString(SEL_GROUP, ""));
     }
+    public static void storeSettings(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putString(SEL_GROUP, SessionState.getSelGroup());
+        editor.putString(SEL_DEVICE, SessionState.getSelDevice());
+        editor.putString(TOKEN, SessionState.getToken());
+        editor.putString(LOCALE, SessionState.getLocale());
+        editor.putString(PASSWORD, SessionState.getPassword());
+        editor.putString(USER_ID, SessionState.getUserID());
+        editor.putString(ACCOUNT_ID, SessionState.getAccountID());
+
+        editor.commit();
+    }
+
 
     private static ProgressDialog pd;
     public static void ShowProgress(Context ctx, String title, String message) {

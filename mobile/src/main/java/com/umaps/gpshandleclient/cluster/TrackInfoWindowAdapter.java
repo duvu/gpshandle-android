@@ -121,7 +121,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         final String id           = jsonObject.getString(MapData.Point.MD_ID);
         String vin          = jsonObject.getString(MapData.Point.MD_VIN);
-        String desc         = jsonObject.getString(MapData.Point.MD_DESC);
+        final String desc         = jsonObject.getString(MapData.Point.MD_DESC);
         long epoch          = jsonObject.getLong(MapData.Point.MD_EPOCH);
         String status       = jsonObject.getString(MapData.Point.MD_STATUS);
         String latLon       = latitude+"/"+longitude;
@@ -182,7 +182,8 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                 //--load 30 min historical data
                 long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
                 long timeFrom = timeTo - 30 * 60;
-                mCallback.onTrackInfoWindowButton(id, timeFrom, timeTo);
+
+                mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
             }
         });
         //--
@@ -199,7 +200,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                         Log.i(TAG, "got clicked on btn60min");
                         long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
                         long timeFrom = timeTo - 60 * 60;
-                        mCallback.onTrackInfoWindowButton(id, timeFrom, timeTo);
+                        mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
                     }
                 }
         );
@@ -215,7 +216,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                         Log.i(TAG, "got clicked on btn6h");
                         long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
                         long timeFrom = timeTo - 6 * 60 * 60;
-                        mCallback.onTrackInfoWindowButton(id, timeFrom, timeTo);
+                        mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
                     }
                 }
         );
@@ -231,7 +232,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                         Log.i(TAG, "got clicked on btn12h");
                         long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
                         long timeFrom = timeTo - 12 * 60 * 60;
-                        mCallback.onTrackInfoWindowButton(id, timeFrom, timeTo);
+                        mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
                     }
                 }
         );
@@ -249,6 +250,6 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     }
 
     public interface TrackInfoWindowCallback{
-        public void onTrackInfoWindowButton(String deviceId, long from, long to);
+        public void onTrackInfoWindowButton(String deviceId, String desc, long from, long to);
     }
 }

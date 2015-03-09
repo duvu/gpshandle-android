@@ -3,7 +3,6 @@ package com.umaps.gpshandleclient.fragment;
 
 import android.app.Activity;
 import android.app.ActionBar;
-import android.content.Intent;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -26,8 +25,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.activities.SettingsActivity;
-import com.umaps.gpshandleclient.settings.SessionState;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -104,7 +101,6 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.id.text1,
                 new String[]{
                         getString(R.string.title_monitor),
-//                        getString(R.string.title_historical),
                         getString(R.string.title_reporting),
                         getString(R.string.title_administration),
                 }));
@@ -271,13 +267,8 @@ public class NavigationDrawerFragment extends Fragment {
             fragmentTransaction.remove(prev);
         }
         fragmentTransaction.addToBackStack(null);
-//        if (SessionState.isIsFleet()) {
             DialogFragment newFragment = GroupListFragment.newInstance(R.string.application_loading);
             newFragment.show(fragmentTransaction, "dialog");
-//        } else {
-//            DialogFragment newFragment = DeviceListDialogFragment.newInstance(R.string.application_loading);
-//            newFragment.show(fragmentTransaction, "dialog");
-//        }
     }
 
     /**

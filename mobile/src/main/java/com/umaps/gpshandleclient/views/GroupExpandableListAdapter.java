@@ -106,6 +106,10 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
             groupSize        = groups.get(groupPosition).getCount();
             countLive        = groups.get(groupPosition).getLive();
         }
+
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.group_list_image);
+        imageView.setImageResource(R.drawable.ic_directions_car_group_grey600_36dp);
+
         TextView tvGrpID = (TextView) convertView.findViewById(R.id.listView_grpID);
         TextView tvGrpDesc = (TextView) convertView.findViewById(R.id.listView_grpDesc);
         tvGrpID.setText("["+groupID+"]");
@@ -152,10 +156,23 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
             isLive = device.isLive();
             lastEventTime = device.getLastEventTime();
         }
+
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.device_image);
+        imageView.setImageResource(R.drawable.ic_directions_car_grey600_36dp);
+
         TextView deviceIDTextView = (TextView) convertView.findViewById(R.id.listView_deviceID);
         TextView deviceDescriptionTextView = (TextView) convertView.findViewById(R.id.listView_deviceDesc);
         deviceIDTextView.setText(deviceID);
         deviceDescriptionTextView.setText(description);
+        CircleImageView circleImageView = (CircleImageView) convertView.findViewById(R.id.device_live_state);
+        circleImageView.setBorderWidth(1);
+        if (isLive) {
+            circleImageView.setImageResource(R.drawable.device_living);
+        } else {
+            circleImageView.setImageResource(R.drawable.device_stopped);
+        }
+//        circleImageView.addShadow();
+
         return convertView;
     }
 

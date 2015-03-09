@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+100% — FF   95% — F2    90% — E6    85% — D9
+80% — CC    75% — BF    70% — B3    65% — A6
+60% — 99    55% — 8C    50% — 80    45% — 73
+40% — 66    35% — 59    30% — 4D    25% — 40
+20% — 33    15% — 26    10% — 1A    5% — 0D
+0% — 00
+-->
 <resources>
-    <color name="color_gps_text">#5e5e5e</color>
-    <color name="group_size_background">#f38383</color>
+    <color name="group_size_background">#cc44b3f3</color>
+    <color name="textColor">#ff1e1e1e</color>
+    <color name="white_opacity_80">#CCFFFFFF</color>
+    <color name="white_opacity_95">#F2FFFFFF</color>
+    <color name="group_child_background">#ffe3e3e3</color>
 </resources>

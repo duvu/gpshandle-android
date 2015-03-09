@@ -4,6 +4,7 @@ import android.app.ActionBar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.Menu;
@@ -12,26 +13,30 @@ import android.support.v4.widget.DrawerLayout;
 
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.cluster.TrackInfoWindowAdapter;
-import com.umaps.gpshandleclient.fragment.DeviceListDialogFragment;
 import com.umaps.gpshandleclient.fragment.GroupListFragment;
+import com.umaps.gpshandleclient.fragment.SettingsFragment;
 import com.umaps.gpshandleclient.settings.SessionState;
 import com.umaps.gpshandleclient.fragment.AdministrationFragment;
-import com.umaps.gpshandleclient.fragment.RealTimeFragment;
+import com.umaps.gpshandleclient.fragment.MapMonitoringFragment;
 import com.umaps.gpshandleclient.fragment.NavigationDrawerFragment;
 import com.umaps.gpshandleclient.fragment.ReportingFragment;
+import com.umaps.gpshandleclient.settings.Utilities;
 
 import org.json.JSONException;
 
+import java.util.Calendar;
+import java.util.Stack;
 
-public class MainActivity extends BaseActivity
+
+public class MainActivity extends FragmentActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-        GroupListFragment.GroupListCallback, DeviceListDialogFragment.DeviceListCallback,
-//        RealTimeFragment.HistoricalCallback,
+        GroupListFragment.GroupListCallback,
         TrackInfoWindowAdapter.TrackInfoWindowCallback
 {
     private static final String TAG = "MainActivity";
     String mTitle;
     private NavigationDrawerFragment mNavigationDrawerFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,20 +56,23 @@ public class MainActivity extends BaseActivity
             case 0:
                 //--set Title for Action
                 SessionState.setIsFleet(true);
+                restoreActionBar(true, SessionState.getSelGroup());
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, RealTimeFragment.newInstance())
+                        .replace(R.id.container, MapMonitoringFragment.newInstance())
                         .addToBackStack("realTime").commit();
 
                 break;
             case 1:
-            fragmentManager.beginTransaction()
-                        .replace(R.id.container, ReportingFragment.newInstance())
-                        .addToBackStack("report").commit();
-            break;
-            case 2:
+                //TODO
                 fragmentManager.beginTransaction()
+                            .replace(R.id.container, ReportingFragment.newInstance())
+                            .addToBackStack("report").commit();
+                break;
+            case 2:
+                //TODO
+                /*fragmentManager.beginTransaction()
                         .replace(R.id.container, AdministrationFragment.newInstance())
-                        .addToBackStack("administration").commit();
+                        .addToBackStack("administration").commit();*/
                 break;
         }
     }
@@ -73,31 +81,25 @@ public class MainActivity extends BaseActivity
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_monitor);
-                SessionState.setSubTitle(getString(R.string.subtitle_real_time));
                 break;
             case 2:
-                mTitle = getString(R.string.title_historical);
-                SessionState.setSubTitle(getString(R.string.subtitle_historical));
-                break;
-            case 3:
                 mTitle = getString(R.string.title_reporting);
                 break;
-            case 4:
+            case 3:
                 mTitle = getString(R.string.title_administration);
+                break;
         }
     }
 
-    public void restoreActionBar() {
+    public void restoreActionBar(boolean isFleet, String desc) {
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
-        if (SessionState.isIsFleet()) {
-            actionBar.setSubtitle(SessionState.getSubTitle()
-                    + ((SessionState.getSelGroup() != null) ? SessionState.getSelGroup() : "All"));
+        if (isFleet) {
+            actionBar.setSubtitle(getString(R.string.subtitle_group) + desc);
         } else {
-            actionBar.setSubtitle(SessionState.getSubTitle()
-                    + ((SessionState.getSelDevice() != null) ? SessionState.getSelDevice() : ""));
+            actionBar.setSubtitle(getString(R.string.subtitle_device) + desc);
         }
     }
 
@@ -106,14 +108,8 @@ public class MainActivity extends BaseActivity
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
             getMenuInflater().inflate(R.menu.main, menu);
             MenuItem actionItem = menu.findItem(R.id.action_list);
-            if (SessionState.isIsFleet()) {
-                actionItem.setTitle(R.string.action_list_groups);
-            } else if (!SessionState.isIsFleet()){
-                actionItem.setTitle(R.string.action_list_devices);
-            }
-//            MenuItem settingItem = menu.findItem(R.id.action_settings);
-
-            restoreActionBar();
+            actionItem.setTitle(R.string.action_list_groups);
+            //restoreActionBar();
             return true;
         }
         return super.onCreateOptionsMenu(menu);
@@ -123,7 +119,25 @@ public class MainActivity extends BaseActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+            //--TODO
+            /*FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, new SettingsFragment())
+                    .addToBackStack("realTime").commit();*/
+            return true;
+        }
+        if (id == R.id.action_logout){
+            Utilities.storeSettings(getApplicationContext());
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.action_exit){
+            Utilities.storeSettings(getApplicationContext());
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("EXIT", true);
             startActivity(intent);
             return true;
         }
@@ -131,67 +145,87 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public void onGroupItemSelected(String groupId) {
-        Log.i("ABC", "onGroupItemSelected" + groupId);
+    public void onGroupItemSelected(String groupId, String desc) {
+        Log.i(TAG, "onGroupItemSelected" + groupId);
         SessionState.setSelGroup(groupId);
-        restoreActionBar();
+        restoreActionBar(true, desc);
         //Update RealTimeFragment here
-        RealTimeFragment realTimeFragment = null;
+        MapMonitoringFragment mapMonitoringFragment = null;
         try {
-            realTimeFragment = (RealTimeFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.container);
-        } catch (ClassCastException e){
-            Log.e("ABC", "cannot cast RealTimeFragment");
-        }
-
-        if (realTimeFragment!=null){
-            realTimeFragment.startRealTimeTracking();
-        } else {
-            Log.e("ABC", "___onGroupItemSelected");
-        }
-    }
-
-    @Override
-    public void onDeviceItemSelected(String deviceID) {
-        Log.i("ABC", "onDeviceItemSelected" + deviceID);
-//        SessionState.setSelDevice(deviceID);
-//        restoreActionBar();
-//        //Update RealTimeFragment here
-//        HistoricalFragment historicalFragment = (HistoricalFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.container);
-//
-//        if (historicalFragment!=null){
-//            try {
-//                historicalFragment.startTracking();
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            Log.e("ABC", "___onDeviceItemSelected");
-//        }
-    }
-    @Override
-    public void onBackPressed(){
-        super.onBackPressed();
-    }
-
-    @Override
-    public void onTrackInfoWindowButton(String deviceId, long from, long to) {
-        Log.i(TAG, "onTrackInfoWindowButton");
-        restoreActionBar();
-        //Update RealTimeFragment here
-        SessionState.setIsFleet(false);
-        RealTimeFragment realTimeFragment = null;
-        try {
-            realTimeFragment = (RealTimeFragment) getSupportFragmentManager()
+            mapMonitoringFragment = (MapMonitoringFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.container);
         } catch (ClassCastException e){
             Log.e(TAG, "cannot cast RealTimeFragment");
         }
 
-        if (realTimeFragment!=null){
+        if (mapMonitoringFragment !=null){
+            mapMonitoringFragment.startRealTimeTracking();
+        } else {
+            Log.e(TAG, "___onGroupItemSelected");
+        }
+    }
+
+    @Override
+    public void onChildItemSelected(String deviceId, String desc) {
+        Log.i(TAG, "onChildItemSelected" + deviceId);
+        SessionState.setSelDevice(deviceId);
+        restoreActionBar(false, desc);
+
+        MapMonitoringFragment mapMonitoringFragment = null;
+        try {
+            mapMonitoringFragment = (MapMonitoringFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.container);
+        } catch (ClassCastException e){
+            Log.e(TAG, "cannot cast RealTimeFragment");
+        }
+        long to = Calendar.getInstance().getTimeInMillis()/1000;
+        long from = to - 60 * 60;   //1 hour
+        if (mapMonitoringFragment !=null){
             try {
-                realTimeFragment.startHistoricalTracking(deviceId, from, to);
+                mapMonitoringFragment.startHistoricalTracking(deviceId, from, to);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.e(TAG, "___onGroupItemSelected");
+        }
+    }
+
+    private Stack<String> forBackState = new Stack<>();
+    @Override
+    public void onBackPressed(){
+        Log.i(TAG, "onBackPressed");
+        if (forBackState.empty()){
+            super.onBackPressed();
+            return;
+        }
+        forBackState.pop();
+        if (getSupportFragmentManager()
+                .findFragmentById(R.id.container) instanceof MapMonitoringFragment){
+            MapMonitoringFragment mapMonitoringFragment = (MapMonitoringFragment) getSupportFragmentManager().findFragmentById(R.id.container);
+            mapMonitoringFragment.startRealTimeTracking();
+            return;
+        }
+    }
+
+    @Override
+    public void onTrackInfoWindowButton(String deviceId, String desc, long from, long to) {
+        Log.i(TAG, "onTrackInfoWindowButton");
+        forBackState.push("ForBackState");
+        SessionState.setIsFleet(false);
+        SessionState.setSelDevice(deviceId);
+        restoreActionBar(false, desc);
+        MapMonitoringFragment mapMonitoringFragment = null;
+        try {
+            mapMonitoringFragment = (MapMonitoringFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.container);
+        } catch (ClassCastException e){
+            Log.e(TAG, "cannot cast RealTimeFragment");
+        }
+
+        if (mapMonitoringFragment !=null){
+            try {
+                mapMonitoringFragment.startHistoricalTracking(deviceId, from, to);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

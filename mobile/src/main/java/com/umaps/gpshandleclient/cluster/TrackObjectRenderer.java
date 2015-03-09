@@ -3,12 +3,14 @@ package com.umaps.gpshandleclient.cluster;
 import android.content.Context;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.umaps.gpshandleclient.model.MapData;
 import com.umaps.gpshandleclient.model.TrackObject;
+import com.umaps.gpshandleclient.util.MarkerTool;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +21,8 @@ import org.json.JSONObject;
  */
 public class TrackObjectRenderer extends DefaultClusterRenderer<TrackObject> {
     private static final int MIN_ITEMS_RENDER   = 3;
+
+    private Context context;
 //    private IconGenerator mIconGenerator;
 //    private IconGenerator mClusterIconGenerator;
 //    private ImageView mImageView;
@@ -27,7 +31,7 @@ public class TrackObjectRenderer extends DefaultClusterRenderer<TrackObject> {
 
     public TrackObjectRenderer(Context context, GoogleMap map, ClusterManager<TrackObject> clusterManager) {
         super(context, map, clusterManager);
-
+        this.context = context;
 //        View multiObject = LayoutInflater.from(context).inflate(R.layout.cluster_group_popup, null);
 //        mClusterIconGenerator = new IconGenerator(context);
 //        mClusterIconGenerator.setContentView(multiObject);
@@ -47,6 +51,16 @@ public class TrackObjectRenderer extends DefaultClusterRenderer<TrackObject> {
             e.printStackTrace();
         }
         options.snippet(snippet.toString());
+        options.icon(
+            BitmapDescriptorFactory.fromBitmap(
+                MarkerTool.getMarker(
+                    this.context,
+                    trackObject.getPointData().getDeviceDescription(),
+                    trackObject.getPointData().getSpeedKPH(),
+                    trackObject.getPointData().getHeading()
+                )
+            )
+        );
         super.onBeforeClusterItemRendered(trackObject, options);
     }
     @Override

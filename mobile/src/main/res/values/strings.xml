@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">GPSHandle Client</string>
+    <string name="app_name">GPSHandle</string>
     <string name="title_monitor">Monitor</string>
     <string name="title_historical">Historical</string>
     <string name="title_reporting">Reports</string>
@@ -14,10 +14,10 @@
 
     <string name="application_loading">Loading ...</string>
 
+    <string name="subtitle_group">G: </string>
+    <string name="subtitle_device">D: </string>
+    <string name="group_all">All</string>
 
-    <string name="title_activity_maps">V9 Tracking</string>
-    <string name="subtitle_real_time">Group: </string>
-    <string name="subtitle_historical">Device: </string>
     <string name="updated_str">Updating ...</string>
     <string name="user_name">User Name</string>
     <string name="account_name">Account</string>
@@ -56,5 +56,17 @@
     <string name="getting_group_device_list">Getting devices info</string>
 
     <string name="partners">International Partners</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_exit">Exit</string>
+
+    <string name="historical_30m">30m</string>
+    <string name="historical_1h">1h</string>
+    <string name="historical_6h">6h</string>
+    <string name="historical_12h">12h</string>
+    <string name="device_description">Description</string>
+    <string name="device_position">Position</string>
+    <string name="device_speedKph">SpeedKPH</string>
+    <string name="device_odometer">Odometer</string>
+    <string name="device_address">Address</string>
 
 </resources>
