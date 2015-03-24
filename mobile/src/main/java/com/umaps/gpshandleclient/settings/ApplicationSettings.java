@@ -9,6 +9,7 @@ public class ApplicationSettings extends Application {
     private static String serverURL; //--Include port
     private static String mappingUrl;
     private static String reportingUrl;
+    private static String chartUrl;
     private static String administrationUrl;
 
     private static long timeInterval = 20000;
@@ -22,6 +23,7 @@ public class ApplicationSettings extends Application {
         setMappingUrl(ApplicationSettings.serverURL+"/monitor");
         setAdministrationUrl(ApplicationSettings.serverURL+"/admin");
         setReportingUrl(ApplicationSettings.serverURL+"/report");
+        setChartUrl(ApplicationSettings.serverURL+"/chart");
     }
 
     public static String getMappingUrl() {
@@ -38,6 +40,13 @@ public class ApplicationSettings extends Application {
 
     public static void setReportingUrl(String reportingUrl) {
         ApplicationSettings.reportingUrl = reportingUrl;
+    }
+
+    public static String getChartUrl(){
+        return chartUrl;
+    }
+    public static void setChartUrl(String chartUrl){
+        ApplicationSettings.chartUrl = chartUrl;
     }
 
     public static String getAdministrationUrl() {

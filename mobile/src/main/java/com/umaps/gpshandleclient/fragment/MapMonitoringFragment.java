@@ -39,9 +39,12 @@ import com.umaps.gpshandleclient.util.HTTPRequestQueue;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.views.CustomMapLayout;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -66,10 +69,11 @@ public class MapMonitoringFragment extends Fragment {
     public static MapMonitoringFragment newInstance(){
         return new MapMonitoringFragment();
     }
-    public MapMonitoringFragment(){
-    }
+    public MapMonitoringFragment(){}
+
     @Override
     public void onAttach(Activity activity) {
+        //-- getGroup
         super.onAttach(activity);
     }
     @Override
@@ -179,19 +183,19 @@ public class MapMonitoringFragment extends Fragment {
     }
     private void getRunInterval(String groupId) throws JSONException {
         JSONObject jsonParamsObject = new JSONObject();
-        jsonParamsObject.put(Utilities.FLD_groupID, groupId);
-        jsonParamsObject.put(Utilities.FLD_status, null);
-        jsonParamsObject.put(Utilities.FLD_inclZones, false);
-        jsonParamsObject.put(Utilities.FLD_inclDebug, false);
-        jsonParamsObject.put(Utilities.FLD_inclPOI, false);
-        jsonParamsObject.put(Utilities.FLD_inclTime, false);
+        jsonParamsObject.put(StringTools.FLD_groupID, groupId);
+        jsonParamsObject.put(StringTools.FLD_status, null);
+        jsonParamsObject.put(StringTools.FLD_inclZones, false);
+        jsonParamsObject.put(StringTools.FLD_inclDebug, false);
+        jsonParamsObject.put(StringTools.FLD_inclPOI, false);
+        jsonParamsObject.put(StringTools.FLD_inclTime, false);
         //--manage ACL
         if (SessionState.getAclMapMonitor()<1){
             return;
         }
 
-        JSONObject jsonRequest = Utilities.createRequest(
-                Utilities.CMD_GET_MAP_FLEET,
+        JSONObject jsonRequest = StringTools.createRequest(
+                StringTools.CMD_GET_MAP_FLEET,
                 Locale.getDefault().getLanguage(),
                 jsonParamsObject);
 
@@ -204,7 +208,7 @@ public class MapMonitoringFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         JSONObject jsonObject = null;
                         try {
-                            jsonObject = response.getJSONObject(Utilities.KEY_RESULTS);
+                            jsonObject = response.getJSONObject(StringTools.KEY_RESULTS);
                         } catch (JSONException e) {
                             e.printStackTrace();
                             return;
@@ -291,16 +295,16 @@ public class MapMonitoringFragment extends Fragment {
         SessionState.setIsFleet(false);
         setUpMapIfNeeded();
         JSONObject jsonParamsObject = new JSONObject();
-        jsonParamsObject.put(Utilities.FLD_deviceID, deviceId);
-        jsonParamsObject.put(Utilities.FLD_status, null);
-        jsonParamsObject.put(Utilities.FLD_timeFrom, from/*1421127296*/);
-        jsonParamsObject.put(Utilities.FLD_timeTo,   to/*1421137296*/);
-        jsonParamsObject.put(Utilities.FLD_inclZones, false);
-        jsonParamsObject.put(Utilities.FLD_inclDebug, false);
-        jsonParamsObject.put(Utilities.FLD_inclPOI, false);
-        jsonParamsObject.put(Utilities.FLD_inclTime, false);
+        jsonParamsObject.put(StringTools.FLD_deviceID, deviceId);
+        jsonParamsObject.put(StringTools.FLD_status, null);
+        jsonParamsObject.put(StringTools.FLD_timeFrom, from/*1421127296*/);
+        jsonParamsObject.put(StringTools.FLD_timeTo,   to/*1421137296*/);
+        jsonParamsObject.put(StringTools.FLD_inclZones, false);
+        jsonParamsObject.put(StringTools.FLD_inclDebug, false);
+        jsonParamsObject.put(StringTools.FLD_inclPOI, false);
+        jsonParamsObject.put(StringTools.FLD_inclTime, false);
         //get historical data here
-        JSONObject jsonRequest = Utilities.createRequest(Utilities.CMD_GET_MAP_DEVICE,
+        JSONObject jsonRequest = StringTools.createRequest(StringTools.CMD_GET_MAP_DEVICE,
                 Locale.getDefault().getLanguage(),
                 jsonParamsObject);
 
@@ -314,7 +318,7 @@ public class MapMonitoringFragment extends Fragment {
                         Log.i(TAG, response.toString());
                         JSONObject jsonObject;
                         try {
-                            jsonObject = response.getJSONObject(Utilities.KEY_RESULTS);
+                            jsonObject = response.getJSONObject(StringTools.KEY_RESULTS);
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Utilities.HideProgress();

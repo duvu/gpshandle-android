@@ -8,8 +8,9 @@ import java.util.Calendar;
 public class Device {
     private String deviceID;
     private String description;
+    private String displayName;
     private String icon;
-//    private String address;
+    private boolean isActive;
     private boolean isLive = true;
     private long   lastEventTime;
 
@@ -34,6 +35,13 @@ public class Device {
         this.deviceID = deviceID;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
     public String getDescription() {
         return description;
     }
@@ -66,4 +74,10 @@ public class Device {
         this.lastEventTime = lastEventTime;
     }
 
+    public boolean isActive(){
+        return isActive;
+    }
+    public void setActive(boolean active){
+        this.isActive = active;
+    }
 }

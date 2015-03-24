@@ -1,6 +1,7 @@
 package com.umaps.gpshandleclient.cluster;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,17 +33,18 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     Context context;
     LayoutInflater inflater = null;
-    IconGenerator iconFactory = null;
+//    IconGenerator iconFactory = null;
     CustomMapLayout mapLayout = null;
     Marker marker;
-
+    Typeface icoMoon = null;
 
     public TrackInfoWindowAdapter(Context _context, CustomMapLayout customMapLayout){
         context = _context;
         mCallback = (MainActivity)_context;
         mapLayout = customMapLayout;
         inflater = (LayoutInflater.from(_context));
-        iconFactory = new IconGenerator(_context);
+//        iconFactory = new IconGenerator(_context);
+        icoMoon = Typeface.createFromAsset(_context.getAssets(), "icomoon.ttf");
     }
     public TrackInfoWindowAdapter(Context _context){
         context = _context;
@@ -52,7 +54,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             Log.e(TAG, "Cannot cast to MainActivity");
         }
         inflater = (LayoutInflater.from(_context));
-        iconFactory = new IconGenerator(_context);
+//        iconFactory = new IconGenerator(_context);
     }
 
     @Override
@@ -119,9 +121,9 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         double latitude     = jsonObject.getDouble(MapData.Point.MD_LATITUDE);
         double longitude    = jsonObject.getDouble(MapData.Point.MD_LONGITUDE);
 
-        final String id           = jsonObject.getString(MapData.Point.MD_ID);
+        final String id     = jsonObject.getString(MapData.Point.MD_ID);
         String vin          = jsonObject.getString(MapData.Point.MD_VIN);
-        final String desc         = jsonObject.getString(MapData.Point.MD_DESC);
+        final String desc   = jsonObject.getString(MapData.Point.MD_DESC);
         long epoch          = jsonObject.getLong(MapData.Point.MD_EPOCH);
         String status       = jsonObject.getString(MapData.Point.MD_STATUS);
         String latLon       = latitude+"/"+longitude;
@@ -137,15 +139,51 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         String gpIo         = jsonObject.getString(MapData.Point.MD_GP_IO);
         String address      = jsonObject.getString(MapData.Point.MD_ADDRESS);
 
-        /*TextView tID = (TextView) view.findViewById(R.id.tID);
-        tID.setText(R.string.tID);
-        TextView cID = (TextView) view.findViewById(R.id.cID);
-        cID.setText(id);*/
+        double batteryLevel = jsonObject.getDouble(MapData.Point.MD_BATTERY_LEVEL);
+        double signalStrength = jsonObject.getDouble(MapData.Point.MD_SIGNAL_STRENGTH);
 
         TextView tDesc = (TextView) view.findViewById(R.id.tDesc);
         tDesc.setText(R.string.tDesc);
         TextView cDesc = (TextView) view.findViewById(R.id.cDesc);
         cDesc.setText(desc);
+
+        TextView icDeviceStatus     = (TextView) view.findViewById(R.id.device_status);
+        TextView icDeviceSatellite  = (TextView) view.findViewById(R.id.device_satellite);
+        TextView icDeviceBattery    = (TextView) view.findViewById(R.id.device_battery);
+        TextView icDeviceBatteryText= (TextView) view.findViewById(R.id.device_battery_text);
+        TextView icDeviceGPRS       = (TextView) view.findViewById(R.id.device_gprs_ssi);
+        icDeviceStatus.setTypeface(icoMoon);
+        icDeviceSatellite.setTypeface(icoMoon);
+        icDeviceBattery.setTypeface(icoMoon);
+        icDeviceGPRS.setTypeface(icoMoon);
+        icDeviceStatus.setText(String.valueOf((char)0xf111));
+        long currentTimestamp = Calendar.getInstance().getTimeInMillis()/1000;
+        if (((currentTimestamp - epoch) > 300)&&((currentTimestamp - epoch) < 1800)){
+            icDeviceStatus.setTextColor(context.getResources().getColor(R.color.yellow));
+        } else if ((currentTimestamp - epoch) > 1800){
+            icDeviceStatus.setTextColor(context.getResources().getColor(R.color.red));
+        }
+        icDeviceSatellite.setText(String.valueOf((char)0xe600));
+        if (satCount < 4){
+            icDeviceSatellite.setTextColor(context.getResources().getColor(R.color.red));
+        } else if (satCount <=7){
+            icDeviceSatellite.setTextColor(context.getResources().getColor(R.color.yellow));
+        }
+        icDeviceBattery.setText(String.valueOf((char)0xe64c));
+        icDeviceBatteryText.setText(String.format("%1$,.0f", batteryLevel*100)+"%");
+        if (batteryLevel < 0.2){
+            icDeviceBattery.setTextColor(context.getResources().getColor(R.color.red));
+            icDeviceBatteryText.setTextColor(context.getResources().getColor(R.color.red));
+        } else if (batteryLevel < 0.7){
+            icDeviceBattery.setTextColor(context.getResources().getColor(R.color.yellow));
+            icDeviceBatteryText.setTextColor(context.getResources().getColor(R.color.yellow));
+        }
+        icDeviceGPRS.setText(String.valueOf((char)0xe657));
+        if (signalStrength < 0.2){
+            icDeviceGPRS.setTextColor(context.getResources().getColor(R.color.red));
+        } else if (signalStrength < 0.7){
+            icDeviceGPRS.setTextColor(context.getResources().getColor(R.color.yellow));
+        }
 
         TextView titlePosition = (TextView) view.findViewById(R.id.titlePosition);
         titlePosition.setText(R.string.title_position);

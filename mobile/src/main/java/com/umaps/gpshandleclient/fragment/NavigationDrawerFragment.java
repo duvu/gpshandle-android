@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.umaps.gpshandleclient.R;
+import com.umaps.gpshandleclient.settings.Utilities;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -32,7 +33,7 @@ import com.umaps.gpshandleclient.R;
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
 public class NavigationDrawerFragment extends Fragment {
-    private static final String TAG = "NavigationDrawerFragment";
+    private static final String TAG = "NavigationFragment";
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
     private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
     private NavigationDrawerCallbacks mCallbacks;
@@ -101,8 +102,8 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.id.text1,
                 new String[]{
                         getString(R.string.title_monitor),
-                        getString(R.string.title_reporting),
-                        getString(R.string.title_administration),
+                        getString(R.string.title_report),
+//                        getString(R.string.title_administration),
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
@@ -237,6 +238,7 @@ public class NavigationDrawerFragment extends Fragment {
         Log.i(TAG, "Click on action settings");
 
         if (item.getItemId() == R.id.action_list) {
+            Utilities.ShowProgress(getActivity(), "", getString(R.string.application_loading));
             showDialogFragment();
             return true;
         }

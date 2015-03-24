@@ -1,6 +1,7 @@
 package com.umaps.gpshandleclient.activities;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -16,13 +18,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.model.ServerInfo;
 import com.umaps.gpshandleclient.settings.ApplicationSettings;
 import com.umaps.gpshandleclient.settings.SessionState;
 import com.umaps.gpshandleclient.settings.Utilities;
 import com.umaps.gpshandleclient.util.HTTPRequestQueue;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpshandleclient.views.ServerInfoSpinnerAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +36,7 @@ import java.util.Locale;
  */
 public class LoginActivity extends FragmentActivity {
     private static final String TAG = "LoginActivity";
+    Typeface mTf = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,41 +44,25 @@ public class LoginActivity extends FragmentActivity {
             finish();
             return;
         }
+        mTf = Typeface.createFromAsset(getAssets(), "icomoon.ttf");
         //-- update saved settings
         Utilities.populateSettings(getApplicationContext());
         setContentView(R.layout.activity_login);
         //-- spinner
-        Spinner spinner = (Spinner) findViewById(R.id.server_selection);
-
-        ArrayList<ServerInfo> listServer = new ArrayList<>();
-        listServer.add(new ServerInfo("http://gps.umaps.vn:8080/ws", "https://gps.umaps.vn", "Server Umaps"));
-        listServer.add(new ServerInfo("http://secure.gpshandle.com:8080/ws", "https://secure.gpshandle.com", "Server GPSHandle"));
-        Log.i(TAG, "Creating spinner");
-        ServerInfoSpinnerAdapter dataAdapter = new ServerInfoSpinnerAdapter(getApplicationContext(), listServer);
-        spinner.setAdapter(dataAdapter);
-
-        final String sUrl = null;
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ServerInfo serverInfo = (ServerInfo) parent.getItemAtPosition(position);
-                Log.i("ABC", serverInfo.getTrackingUrl());
-                ApplicationSettings.setServerURL(serverInfo.getTrackingUrl());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                ApplicationSettings.setServerURL("http://gps.umaps.vn:8080/ws");
-
-            }
-        });
-
-        ServerInfo si = (ServerInfo)spinner.getSelectedItem();
-        Log.i("ABC", si.getTrackingUrl());
-
-
+        ApplicationSettings.setServerURL("http://secure.gpshandle.com:8080/ws");
 
         //-- save application setting
+        TextView icAccount  = (TextView) findViewById(R.id.ic_account);
+        TextView icUser     = (TextView) findViewById(R.id.ic_user);
+        TextView icKey      = (TextView) findViewById(R.id.ic_key);
+        icAccount.setTypeface(mTf);
+        icUser.setTypeface(mTf);
+        icKey.setTypeface(mTf);
+        icAccount.setText(String.valueOf((char)0x61));
+        icUser.setText(String.valueOf((char)0x71));
+        icKey.setText(String.valueOf((char)0x67));
+
+
         final EditText edtAccount = (EditText) findViewById(R.id.account_name);
         edtAccount.setText(SessionState.getAccountID());
 
@@ -115,8 +100,8 @@ public class LoginActivity extends FragmentActivity {
                 }
                 JSONObject jsonRequest = null;
                 try {
-                    jsonRequest = Utilities.createRequest(
-                            Utilities.CMD_GET_USER_ACL,
+                    jsonRequest = StringTools.createRequest(
+                            StringTools.CMD_GET_USER_ACL,
                             Locale.getDefault().getLanguage(),
                             null);
                 } catch (JSONException e) {
@@ -132,14 +117,12 @@ public class LoginActivity extends FragmentActivity {
                             public void onResponse(JSONObject jsoResponse) {
                                 Utilities.HideProgress();
                                 if (!okResult(jsoResponse)) {
-//                                    showToast(R.string.failure_login);
                                     Toast.makeText(getApplicationContext(), R.string.failure_login, Toast.LENGTH_LONG);
                                     return;
                                 }
-//                                showToast(R.string.welcome_login);
                                 JSONArray aclList = null;
                                 try {
-                                    aclList = jsoResponse.getJSONArray(Utilities.KEY_RESULTS);
+                                    aclList = jsoResponse.getJSONArray(StringTools.KEY_RESULTS);
                                     if (aclList == null) return;
                                     for (int i = 0; i< aclList.length(); i++){
                                         JSONObject acl = aclList.getJSONObject(i);
@@ -194,7 +177,7 @@ public class LoginActivity extends FragmentActivity {
     public boolean okResult(JSONObject jsonObject){
         //-- Check return status first
         try {
-            JSONObject jsonStatus = jsonObject.getJSONObject(Utilities.KEY_STATUS);
+            JSONObject jsonStatus = jsonObject.getJSONObject(StringTools.KEY_STATUS);
             if (jsonStatus.getString(STATUS_CODE).equalsIgnoreCase(CODE_SUCCESSFUL)) return true;
             else return false;
         } catch (JSONException e) {

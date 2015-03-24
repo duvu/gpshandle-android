@@ -1,28 +1,39 @@
 package com.umaps.gpshandleclient.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Created by beou on 31/10/2014.
  */
 public class Group {
+    private String accountId;
     private String groupId;
-    private String icon;
     private String description;
+    private String displayName;
+    private String icon;
     private int live = 0;
-    private int count = 0;
-//    public Group(String groupId, String desc, int count){
-//        this.setGroupId(groupId);
-//        this.setDescription(desc);
-//        this.setCount(count);
-//    }
-    public Group(String groupId, String description, String icon, int live, int count){
+    private int deviceCount = 0;
+
+    public Group(String accountID, String groupId, String description,
+                 String displayName, String icon, int live, int deviceCount){
+        this.setAccountId(accountID);
         this.setGroupId(groupId);
-        this.setIcon(icon);
         this.setDescription(description);
+        this.setDisplayName(displayName);
+        this.setIcon(icon);
         this.setLive(live);
-        this.setCount(count);
+        this.setDeviceCount(deviceCount);
+    }
+    public String getAccountId(){
+        return (accountId!=null)?accountId:"";
+    }
+    public void setAccountId(String accountID){
+        this.accountId = accountID;
     }
     public String getGroupId() {
-        return groupId;
+        return (groupId!=null)?groupId:"";
     }
 
     public void setGroupId(String groupId) {
@@ -44,12 +55,17 @@ public class Group {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public int getCount() {
-        return count;
+    public String getDisplayName(){
+        return (displayName!=null)?displayName:"";
     }
-    public void setCount(int count) {
-        this.count = count;
+    public void setDisplayName(String displayName){
+        this.displayName = displayName;
+    }
+    public int getDeviceCount() {
+        return deviceCount;
+    }
+    public void setDeviceCount(int deviceCount) {
+        this.deviceCount = deviceCount;
     }
 
     public int getLive() {

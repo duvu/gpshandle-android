@@ -1,12 +1,10 @@
 package com.umaps.gpshandleclient.views;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -103,7 +101,7 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
             groupID          = groups.get(groupPosition).getGroupId();
             groupDescription = groups.get(groupPosition).getDescription();
             groupIcon        = groups.get(groupPosition).getIcon();
-            groupSize        = groups.get(groupPosition).getCount();
+            groupSize        = groups.get(groupPosition).getDeviceCount();
             countLive        = groups.get(groupPosition).getLive();
         }
 

@@ -40,6 +40,8 @@ public class MapData {
         public static final String MD_IS_STOPPED   = "isStopped";
         public static final String MD_GP_IO        = "gpIO";
         public static final String MD_ADDRESS      = "address";
+        public static final String MD_BATTERY_LEVEL= "batteryLevel";
+        public static final String MD_SIGNAL_STRENGTH = "signalStrength";
         //----------------------------------------------------------------------------------------//
         private String id;
         private String vin;
@@ -59,6 +61,8 @@ public class MapData {
         private boolean stopped;
         private String gpio;
         private String address;
+        private double batteryLevel;
+        private double signalStrength;
         public Point(String data){
             if (StringTools.isBlank(data)){ return; }
             String[] _data = data.split("\\|", -1);
@@ -80,6 +84,8 @@ public class MapData {
             this.setStopped(Boolean.parseBoolean(_data[19]));
             this.setGpio(_data[20]);
             this.setAddress(_data[21]);
+            this.setBatteryLevel(Double.parseDouble(_data[22]));
+            this.setSignalStrength(Double.parseDouble(_data[23]));
         }
         public String toString(){
             String resp = this.getId()+ SEPARATE_CHAR;
@@ -123,6 +129,8 @@ public class MapData {
                 jsonObject.put(MD_IS_STOPPED,   this.isStopped());
                 jsonObject.put(MD_GP_IO,        this.getGpio());
                 jsonObject.put(MD_ADDRESS,      this.getAddress());
+                jsonObject.put(MD_BATTERY_LEVEL, this.getBatteryLevel());
+                jsonObject.put(MD_SIGNAL_STRENGTH, this.getSignalStrength());
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
@@ -165,6 +173,10 @@ public class MapData {
         public void     setGpio(String gpio) { this.gpio = gpio; }
         public String   getAddress() { return address; }
         public void     setAddress(String address) { this.address = address; }
+        public double   getBatteryLevel() {return batteryLevel;}
+        public void     setBatteryLevel(double v) {this.batteryLevel = v; }
+        public double   getSignalStrength() { return  signalStrength; }
+        public  void    setSignalStrength(double v) { this.signalStrength = v; }
     }
     public MapData(String data){
         if (StringTools.isBlank(data)){

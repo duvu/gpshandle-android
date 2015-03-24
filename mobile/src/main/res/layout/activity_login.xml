@@ -10,66 +10,110 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Spinner
-        android:id="@+id/server_selection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16dp"
         android:textStyle="bold"
+        android:layout_marginTop="15dp"
         android:text="@string/account_name"/>
-    <EditText
-        android:id="@+id/account_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:padding="15dp"
-        android:textColorHint="#5e5e5e"
-        android:textColor="#1f1f1f"
-        android:hint="@string/hint_account_name"
-        />
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:background="@drawable/roundborder">
+        <TextView
+            android:id="@+id/ic_account"
+            android:textSize="32sp"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <EditText
+            android:id="@+id/account_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHint="#5e5e5e"
+            android:background="@drawable/noborder"
+            android:textColor="#1f1f1f"
+            android:hint="@string/hint_account_name"
+            android:padding="10dp"
+            android:singleLine="true"/>
+    </LinearLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:textSize="16dp"
         android:textStyle="bold"
         android:text="@string/user_name"/>
-    <EditText
-        android:id="@+id/user_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:padding="15dp"
-        android:textColorHint="#5e5e5e"
-        android:textColor="#1f1f1f"
-        android:hint="@string/hint_user_name"/>
-
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:background="@drawable/roundborder">
+        <TextView
+            android:id="@+id/ic_user"
+            android:textSize="32sp"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <EditText
+            android:id="@+id/user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColorHint="#5e5e5e"
+            android:background="@drawable/noborder"
+            android:textColor="#1f1f1f" android:singleLine="true"
+            android:hint="@string/hint_user_name"/>
+    </LinearLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16dp"
         android:textStyle="bold"
+        android:layout_marginTop="15dp"
         android:text="@string/password"/>
-    <EditText
-        android:id="@+id/password"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:padding="15dp"
-        android:textColorHint="#5e5e5e"
-        android:textColor="#1f1f1f"
-        android:hint="@string/hint_password"
-        android:inputType="textPassword"/>
-
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:background="@drawable/roundborder">
+        <TextView
+            android:id="@+id/ic_key"
+            android:textSize="32sp"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColorHint="#5e5e5e"
+            android:textColor="#1f1f1f"
+            android:background="@drawable/noborder"
+            android:hint="@string/hint_password" android:singleLine="true"
+            android:inputType="textPassword"/>
+    </LinearLayout>
     <Button
         android:id="@+id/btnlogin"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:textStyle="bold"
+        android:layout_gravity="center"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:textColor="@color/white_opacity_95"
+        android:background="@drawable/button"
         android:text="@string/btnlogin" />
     <TextView
         android:layout_width="wrap_content"

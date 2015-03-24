@@ -4,7 +4,7 @@
     <string name="app_name">GPSHandle</string>
     <string name="title_monitor">Monitor</string>
     <string name="title_historical">Historical</string>
-    <string name="title_reporting">Reports</string>
+    <string name="title_report">Summary Report</string>
     <string name="title_administration">Administration</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -16,6 +16,7 @@
 
     <string name="subtitle_group">G: </string>
     <string name="subtitle_device">D: </string>
+    <string name="select_a_group">Select A Group</string>
     <string name="group_all">All</string>
 
     <string name="updated_str">Updating ...</string>
@@ -68,5 +69,10 @@
     <string name="device_speedKph">SpeedKPH</string>
     <string name="device_odometer">Odometer</string>
     <string name="device_address">Address</string>
+    <string name="status_running">Running</string>
+    <string name="status_idling">Idling</string>
+    <string name="status_stopped">Stopped</string>
+    <string name="bar_events">Events</string>
+    <string name="bar_odo_meter">Odometer</string>
 
 </resources>
