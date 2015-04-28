@@ -1,21 +1,20 @@
-package com.umaps.gpshandleclient.views;
+package com.umaps.gpshandleclient.view;
 
 import android.content.Context;
 import android.graphics.Point;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
 
 /**
  * Created by vu@umaps.vn on 10/02/2015.
  */
-public class CustomMapLayout extends FrameLayout {
+public class CustomMapLayout extends RelativeLayout {
     private static final String TAG = "CustomMapLayout";
     private GoogleMap googleMap;
     private int bottomOffsetPixels;

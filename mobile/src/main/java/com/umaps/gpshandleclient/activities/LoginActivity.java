@@ -62,7 +62,7 @@ public class LoginActivity extends FragmentActivity {
         icUser.setText(String.valueOf((char)0x71));
         icKey.setText(String.valueOf((char)0x67));
 
-
+        //-- save application setting
         final EditText edtAccount = (EditText) findViewById(R.id.account_name);
         edtAccount.setText(SessionState.getAccountID());
 
@@ -87,10 +87,6 @@ public class LoginActivity extends FragmentActivity {
                         (StringTools.isBlank(password)))
                 {
                     Toast.makeText(getApplicationContext(), R.string.failure_login, Toast.LENGTH_SHORT);
-//                    accountID = "zealand";
-//                    userID = "admin";
-//                    password = "123456";
-//                    return;
                 }
                 {
                     //-- save to SessionState

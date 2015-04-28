@@ -15,15 +15,13 @@ import com.umaps.gpshandleclient.model.Device;
 import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.settings.SessionState;
 import com.umaps.gpshandleclient.settings.Utilities;
-import com.umaps.gpshandleclient.views.GroupExpandableListAdapter;
+import com.umaps.gpshandleclient.view.GroupExpandableListAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 import static com.umaps.gpshandleclient.util.StringTools.createDevicesInGroup;
 import static com.umaps.gpshandleclient.util.StringTools.createGroupList;

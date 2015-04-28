@@ -144,10 +144,12 @@ public class StringTools {
                 String icon             = jsonDevice.getString("pushpinID");
                 String deviceID         = jsonDevice.getString("deviceID");
                 String description      = jsonDevice.getString("description");
+                Double lastBatteryLevel = jsonDevice.getDouble("lastBatteryLevel");
                 long lastEventTimestamp = jsonDevice.getLong("lastEventTimestamp");
                 boolean isLive          = (isActive && (currentTimestamp-lastEventTimestamp<300));
                 //--Create new Device Object Model
                 Device device = new Device(deviceID, description, icon, isLive, lastEventTimestamp);
+                device.setBatteryLevel(lastBatteryLevel);
                 devicesList.add(device);
             }
             hashMapGroupDevices.put(groupID, devicesList);

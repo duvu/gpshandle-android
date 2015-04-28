@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.views;
+package com.umaps.gpshandleclient.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;

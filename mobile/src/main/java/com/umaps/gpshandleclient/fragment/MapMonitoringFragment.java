@@ -3,6 +3,7 @@ package com.umaps.gpshandleclient.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -37,14 +40,11 @@ import com.umaps.gpshandleclient.settings.SessionState;
 import com.umaps.gpshandleclient.settings.Utilities;
 import com.umaps.gpshandleclient.util.HTTPRequestQueue;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpshandleclient.views.CustomMapLayout;
+import com.umaps.gpshandleclient.view.CustomMapLayout;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,6 +56,7 @@ public class MapMonitoringFragment extends Fragment {
     private final String TAG    = "MapMonitoringFragment";
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private SupportMapFragment mapFragment;
+    Typeface mTf = null;
 
     private ClusterManager<TrackObject> mClusterManager;
     CustomMapLayout customMapLayout;
@@ -66,10 +67,9 @@ public class MapMonitoringFragment extends Fragment {
 
     private MapData.Point[] pts = null;
 
-    public static MapMonitoringFragment newInstance(){
+    public static final MapMonitoringFragment newInstance(){
         return new MapMonitoringFragment();
     }
-    public MapMonitoringFragment(){}
 
     @Override
     public void onAttach(Activity activity) {
@@ -79,6 +79,15 @@ public class MapMonitoringFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_monitoring, container, false);
+
+        mTf = Typeface.createFromAsset(getActivity().getAssets(), "icomoon.ttf");
+        TextView tvDeviceList = (TextView) view.findViewById(R.id.device_list);
+        TextView tvDeviceListText = (TextView) view.findViewById(R.id.device_list_text);
+        tvDeviceList.setTypeface(mTf);
+        tvDeviceList.setText(String.valueOf((char)0xe64e));
+        tvDeviceListText.setText(R.string.device_list);
+
+
         setUpMapIfNeeded();
         customMapLayout = (CustomMapLayout) view;
         return view;
@@ -131,6 +140,15 @@ public class MapMonitoringFragment extends Fragment {
         if (trackInfoWindowAdapter==null){
             trackInfoWindowAdapter = new TrackInfoWindowAdapter(getActivity(), customMapLayout);
         }
+        //-- Setup UI
+        UiSettings uiSettings = mMap.getUiSettings();
+        uiSettings.setMapToolbarEnabled(false);
+        uiSettings.setMyLocationButtonEnabled(true);
+        uiSettings.setCompassEnabled(true);
+        uiSettings.setZoomControlsEnabled(true);
+
+
+
         //--For historical tracking
         if (!SessionState.isIsFleet()) {
             mMap.clear();
@@ -151,6 +169,8 @@ public class MapMonitoringFragment extends Fragment {
             mClusterManager.setOnClusterItemClickListener(TrackClusterManager.getInstance());
             mClusterManager.setOnClusterItemInfoWindowClickListener(TrackClusterManager.getInstance());
         }
+
+
     }
     public static int getPixelsFromDp(Context context, float dp) {
         final float scale = context.getResources().getDisplayMetrics().density;
@@ -164,7 +184,8 @@ public class MapMonitoringFragment extends Fragment {
         setViewing(false);
         String groupId = SessionState.getSelGroup();
         if (StringTools.isBlank(groupId)){
-            return;
+            //return;
+            groupId="all";
         }
         try {
             getRunInterval(groupId);

@@ -29,12 +29,15 @@
             </intent-filter>
         </activity>
         <activity android:screenOrientation="portrait"
-            android:name="com.umaps.gpshandleclient.activities.MainActivity" />
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:name="com.umaps.gpshandleclient.activities.MainActivity">
+
+            </activity>
         <!--<activity-->
             <!--android:screenOrientation="portrait"-->
             <!--android:name=".fragment.SettingsFragment"-->
             <!--android:label="@string/title_activity_settings" />-->
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

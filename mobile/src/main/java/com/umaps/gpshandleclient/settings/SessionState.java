@@ -4,6 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import com.umaps.gpshandleclient.util.StringTools;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -211,7 +214,7 @@ public class SessionState /*extends Application*/ {
     }
 
     public static String getSelGroup() {
-        return selGroup;
+        return (StringTools.isBlank(selGroup)? "all":selGroup);
     }
 
     public static void setSelGroup(String selGroup) {

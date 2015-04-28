@@ -4,8 +4,8 @@
     <string name="app_name">GPSHandle</string>
     <string name="title_monitor">Monitor</string>
     <string name="title_historical">Historical</string>
-    <string name="title_report">Summary Report</string>
-    <string name="title_administration">Administration</string>
+    <string name="title_report">Report</string>
+    <string name="title_administration">Admin</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_list_groups">Groups List</string>

@@ -10,19 +10,17 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-import com.google.maps.android.ui.IconGenerator;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.activities.MainActivity;
 import com.umaps.gpshandleclient.model.MapData;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpshandleclient.views.CustomMapLayout;
-import com.umaps.gpshandleclient.views.OnInfoWindowElemTouchListener;
+import com.umaps.gpshandleclient.view.CustomMapLayout;
+import com.umaps.gpshandleclient.view.OnInfoWindowElemTouchListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by beou on 29/10/2014.
@@ -141,6 +139,8 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         double batteryLevel = jsonObject.getDouble(MapData.Point.MD_BATTERY_LEVEL);
         double signalStrength = jsonObject.getDouble(MapData.Point.MD_SIGNAL_STRENGTH);
+
+
 
         TextView tDesc = (TextView) view.findViewById(R.id.tDesc);
         tDesc.setText(R.string.tDesc);

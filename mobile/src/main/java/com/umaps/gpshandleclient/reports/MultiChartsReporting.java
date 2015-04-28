@@ -276,6 +276,8 @@ public class MultiChartsReporting extends Fragment {
                 return;
             }
             for (int i = 0; i< jsonReportBody.length(); i++){
+                ItemSummary itemSummary = new ItemSummary();
+
                 String itemR = jsonReportBody.getString(i);
                 if (StringTools.isBlank(itemR)) continue;
                 String[] childItems = itemR.split("\\|");
@@ -283,26 +285,28 @@ public class MultiChartsReporting extends Fragment {
                 long timestamp = Long.parseLong(childItems[2]);
                 double distance = Double.parseDouble(childItems[3]);
                 String geoPoint = childItems[4];
-                double lat = Double.parseDouble(geoPoint.split("\\/")[0]);
-                double lon = Double.parseDouble(geoPoint.split("\\/")[1]);
+                if (!StringTools.isBlank(geoPoint)) {
+                    double lat = Double.parseDouble(geoPoint.split("\\/")[0]);
+                    double lon = Double.parseDouble(geoPoint.split("\\/")[1]);
+
+                    itemSummary.setLatitude(lat);
+                    itemSummary.setLongitude(lon);
+                }
                 totalKM+=distance;
                 double batteryLevel = 0.0D;
-                if ((!StringTools.isBlank(childItems[5])) && (!StringTools.isBlank(childItems[5].replace("%", "")))){
-                    batteryLevel = Double.parseDouble(childItems[5].replace("%",""));
+                String trimNumber = (!StringTools.isBlank(childItems[5])?childItems[5].replaceAll("[^0-9.]", ""):"");
+                if (!StringTools.isBlank(trimNumber)){
+                    batteryLevel = Double.parseDouble(trimNumber);
                 }
                 long eventCount = Long.parseLong(childItems[6]);
 
-                ItemSummary itemSummary = new ItemSummary();
                 itemSummary.setDescription(description);
                 itemSummary.setTimestamp(timestamp);
                 itemSummary.setDistance(distance);
-                itemSummary.setLatitude(lat);
-                itemSummary.setLongitude(lon);
                 itemSummary.setBatteryLevel(batteryLevel);
                 itemSummary.setEventCount(eventCount);
 
                 summaryArrayList.add(itemSummary);
-
                 totalEvent+=eventCount;
                 long timeAge = currentTime - timestamp;
                 if (timeAge <= 300){

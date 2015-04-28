@@ -13,6 +13,9 @@ public class Device {
     private boolean isActive;
     private boolean isLive = true;
     private long   lastEventTime;
+    private int satCount;
+    private double batteryLevel;
+    private double signalStrength;
 
     public Device(String deviceID, String description){
         this(deviceID, description, Calendar.getInstance().getTimeInMillis()/1000, null);
@@ -79,5 +82,29 @@ public class Device {
     }
     public void setActive(boolean active){
         this.isActive = active;
+    }
+
+    public int getSatCount() {
+        return satCount;
+    }
+
+    public void setSatCount(int satCount) {
+        this.satCount = satCount;
+    }
+
+    public double getBatteryLevel() {
+        return batteryLevel;
+    }
+
+    public void setBatteryLevel(double batteryLevel) {
+        this.batteryLevel = batteryLevel;
+    }
+
+    public double getSignalStrength() {
+        return signalStrength;
+    }
+
+    public void setSignalStrength(double signalStrength) {
+        this.signalStrength = signalStrength;
     }
 }

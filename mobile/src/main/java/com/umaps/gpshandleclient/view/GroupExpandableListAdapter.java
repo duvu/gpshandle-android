@@ -1,6 +1,7 @@
-package com.umaps.gpshandleclient.views;
+package com.umaps.gpshandleclient.view;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,17 +26,18 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private ArrayList<Group> groups; //Header gpshandle_device_group
     private HashMap<String, ArrayList<Device>> devicesInGroup; //List of devices
-
+    Typeface mTf = null;
     private ExpandableListView expl;
-
-    public void setExpandableListView(ExpandableListView expandableListview){
-        expl = expandableListview;
-    }
 
     public GroupExpandableListAdapter(Context _context, ArrayList<Group> _groups, HashMap<String, ArrayList<Device>> _gDevices){
         context = _context;
         groups = _groups;
         devicesInGroup = _gDevices;
+        mTf = Typeface.createFromAsset(context.getAssets(), "icomoon.ttf");
+    }
+
+    public void setExpandableListView(ExpandableListView expandableListview){
+        expl = expandableListview;
     }
 
     @Override
@@ -145,7 +147,9 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
         String icon         = "";
         String address      = "";
         boolean isLive      = true;
-        long lastEventTime  = 0;
+        double batteryLevel = 0D;
+        long lastEventTime  = 0L;
+
         if (groups != null && devicesInGroup != null) {
             Device device = devicesInGroup.get(groups.get(groupPosition).getGroupId()).get(childPosition);
             deviceID = device.getDeviceID();
@@ -153,6 +157,7 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
             icon = device.getIcon();
             isLive = device.isLive();
             lastEventTime = device.getLastEventTime();
+            batteryLevel = device.getBatteryLevel();
         }
 
         ImageView imageView = (ImageView) convertView.findViewById(R.id.device_image);
@@ -162,14 +167,30 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
         TextView deviceDescriptionTextView = (TextView) convertView.findViewById(R.id.listView_deviceDesc);
         deviceIDTextView.setText(deviceID);
         deviceDescriptionTextView.setText(description);
-        CircleImageView circleImageView = (CircleImageView) convertView.findViewById(R.id.device_live_state);
-        circleImageView.setBorderWidth(1);
-        if (isLive) {
-            circleImageView.setImageResource(R.drawable.device_living);
-        } else {
-            circleImageView.setImageResource(R.drawable.device_stopped);
-        }
+        TextView liveStateView  = (TextView) convertView.findViewById(R.id.device_status);
+        TextView batteryView    = (TextView) convertView.findViewById(R.id.device_battery);
+        TextView batteryText    = (TextView) convertView.findViewById(R.id.device_battery_text);
+        liveStateView.setTypeface(mTf);
+        batteryView.setTypeface(mTf);
+        liveStateView.setText(String.valueOf((char)0xf111));
 //        circleImageView.addShadow();
+        /*CircleImageView circleImageView = (CircleImageView) convertView.findViewById(R.id.device_live_state);
+        circleImageView.setBorderWidth(1);
+        */
+        if (isLive) {
+            liveStateView.setTextColor(context.getResources().getColor(R.color.green));
+        } else {
+            liveStateView.setTextColor(context.getResources().getColor(R.color.red));
+        }
+        batteryView.setText(String.valueOf((char)0xe64c));
+        batteryText.setText(String.format("%1$,.0f", batteryLevel*100)+"%");
+        if (batteryLevel < 0.2){
+            batteryView.setTextColor(context.getResources().getColor(R.color.red));
+            batteryText.setTextColor(context.getResources().getColor(R.color.red));
+        } else if ((batteryLevel < 0.7)) {
+            batteryView.setTextColor(context.getResources().getColor(R.color.yellow));
+            batteryText.setTextColor(context.getResources().getColor(R.color.yellow));
+        }
 
         return convertView;
     }

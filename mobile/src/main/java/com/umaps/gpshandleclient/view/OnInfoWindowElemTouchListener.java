@@ -1,14 +1,11 @@
-package com.umaps.gpshandleclient.views;
+package com.umaps.gpshandleclient.view;
 
-import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 /**
