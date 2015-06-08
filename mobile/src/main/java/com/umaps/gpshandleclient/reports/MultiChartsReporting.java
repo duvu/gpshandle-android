@@ -1,9 +1,11 @@
 package com.umaps.gpshandleclient.reports;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,32 +17,22 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.utils.PercentFormatter;
 import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.model.Device;
-import com.umaps.gpshandleclient.reports.chart.BarChartItem;
 import com.umaps.gpshandleclient.reports.chart.ChartItem;
 import com.umaps.gpshandleclient.reports.chart.HorizontalBarChartItem;
-import com.umaps.gpshandleclient.reports.chart.LineChartItem;
 import com.umaps.gpshandleclient.reports.chart.PieChartItem;
 import com.umaps.gpshandleclient.reports.model.ItemSummary;
-import com.umaps.gpshandleclient.settings.ApplicationSettings;
-import com.umaps.gpshandleclient.settings.SessionState;
-import com.umaps.gpshandleclient.settings.Utilities;
-import com.umaps.gpshandleclient.util.HTTPRequestQueue;
+import com.umaps.gpshandleclient.MyApplication;
+import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.HttpQueue;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
@@ -57,8 +49,12 @@ import java.util.Locale;
  */
 public class MultiChartsReporting extends Fragment {
     private static ArrayList<ChartItem> listChart = null;
+    ProgressDialog pd;
     private static ListView listView = null;
     private static final String TAG = "MultiChartsReporting";
+
+    private MyApplication mApplication;
+
     public static MultiChartsReporting newInstance(){
         return new MultiChartsReporting();
     }
@@ -69,36 +65,16 @@ public class MultiChartsReporting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list_report, container, false);
+        mApplication = MyApplication.getInstance();
+
         Utils.init(getResources());
         listView = (ListView) view.findViewById(R.id.chartListView);
-
-//        if (listChart == null) {
-//            listChart = new ArrayList<>();
-//        }
-        //--TODO: generate list of chart here and add to #listChart
-        //--1. pieChart for summary
+        getScreenSize();
         try {
-//            listChart = new ArrayList<>();
-//            Utilities.ShowProgress(getActivity(), "", getString(R.string.application_loading));
             getSummaryData();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-//        ChartData pieChartData = generateDataPie();
-//        listChart.add(new PieChartItem(pieChartData, getActivity()));
-//        // 30 items
-//        for (int i = 0; i < 30; i++) {
-//
-//            if(i % 3 == 0) {
-//                listChart.add(new LineChartItem(generateDataLine(i + 1), getActivity()));
-//            } else if(i % 3 == 1) {
-//                listChart.add(new BarChartItem(generateDataBar(i + 1), getActivity()));
-//            } else if(i % 3 == 2) {
-//                listChart.add(new PieChartItem(generateDataPie(i + 1), getActivity()));
-//            }
-//        }
-
-
         return view;
     }
 
@@ -121,122 +97,6 @@ public class MultiChartsReporting extends Fragment {
             return 3; //-- we have 3 different item-types
         }
     }
-
-    /**
-     * generates a random ChartData object with just one DataSet
-     *
-     * @return
-     */
-    private LineData generateDataLine(int cnt) {
-
-        ArrayList<Entry> e1 = new ArrayList<Entry>();
-
-        for (int i = 0; i < 12; i++) {
-            e1.add(new Entry((int) (Math.random() * 65) + 40, i));
-        }
-
-        LineDataSet d1 = new LineDataSet(e1, "New DataSet " + cnt + ", (1)");
-        d1.setLineWidth(2.5f);
-        d1.setCircleSize(4.5f);
-        d1.setHighLightColor(Color.rgb(244, 117, 117));
-        d1.setDrawValues(false);
-
-        ArrayList<Entry> e2 = new ArrayList<Entry>();
-
-        for (int i = 0; i < 12; i++) {
-            e2.add(new Entry(e1.get(i).getVal() - 30, i));
-        }
-
-        LineDataSet d2 = new LineDataSet(e2, "New DataSet " + cnt + ", (2)");
-        d2.setLineWidth(2.5f);
-        d2.setCircleSize(4.5f);
-        d2.setHighLightColor(Color.rgb(244, 117, 117));
-        d2.setColor(ColorTemplate.VORDIPLOM_COLORS[0]);
-        d2.setCircleColor(ColorTemplate.VORDIPLOM_COLORS[0]);
-        d2.setDrawValues(false);
-
-        ArrayList<LineDataSet> sets = new ArrayList<LineDataSet>();
-        sets.add(d1);
-        sets.add(d2);
-
-        LineData cd = new LineData(getMonths(), sets);
-        return cd;
-    }
-
-    /**
-     * generates a random ChartData object with just one DataSet
-     *
-     * @return
-     */
-    private BarData generateDataBar(int cnt) {
-
-        ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
-
-        for (int i = 0; i < 12; i++) {
-            entries.add(new BarEntry((int) (Math.random() * 70) + 30, i));
-        }
-
-        BarDataSet d = new BarDataSet(entries, "New DataSet " + cnt);
-        d.setBarSpacePercent(20f);
-        d.setColors(ColorTemplate.VORDIPLOM_COLORS);
-        d.setHighLightAlpha(255);
-
-        BarData cd = new BarData(getMonths(), d);
-        return cd;
-    }
-
-    /**
-     * generates a random ChartData object with just one DataSet
-     *
-     * @return
-     */
-    private PieData generateDataPie(/*int cnt*/) {
-
-        ArrayList<Entry> entries = new ArrayList<Entry>();
-
-        for (int i = 0; i < 4; i++) {
-            entries.add(new Entry((int) (Math.random() * 70) + 30, i));
-        }
-
-        PieDataSet d = new PieDataSet(entries, "");
-
-        // space between slices
-        d.setSliceSpace(2f);
-        d.setColors(ColorTemplate.VORDIPLOM_COLORS);
-
-        PieData cd = new PieData(getQuarters(), d);
-        return cd;
-    }
-
-    private ArrayList<String> getQuarters() {
-
-        ArrayList<String> q = new ArrayList<String>();
-        q.add("1st Quarter");
-        q.add("2nd Quarter");
-        q.add("3rd Quarter");
-        q.add("4th Quarter");
-
-        return q;
-    }
-
-    private ArrayList<String> getMonths() {
-
-        ArrayList<String> m = new ArrayList<String>();
-        m.add("Jan");
-        m.add("Feb");
-        m.add("Mar");
-        m.add("Apr");
-        m.add("May");
-        m.add("Jun");
-        m.add("Jul");
-        m.add("Aug");
-        m.add("Sep");
-        m.add("Okt");
-        m.add("Nov");
-        m.add("Dec");
-
-        return m;
-    }
     //----------------------------------------------------------------------------------------------
     private void generatePieData(JSONObject inputData){
         listChart = new ArrayList<>();
@@ -244,8 +104,6 @@ public class MultiChartsReporting extends Fragment {
         if (inputData==null){
             return;
         }
-
-        ArrayList<ItemSummary> summaryArrayList = new ArrayList<>();
 
         String[] mParties = new String[]{
                 getString(R.string.status_running),
@@ -266,6 +124,7 @@ public class MultiChartsReporting extends Fragment {
         double totalKM = 0.0D;
         long totalEvent = 0L;
         long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
+        ArrayList<ItemSummary> summaryArrayList = new ArrayList<>();
         try {
             JSONObject jsonReport = inputData.getJSONObject(StringTools.KEY_REPORT);
             if (jsonReport == null){
@@ -347,77 +206,85 @@ public class MultiChartsReporting extends Fragment {
         //data.setValueFormatter(new PercentFormatter());
         data.setValueTextSize(11f);
         data.setValueTextColor(Color.WHITE);
-        StringBuffer sb = new StringBuffer();
-        sb.append(SessionState.getSelGroupDesc()).append(": ").append(totalDevice).append("\n");
-        sb.append("Total Km: ").append(totalKM).append("\n");
-        sb.append("Total Events: ").append(totalEvent);
+//        StringBuffer sb = new StringBuffer();
+//        sb.append(SessionState.getSelGroupDesc()).append(": ").append(totalDevice).append("\n");
+//        sb.append(getText(R.string.total_km)).append(": ").append(totalKM).append("\n");
+//        sb.append(getText(R.string.total_events)).append(": ").append(totalEvent);
         PieChartItem pieChartItem = new PieChartItem(data, getActivity());
-        pieChartItem.setCenterText(sb.toString());
+        pieChartItem.setGroup(mApplication.getSelGroup());
+        pieChartItem.setTotalEvent(totalEvent);
+        pieChartItem.setTotalKm(totalKM);
+        pieChartItem.setCenterText("" + totalDevice);
+        pieChartItem.setWidth((int)(layoutW *0.7));
         listChart.add(pieChartItem);
+
         //-- Horizontal-BarChart
         ArrayList<BarEntry> yHBVal = new ArrayList<>();
         ArrayList<BarEntry> odoYVal = new ArrayList<>();
         for (int i = 0; i< totalDevice; i++){
-            yHBVal.add(new BarEntry((float)summaryArrayList.get(i).getEventCount()+1, i));
-            odoYVal.add(new BarEntry((float)summaryArrayList.get(i).getDistance()+1, i));
+            yHBVal.add(new BarEntry((float)summaryArrayList.get(i).getEventCount(), i));
+            odoYVal.add(new BarEntry((float)summaryArrayList.get(i).getDistance(), i));
         }
 
+        ArrayList<BarDataSet> barDataSets = new ArrayList<>();
         BarDataSet barDataSet = new BarDataSet(yHBVal, getString(R.string.bar_events));//"Events");
         BarDataSet odoDataSet = new BarDataSet(odoYVal, getString(R.string.bar_odo_meter));//"Odo-meter");
-
         barDataSet.setColor(colors.get(0));
-        odoDataSet.setColor(colors.get(1));
-
         barDataSet.setBarSpacePercent(1f);
-
-        ArrayList<BarDataSet> barDataSets = new ArrayList<>();
+        odoDataSet.setColor(colors.get(1));
         barDataSets.add(barDataSet);
         barDataSets.add(odoDataSet);
 
         ArrayList<String> xHBVals = new ArrayList<>();
         for (int i = 0; i< totalDevice; i++){
-            xHBVals.add(summaryArrayList.get(i).getDescription());
+            String desc = summaryArrayList.get(i).getDescription();
+            desc = desc.length() > 16 ? desc.substring(0, 15) : desc;
+            xHBVals.add(desc);
         }
         BarData barData = new BarData(xHBVals, barDataSets);
         HorizontalBarChartItem hbChartItem = new HorizontalBarChartItem(barData, getActivity());
+        hbChartItem.setWidth(layoutW);
+        hbChartItem.setHeight(totalDevice*80);
         listChart.add(hbChartItem);
 
         //-- add charts
         ChartDataAdapter cda = new ChartDataAdapter(getActivity(), listChart);
         listView.setAdapter(cda);
-
-        Utilities.HideProgress();
-//        pieChart.setCenterText(sb.toString());
-//        pieChart.setData(data);
-//        Legend l = pieChart.getLegend();
-//        l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
-//        pieChart.invalidate();
-//        return data;
     }
 
     public void getSummaryData() throws JSONException {
-        Utilities.ShowProgress(getActivity(), "", getString(R.string.application_loading));
+        //pd = Utilities.ShowProgress(getActivity(), "", getString(R.string.application_loading));
         JSONObject jsonParam = new JSONObject();
-        jsonParam.put(StringTools.FLD_groupID, SessionState.getSelGroup());
-        JSONObject jsonRequest = StringTools.createRequest(StringTools.CMD_GET_CHART_SUMMARY,
+        jsonParam.put(StringTools.FLD_groupID, mApplication.getSelGroup());
+        JSONObject jsonRequest = StringTools.createRequest(
+                mApplication.getAccountID(), mApplication.getUserID(), mApplication.getPassword(),
+                StringTools.CMD_GET_CHART_SUMMARY,
                 Locale.getDefault().getLanguage(),jsonParam);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
-                ApplicationSettings.getChartUrl(),
+                GpsOldRequest.CHART_URL,
                 jsonRequest, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-                Log.i(TAG, response.toString());
-                generatePieData(response);
-            }
-        },
+                        Log.i(TAG, response.toString());
+                        generatePieData(response);
+                    }
+                },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //TODO
                     }
                 });
-        HTTPRequestQueue.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
+        HttpQueue.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private int layoutH, layoutW;
+    private void getScreenSize(){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        this.layoutH = displayMetrics.heightPixels;
+        this.layoutW = displayMetrics.widthPixels;
     }
 }

@@ -2,9 +2,10 @@
 <TableLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:stretchColumns="1"
-    android:paddingTop="0dip"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     android:descendantFocusability="blocksDescendants"
     android:layout_gravity="top">
     <TableRow>
@@ -16,34 +17,16 @@
             android:layout_marginStart="10dp"
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/account_name"/>
-        <TableLayout
-            android:stretchColumns="1">
-            <TableRow>
-                <TextView
-                    android:id="@+id/listView_grpDesc"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:textColor="@color/wallet_dim_foreground_inverse_disabled_holo_dark"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content">
-                </TextView>
-            </TableRow>
-            <TableRow>
-                <TextView
-                    android:id="@+id/listView_grpID"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:textSize="12sp"
-                    android:textStyle="italic"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content">
-                </TextView>
-            </TableRow>
-        </TableLayout>
+        <TextView
+                android:id="@+id/listView_grpDesc"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/text_color_dark"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content">
+        </TextView>
         <FrameLayout
             android:layout_gravity="center"
             android:layout_height="40dp"

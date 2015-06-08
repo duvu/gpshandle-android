@@ -3,18 +3,17 @@ package com.umaps.gpshandleclient.cluster;
 import android.util.Log;
 
 import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
-import com.umaps.gpshandleclient.model.TrackObject;
+import com.umaps.gpshandleclient.model.TrackItem;
 
 /**
  * Created by vu@umaps.vn on 27/01/2015.
  */
 public class TrackClusterManager implements
-        ClusterManager.OnClusterClickListener<TrackObject>,
-        ClusterManager.OnClusterInfoWindowClickListener<TrackObject>,
-        ClusterManager.OnClusterItemClickListener<TrackObject>,
-        ClusterManager.OnClusterItemInfoWindowClickListener<TrackObject>
+        ClusterManager.OnClusterClickListener<TrackItem>,
+        ClusterManager.OnClusterInfoWindowClickListener<TrackItem>,
+        ClusterManager.OnClusterItemClickListener<TrackItem>,
+        ClusterManager.OnClusterItemInfoWindowClickListener<TrackItem>
 {
     private static TrackClusterManager instance = null;
     private static final String TAG = "TrackClusterManager";
@@ -25,25 +24,25 @@ public class TrackClusterManager implements
         return instance;
     }
     @Override
-    public boolean onClusterClick(Cluster<TrackObject> trackCluster) {
+    public boolean onClusterClick(Cluster<TrackItem> trackCluster) {
         Log.i(TAG, "onClusterClick");
         return false;
     }
 
     @Override
-    public void onClusterInfoWindowClick(Cluster<TrackObject> trackObjectCluster) {
+    public void onClusterInfoWindowClick(Cluster<TrackItem> trackObjectCluster) {
         Log.i(TAG, "onClusterInfoWindowClick");
         //show list device of this cluster
     }
 
     @Override
-    public boolean onClusterItemClick(TrackObject trackObject) {
+    public boolean onClusterItemClick(TrackItem trackItem) {
         Log.i(TAG, "onClusterItemClick");
         return false;
     }
 
     @Override
-    public void onClusterItemInfoWindowClick(TrackObject trackObject) {
+    public void onClusterItemInfoWindowClick(TrackItem trackItem) {
         Log.i(TAG, "onClusterItemInfoWindowClick");
     }
 }

@@ -7,60 +7,101 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
     <android.support.v7.widget.Toolbar
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimaryDark"
-        android:minHeight="?attr/actionBarSize">
-
+        android:background="@color/base_color"
+        android:minHeight="?attr/actionBarSize"
+        app:popupTheme="@style/Theme.AppCompat.NoActionBar"
+        app:theme="@style/AppTheme">
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_marginLeft="10dp"
+            android:orientation="horizontal"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <TextView
+            <LinearLayout
                 android:id="@+id/monitor"
-                android:textSize="26sp"
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/monitor_text"
-                android:textSize="10sp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/ic_monitor"
+                    android:textSize="30sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>dna
+                <TextView
+                    android:id="@+id/txt_monitor"
+                    android:textSize="8sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <View style="@style/Separator"/>
+            <LinearLayout
+                android:id="@+id/report"
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_marginLeft="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/summary_report"
-                android:textSize="26sp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/ic_report"
+                    android:textSize="30sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/txt_report"
+                    android:textSize="8sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <View style="@style/Separator"/>
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/summary_report_text"
-                android:textSize="10sp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/ic_admin"
+                    android:textSize="30sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/txt_admin"
+                    android:textSize="8sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <View style="@style/Separator"/>
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_marginLeft="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/administration"
-                android:textSize="26sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/administration_text"
-                android:textSize="10sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/btn_settings"
+                    android:textSize="30sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/btn_settings_text"
+                    android:textSize="8sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
     <FrameLayout

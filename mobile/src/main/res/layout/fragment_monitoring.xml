@@ -9,30 +9,103 @@
         android:layout_width="match_parent"
         android:layout_marginBottom="?attr/actionBarSize"
         android:layout_height="match_parent"/>
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/orange"
+        android:background="@color/base_color"
         android:layout_alignParentBottom="true"
         android:minHeight="?attr/actionBarSize">
-
         <LinearLayout
-            android:orientation="vertical"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/ic_refresh"
+                    android:textSize="30sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/txt_refresh"
+                    android:textSize="8sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <View style="@style/Separator"/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/ic_history"
+                    android:textSize="30sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/txt_history"
+                    android:textSize="8sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <TextView
-                android:id="@+id/device_list"
-                android:textSize="26sp"
+                android:id="@+id/txt_device_group"
+                android:textSize="15sp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
             <TextView
-                android:id="@+id/device_list_text"
-                android:textSize="10sp"
+                android:id="@+id/ic_device_group_search"
+                android:textSize="20sp"
+                android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:id="@+id/dev_list"
+        android:orientation="vertical"
+        android:background="@color/primary_background"
+        android:layout_marginBottom="?attr/actionBarSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+        <ExpandableListView
+            android:id="@+id/expandable_group_list"
+            android:groupIndicator="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"/>
+    </LinearLayout>
+
+    <TableLayout
+        android:id="@+id/options_history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TableRow></TableRow>
+    </TableLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

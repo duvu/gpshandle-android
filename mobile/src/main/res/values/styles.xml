@@ -1,8 +1,19 @@
 <resources>
-
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="AppTheme.Base">
         <!-- Customize your theme here. -->
+        <item name="android:textColorSecondary">@color/toolbar_text</item>
     </style>
+    <style name="AppTheme.Base" parent="Theme.AppCompat.NoActionBar">
+    </style>
+
+    <style name="Separator">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:background">@color/base_color_light</item>
+    </style>
+
 
 </resources>

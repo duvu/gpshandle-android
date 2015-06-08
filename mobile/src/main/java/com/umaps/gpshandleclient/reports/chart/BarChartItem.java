@@ -39,7 +39,7 @@ public class BarChartItem extends ChartItem {
 
             convertView = LayoutInflater.from(c).inflate(
                     R.layout.list_item_barchart, null);
-            holder.chart = (BarChart) convertView.findViewById(R.id.chart);
+            holder.chart = (BarChart) convertView.findViewById(R.id.event_count_chart);
 
             convertView.setTag(holder);
 

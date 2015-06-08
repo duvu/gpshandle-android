@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.XAxis.XAxisPosition;
@@ -17,6 +17,21 @@ import com.umaps.gpshandleclient.R;
 public class HorizontalBarChartItem extends ChartItem {
 
     private Typeface mTf;
+    int w, h;
+
+    public void setWidth(int width){
+        w = width;
+    }
+    public int getWidth(){
+        return w;
+    }
+
+    public void setHeight(int height){
+        h = height;
+    }
+    public int getHeight(){
+        return h;
+    }
 
     public HorizontalBarChartItem(ChartData<?> cd, Context c) {
         super(cd);
@@ -35,17 +50,20 @@ public class HorizontalBarChartItem extends ChartItem {
         if (convertView == null) {
             holder = new ViewHolder();
             convertView = LayoutInflater.from(c).inflate(R.layout.list_item_horizontal_barchart, null);
-            holder.chart = (HorizontalBarChart) convertView.findViewById(R.id.chart);
+            holder.chart = (HorizontalBarChart) convertView.findViewById(R.id.event_count_chart);
+            holder.chart.setLayoutParams(new LinearLayout.LayoutParams(getWidth(), getHeight()));
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         // apply styling
         holder.chart.setDescription("");
-        holder.chart.setMinimumHeight(100);
-        holder.chart.setMinimumWidth(100);
+        holder.chart.setMinimumHeight(200);
+        holder.chart.setMinimumWidth(200);
         holder.chart.setDrawGridBackground(true);
         holder.chart.setDrawBarShadow(true);
+
+
 
 
         XAxis xAxis = holder.chart.getXAxis();
@@ -72,7 +90,7 @@ public class HorizontalBarChartItem extends ChartItem {
 
         // do not forget to refresh the chart
 //        holder.chart.invalidate();
-        holder.chart.animateY(700);
+        holder.chart.animateY(900);
 
         return convertView;
     }

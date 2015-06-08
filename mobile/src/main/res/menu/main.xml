@@ -1,14 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/action_list"
-        android:title="@string/action_list_groups"
-        android:icon="@android:drawable/ic_menu_compass"
-        app:showAsAction="withText|ifRoom" />
-    <item android:id="@+id/action_exit"
-        android:title="@string/action_exit"
-        android:orderInCategory="102"
-        app:showAsAction="never"/>
+        xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
     <item android:id="@+id/action_logout"
         android:title="@string/action_logout"
         android:orderInCategory="101"
@@ -16,5 +9,5 @@
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 </menu>

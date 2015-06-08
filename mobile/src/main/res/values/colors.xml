@@ -8,13 +8,24 @@
 0% — 00
 -->
 <resources>
+    <color name="base_color">#ff01054d</color>
+    <color name="base_color_inverse">#ffffffff</color>
+    <color name="base_color_light">#b4b2b2ff</color>
+
+
+    <color name="primary_background">#ffffffff</color>
+    <color name="toolbar_text">#ffffffff</color>
+    <color name="cluster_popup_background">#ffffffff</color>
+
+
+
     <color name="group_size_background">#cc44b3f3</color>
-    <color name="textColor">#ff1e1e1e</color>
+    <color name="text_color_dark">#ff1e1e1e</color>
+    <color name="text_color_white">#ffffffff</color>
     <color name="white_opacity_80">#CCFFFFFF</color>
-    <color name="white_opacity_95">#F2FFFFFF</color>
-    <color name="group_child_background">#ffe3e3e3</color>
-    <color name="red">#ffcc0008</color>
+    <color name="group_child_background">#ffe9e9e9</color>
+    <color name="bad">#ffcc0008</color>
     <color name="green">#ff2dab00</color>
-    <color name="yellow">#ffffe626</color>
+    <color name="warning">#ffff9600</color>
     <color name="orange">#fffac34c</color>
 </resources>
