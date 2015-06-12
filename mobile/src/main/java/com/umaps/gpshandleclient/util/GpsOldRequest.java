@@ -41,6 +41,8 @@ public class GpsOldRequest {
     public static final String KEY_USER_ID         = "userID";
 
     public static final String CMD_GET_USER_ACL     = "getUserAcl";
+    public static final String CMD_GET_ACCOUNT      = "getAccount";
+    public static final String CMD_GET_USERS        = "getUsers";
     public static final String CMD_GET_GROUPS       = "getGroups";
     public static final String CMD_GET_DEVICES      = "getDevices";
     public static final String CMD_GET_MAP_FLEET    = "getMapFleet";
@@ -48,9 +50,11 @@ public class GpsOldRequest {
     public static final String CMD_GET_CHART_SUMMARY = "chartSummary";
 
     private Context context;
+    private HttpQueue mQueue;
 
     private int method;
     private String url;
+    private String requestTag;
 
     private String accountID;
     private String userID;
@@ -64,6 +68,7 @@ public class GpsOldRequest {
 
     public GpsOldRequest(Context context) {
         this.context = context;
+        mQueue = HttpQueue.getInstance(context);
     }
 
     public int getMethod() {
@@ -76,6 +81,14 @@ public class GpsOldRequest {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getRequestTag() {
+        return requestTag;
+    }
+
+    public void setRequestTag(String requestTag) {
+        this.requestTag = requestTag;
     }
 
     public void setUrl(String url) {
@@ -185,59 +198,24 @@ public class GpsOldRequest {
         return null;
     }
 
-    /*private JSONObject createRequestToken(){
-        JSONObject request = new JSONObject();
-        try {
-            request.put(KEY_ACCOUNT_ID, accountID);
-            request.put(KEY_USER_ID, userID);
-            request.put(KEY_PASSWORD, password);
-            request.put(KEY_LOCALE, locale);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return request;
-    }
-    public void updateToken(){
-        this.method = Request.Method.POST;
-        this.url = TOKEN_URL;
-        Response.Listener<JSONObject> tokeHanler = new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.i(TAG, response.toString());
-                MyResponse mRes = new MyResponse(response);
-                if (mRes.isError()){
-                    return;
-                }
-                String token = null;
-                long expiredOn = 0;
-                try {
-                    token = ((JSONObject)mRes.getData()).getString("token");
-                    expiredOn = ((JSONObject)mRes.getData()).getLong("expireOn");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                mApplication.setToken(token);
-                mApplication.setExpireOn(expiredOn);
-            }
-        };
-        Response.ErrorListener tokenErrorHandler = new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //TODO
-            }
-        };
-        JsonObjectRequest jObReq = new
-                JsonObjectRequest(method, url, createRequestToken(), tokeHanler, tokenErrorHandler);
-        HttpQueue.getInstance(context).addToRequestQueue(jObReq);
-    }*/
-
     public void exec(){
         exec(getJson());
     }
+
     public void exec(JSONObject params){
         Log.i(TAG, url);
         JsonObjectRequest jObjReq =
                 new JsonObjectRequest(method, url, params, responseHandler, errorHandler);
-        HttpQueue.getInstance(context).addToRequestQueue(jObjReq);
+        if (!StringTools.isBlank(requestTag)){
+            jObjReq.setTag(requestTag);
+        }
+        if (mQueue != null) {
+            mQueue.addToRequestQueue(jObjReq);
+        }
+    }
+    public void cancel(String tag){
+        if (mQueue != null){
+            mQueue.cancel(tag);
+        }
     }
 }

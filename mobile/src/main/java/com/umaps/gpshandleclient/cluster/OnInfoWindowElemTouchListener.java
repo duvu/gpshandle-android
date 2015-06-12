@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.Marker;
  * Created by vu@umaps.vn on 09/02/2015.
  */
 public abstract class OnInfoWindowElemTouchListener implements View.OnTouchListener {
+    private static final String TAG = "OnInfoWindowListener";
     private View view;
     private Marker marker;
     private Drawable bgNormal;
@@ -31,8 +32,9 @@ public abstract class OnInfoWindowElemTouchListener implements View.OnTouchListe
     @Override
     public boolean onTouch(View vv, MotionEvent event){
         this.view = vv;
+        Log.d(TAG, event.getX()+"/"+event.getY());
         if (0 <= event.getX() && event.getX() <= view.getWidth() &&
-                0 <= event.getY() && event.getY() <= view.getHeight()){
+            0 <= event.getY() && event.getY() <= view.getHeight()){
             switch (event.getActionMasked()){
                 case MotionEvent.ACTION_DOWN:
                     //Start process
@@ -64,20 +66,12 @@ public abstract class OnInfoWindowElemTouchListener implements View.OnTouchListe
             }
         }
     };
-//    @SuppressLint("NewApi")
-    private void setBackground(Drawable bg){
-//        int currentVersion = Build.VERSION.;
-//        if (currentVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH ){
-            view.setBackgroundDrawable(bg);
-//        } else {
-//            view.setBackground(bg);
-//        }
-    }
+
     private void startPress(){
         if (!isPressed){
             isPressed = true;
             handler.removeCallbacks(confirmClickRunnable);
-            setBackground(bgPressed);
+            view.setBackgroundDrawable(bgPressed);
             if (marker!=null){
                 marker.showInfoWindow();
             }
@@ -87,7 +81,7 @@ public abstract class OnInfoWindowElemTouchListener implements View.OnTouchListe
         if (isPressed) {
             this.isPressed = false;
             handler.removeCallbacks(confirmClickRunnable);
-            setBackground(bgNormal);
+            view.setBackgroundDrawable(bgNormal);
             if (marker != null){
                 marker.showInfoWindow();
             }

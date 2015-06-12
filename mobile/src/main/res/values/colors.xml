@@ -13,7 +13,7 @@
     <color name="base_color_light">#b4b2b2ff</color>
 
 
-    <color name="primary_background">#ffffffff</color>
+    <color name="primary_background">#ffd2d2d2</color>
     <color name="toolbar_text">#ffffffff</color>
     <color name="cluster_popup_background">#ffffffff</color>
 

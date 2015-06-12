@@ -9,13 +9,13 @@ import java.util.List;
 /**
  * Created by beou on 01/06/2015.
  */
-public class ReportPagerAdapter extends FragmentPagerAdapter {
+public class PagerAdapter extends FragmentPagerAdapter {
 
     List<Fragment> fragments;
-    public ReportPagerAdapter(FragmentManager fm) {
+    public PagerAdapter(FragmentManager fm) {
         super(fm);
     }
-    public ReportPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+    public PagerAdapter(FragmentManager fm, List<Fragment> fragments) {
         super(fm);
         this.fragments = fragments;
     }

@@ -11,4 +11,10 @@
             android:summary="@string/summary_checkbox_preference" />
 
     </PreferenceCategory>
+    <PreferenceScreen
+        android:key="settings_about"
+        android:title="@string/title_settings_about"
+        android:persistent="false">
+
+    </PreferenceScreen>
 </PreferenceScreen>

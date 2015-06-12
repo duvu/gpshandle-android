@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.reports;
+package com.umaps.gpshandleclient.util;
 
 import android.graphics.Color;
 

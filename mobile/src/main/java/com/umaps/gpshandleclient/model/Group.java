@@ -1,5 +1,7 @@
 package com.umaps.gpshandleclient.model;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +18,9 @@ public class Group {
     private int live = 0;
     private int deviceCount = 0;
 
+    public Group(JSONObject itemGroup){
+
+    }
     public Group(String accountID, String groupId, String description,
                  String displayName, String icon, int live, int deviceCount){
         this.setAccountId(accountID);

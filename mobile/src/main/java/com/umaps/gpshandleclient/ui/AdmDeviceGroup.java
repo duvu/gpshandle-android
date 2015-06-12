@@ -3,17 +3,12 @@ package com.umaps.gpshandleclient.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +21,6 @@ import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
-import com.umaps.gpshandleclient.util.PagerAdapter;
-import com.umaps.gpshandleclient.util.ReportGroupListViewAdapter;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
@@ -39,89 +32,30 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * Created by beou on 04/06/2015.
+ * Created by beou on 08/06/2015.
  */
-public class ReportPager extends Fragment {
-
-    private static final String TAG = "ReportPager";
-    private static final String TAG_REQUEST = "ReportPager";
-
-    private View view;
-    private View mView;
+public class AdmDeviceGroup extends Fragment {
+    private static final String TAG = "AdmDevice";
+    private static final String TAG_REQUEST = "AdmDevice";
     private View mBarProgress;
     private View mProgress;
+    private View mLayout;
+    private MyApplication mApplication;
 
     private GpsOldRequest mRequestGetGroup;
-    ArrayList<Group> groupsList;
-    MyApplication mApplication;
-    private Typeface mTf;
-    public static ReportPager newInstance() {
-        return new ReportPager();
-    }
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public static AdmDeviceGroup newInstance(){
+        return new AdmDeviceGroup();
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_pager_report, container, false);
-        mView = view.findViewById(R.id.view_pager_report);
-        mApplication = MyApplication.getInstance();
-        mTf = mApplication.getIconFont();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.frag_adm_device_groups, container, false);
+
+        //-- for progress-bar
         mBarProgress = view.findViewById(R.id.bar_progress);
         mProgress = view.findViewById(R.id.progress);
-
-        updateAllFragment();
-
-        View deviceGroup = view.findViewById(R.id.device_group);
-        deviceGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleDeviceList(/*view*/);
-            }
-        });
-
-        return view;
-    }
-    private List<Fragment> getFragments() {
-        List<Fragment> frags = new ArrayList<>();
-        RptOverview rptOverview = RptOverview.newInstance();
-        RptEventCount rptEventCount = RptEventCount.newInstance();
-        frags.add(rptOverview);
-        frags.add(rptEventCount);
-        return frags;
-    }
-
-    public void updateAllFragment() {
-        ViewPager mViewPager = (ViewPager) view.findViewById(R.id.view_pager_report);
-
-        TextView tvDeviceGroupSearch = (TextView) view.findViewById(R.id.ic_device_group_search);
-        TextView txtDeviceGroup = (TextView) view.findViewById(R.id.txt_device_group);
-        tvDeviceGroupSearch.setTypeface(mTf);
-        tvDeviceGroupSearch.setText(String.valueOf((char) 0xe629));
-        txtDeviceGroup.setText(mApplication.getSelGroupDesc());
-
-        List<Fragment> fragments = getFragments();
-        PagerAdapter mPageAdapter = new PagerAdapter(getChildFragmentManager(), fragments);
-        mViewPager.setAdapter(mPageAdapter);
-    }
-
-    /**
-     * function toggle device list
-     **/
-    private void toggleDeviceList(/*View mView*/){
-        if (view == null){
-            return;
-        }
-        final View layout = view.findViewById(R.id.rpt_group_list_layout);
-        if (layout.getVisibility()==View.VISIBLE){
-            layout.setVisibility(View.GONE);
-            return;
-        } else {
-            layout.setVisibility(View.VISIBLE);
-        }
-        Log.d(TAG, "toggleDeviceList: " + mApplication.getGroupList());
+        mLayout = view.findViewById(R.id.layout_devices);
+        mApplication = MyApplication.getInstance();
 
         mRequestGetGroup = new GpsOldRequest(getActivity());
         mRequestGetGroup.setAccountID(mApplication.getAccountID());
@@ -140,8 +74,7 @@ public class ReportPager extends Fragment {
                 if (mRes.isError()) {
                     return;
                 }
-                groupsList = new ArrayList<>();
-                //HashMap<String, ArrayList<Device>> devicesInGroup = new HashMap<>();
+                ArrayList<Group> groupsList = new ArrayList<>();
                 try {
                     JSONArray mJSONArray = (JSONArray) mRes.getData();
                     for (int i = 0; i < mJSONArray.length(); i++) {
@@ -154,53 +87,52 @@ public class ReportPager extends Fragment {
                         int deviceCount = itemGroup.getInt("deviceCount");
 
                         long currTimestamp = Calendar.getInstance().getTimeInMillis() / 1000;
+                        int countLive = 0;
                         Group group = new Group(
                                 accountID,
                                 groupID,
                                 (groupDisplay == null ? groupDescription : groupDisplay),
                                 (groupDisplay == null ? groupDescription : groupDisplay),
                                 pushpinID/*icon*/,
-                                0/*countLive*//*live*/,
+                                countLive/*live*/,
                                 deviceCount);
                         groupsList.add(group);
-                        //devicesInGroup.put(groupID, mArrayDevice);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                ListView groupListView = (ListView) view.findViewById(R.id.rpt_group_list);
-                groupListView.setClickable(true);
+                ListView groupList = (ListView) view.findViewById(R.id.list_view_device_groups);
+                groupList.setClickable(true);
+                final AdmDeviceGroupAdapter groupListAdapter =
+                        new AdmDeviceGroupAdapter(getActivity(), R.layout.list_view_adm_group, groupsList);
+                if (groupListAdapter != null) {
+                    groupList.setAdapter(groupListAdapter);
+                }
 
-                groupListView.setAdapter(new ReportGroupListViewAdapter(getActivity(),
-                        R.layout.list_view_report_group,
-                        groupsList));
-                groupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Log.i(TAG, "You'v just clicked on: " + groupsList.get(position).getDisplayName());
-                        mApplication.setSelGroup(groupsList.get(position).getGroupId());
-                        mApplication.setSelGroupDesc(groupsList.get(position).getDisplayName());
-                        mApplication.storeSettings();
-                        //invalidated();
-                        //get
-                        updateAllFragment();
-                        //-- hide layout
-                        layout.setVisibility(View.GONE);
-                    }
-                });
+                final TextView tvDeviceGroup = (TextView) view.findViewById(R.id.txt_device_group);
+                //--setOnclickListener
+
             }
         });
         mRequestGetGroup.setRequestTag(TAG_REQUEST);
         mRequestGetGroup.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                showProgress(false);
-                Toast.makeText(getActivity(), "Error", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
         mRequestGetGroup.exec();
         showProgress(true);
+        return view;
     }
+
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        mRequestGetGroup.cancel(TAG_REQUEST);
+        showProgress(false);
+    }
+
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -210,14 +142,14 @@ public class ReportPager extends Fragment {
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+            int shortAnimTime = getActivity().getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mView.animate().setDuration(shortAnimTime).alpha(
+            mLayout.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLayout.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    mLayout.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
 
@@ -234,18 +166,18 @@ public class ReportPager extends Fragment {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mBarProgress.setVisibility(show ? View.VISIBLE : View.GONE);
-            mView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLayout.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
     private JSONObject createParams(){
         JSONObject jsonParamsObject = new JSONObject();
         List<String> fields = new ArrayList<>();
-        fields.add("accountID");
-        fields.add("groupID");
-        fields.add("description");
-        fields.add("pushpinID");
-        fields.add("displayName");
-        fields.add("deviceCount");
+            fields.add("accountID");
+            fields.add("groupID");
+            fields.add("description");
+            fields.add("pushpinID");
+            fields.add("displayName");
+            fields.add("deviceCount");
         try {
             jsonParamsObject.put(StringTools.KEY_FIELDS, new JSONArray(fields));
         } catch (JSONException e) {
@@ -253,5 +185,4 @@ public class ReportPager extends Fragment {
         }
         return jsonParamsObject;
     }
-
 }

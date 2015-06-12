@@ -2,7 +2,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="AppTheme.Base">
         <!-- Customize your theme here. -->
-        <item name="android:textColorSecondary">@color/toolbar_text</item>
     </style>
     <style name="AppTheme.Base" parent="Theme.AppCompat.NoActionBar">
     </style>

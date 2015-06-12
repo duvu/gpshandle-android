@@ -14,7 +14,7 @@
         android:background="@color/base_color"
         android:minHeight="?attr/actionBarSize"
         app:popupTheme="@style/Theme.AppCompat.NoActionBar"
-        app:theme="@style/AppTheme">
+        android:theme="@style/AppTheme">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_gravity="end"
@@ -64,6 +64,7 @@
             </LinearLayout>
             <View style="@style/Separator"/>
             <LinearLayout
+                android:id="@+id/admin"
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -84,6 +85,7 @@
             </LinearLayout>
             <View style="@style/Separator"/>
             <LinearLayout
+                android:id="@+id/settings"
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">

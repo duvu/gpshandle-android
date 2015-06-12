@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.android.volley.Request;
@@ -26,8 +25,7 @@ import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.model.MyResponse;
-import com.umaps.gpshandleclient.reports.GPSColors;
-import com.umaps.gpshandleclient.reports.chart.HorizontalBarChartItem;
+import com.umaps.gpshandleclient.util.GPSColors;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
@@ -36,26 +34,28 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by beou on 06/06/2015.
  */
-public class EventCountChart extends Fragment {
+public class RptEventCount extends Fragment {
     private static final String TAG = "EventCountChart";
     private HorizontalBarChart mChart;
     private View mBarProgress;
     private View mProgress;
-    public static EventCountChart newInstance(){
-        return new EventCountChart();
+    private GpsOldRequest mRequest;
+
+    private static final String TAG_REQUEST = "rptEventCount";
+    public static RptEventCount newInstance(){
+        return new RptEventCount();
     }
-    public EventCountChart(){
+    public RptEventCount(){
         super();
     }
     @Override
     public void onAttach(Activity activity){
         super.onAttach(activity);
-        Utils.init(getResources());
+
     }
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -66,88 +66,91 @@ public class EventCountChart extends Fragment {
         View view = inflater.inflate(R.layout.frag_event_count_report, container, false);
         mBarProgress = view.findViewById(R.id.bar_progress);
         mProgress = view.findViewById(R.id.progress);
-        //getScreenSize();
-
-
-        mChart = (HorizontalBarChart) view.findViewById(R.id.event_count_chart);
-
         MyApplication mApplication = MyApplication.getInstance();
-        final GpsOldRequest mRequest = new GpsOldRequest(getActivity());
-
+        Utils.init(getResources());
+        mChart = (HorizontalBarChart) view.findViewById(R.id.event_count_chart);
+        mRequest = new GpsOldRequest(getActivity());
         mRequest.setAccountID(mApplication.getAccountID());
         mRequest.setUserID(mApplication.getUserID());
         mRequest.setPassword(mApplication.getPassword());
         mRequest.setMethod(Request.Method.GET);
-        String url = String.format(GpsOldRequest.CHART_SUMMARY_URL, mApplication.getToken(), mApplication.getSelGroup());
+        String url = String.format(GpsOldRequest.CHART_SUMMARY_URL,
+                mApplication.getToken(), mApplication.getSelGroup());
         mRequest.setUrl(url);
+
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
-
+                showProgress(false);
                 MyResponse mRes = new MyResponse(response);
                 if (mRes.isError()) return;
-                JSONArray mData = (JSONArray) mRes.getData();
 
-                List<ECModel> mPreDat = new ArrayList<ECModel>();
-                ArrayList<BarEntry> yHBVal = new ArrayList<>();
+                JSONArray mData = (JSONArray) mRes.getData();
+                ArrayList<BarEntry> eventYVal = new ArrayList<>();
                 ArrayList<BarEntry> odoYVal = new ArrayList<>();
                 ArrayList<String> xHBVals = new ArrayList<>();
                 for (int i = 0; i < mData.length(); i++) {
                     try {
                         ECModel ec = new ECModel(mData.getString(i));
-                        yHBVal.add(new BarEntry((float)ec.getCount(), i));
-                        odoYVal.add(new BarEntry((float)ec.getDistance(), i));
+                        Log.d(TAG, "" + ec.getCount());
+                        Log.d(TAG, "" + ec.getDistance());
+
+                        eventYVal.add(new BarEntry((float) ec.getCount(), i));
+                        odoYVal.add(new BarEntry(ec.getDistance(), i));
+
                         String desc = ec.getDescription();
                         desc = desc.length() > 16 ? desc.substring(0, 15) : desc;
                         xHBVals.add(desc);
-                        mPreDat.add(ec);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
 
-                //-- Horizontal-BarChart
-                ArrayList<BarDataSet> barDataSets = new ArrayList<>();
-                BarDataSet barDataSet = new BarDataSet(yHBVal, getString(R.string.bar_events));//"Events");
-                BarDataSet odoDataSet = new BarDataSet(odoYVal, getString(R.string.bar_odo_meter));//"Odo-meter");
-
                 //-- color
                 ArrayList<Integer> colors = new ArrayList<>();
-                for (int c : GPSColors.RUNNING_COLORS){
+                for (int c : GPSColors.RUNNING_COLORS) {
                     colors.add(c);
                 }
-                for (int c : GPSColors.IDLING_COLORS){
+                for (int c : GPSColors.IDLING_COLORS) {
                     colors.add(c);
                 }
-                for (int c : GPSColors.STOPPED_COLORS){
+                for (int c : GPSColors.STOPPED_COLORS) {
                     colors.add(c);
                 }
 
-                barDataSet.setColor(colors.get(0));
-                barDataSet.setBarSpacePercent(1f);
+                //-- Horizontal-BarChart
+                BarDataSet eventDataSet = new BarDataSet(eventYVal, getString(R.string.bar_events));//"Events");
+                BarDataSet odoDataSet = new BarDataSet(odoYVal, getString(R.string.bar_odo_meter));//"Odo-meter");
+
+                eventDataSet.setColor(colors.get(0));
                 odoDataSet.setColor(colors.get(1));
-                barDataSets.add(barDataSet);
+
+                //eventDataSet.setBarSpacePercent(1f);
+                ArrayList<BarDataSet> barDataSets = new ArrayList<>();
+                barDataSets.add(eventDataSet);
                 barDataSets.add(odoDataSet);
 
                 BarData barData = new BarData(xHBVals, barDataSets);
                 mChart.setData(barData);
 
                 // apply styling
-                mChart.setDescription("");
-                mChart.setMinimumHeight(200);
-                mChart.setMinimumWidth(200);
+                mChart.setDescription(getString(R.string.rpt_event_count_desc));
+                //mChart.setMinimumHeight(200);
+                //mChart.setMinimumWidth(200);
                 mChart.setDrawGridBackground(true);
                 mChart.setDrawBarShadow(true);
 
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                 int layoutH, layoutW;
-                layoutH = mData.length()*80;
+                layoutH = 80 + mData.length() * 120;
+                //layoutH = displayMetrics.heightPixels;
+                //layoutH = (layoutH >= (mData.length() * 100) ? layoutH : mData.length() * 100);
                 layoutW = displayMetrics.widthPixels;
                 mChart.setLayoutParams(new LinearLayout.LayoutParams(layoutW, layoutH));
                 mChart.invalidate();
-                showProgress(false);
+
             }
         });
         mRequest.setErrorHandler(new Response.ErrorListener() {
@@ -156,11 +159,19 @@ public class EventCountChart extends Fragment {
                 Log.e(TAG, error.toString());
             }
         });
+        mRequest.setRequestTag(TAG_REQUEST);
         mRequest.exec();
         showProgress(true);
         return view;
     }
-
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        //mChart = null;
+        //mBarProgress = null;
+        //mProgress = null;
+        mRequest.cancel(TAG_REQUEST);
+    }
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -201,23 +212,24 @@ public class EventCountChart extends Fragment {
         private String id;
         private String description;
         private int count;
-        private double distance;
+        private float distance;
 
         public ECModel(String data){
+            Log.d(TAG, data);
             if (StringTools.isBlank(data)) return;
             String[] mDat = data.split("\\|", -1);
             if (mDat.length < 4) return;
             this.id = mDat[0];
             this.description = mDat[1];
             this.count = Integer.parseInt(mDat[2]);
-            this.distance = Double.parseDouble(mDat[3]);
+            this.distance = Float.parseFloat(mDat[3]);
         }
 
-        public double getDistance() {
+        public float getDistance() {
             return distance;
         }
 
-        public void setDistance(double distance) {
+        public void setDistance(float distance) {
             this.distance = distance;
         }
 
@@ -245,11 +257,4 @@ public class EventCountChart extends Fragment {
             this.id = id;
         }
     }
-    /*private int layoutH, layoutW;
-    private void getScreenSize(){
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        this.layoutH = displayMetrics.heightPixels;
-        this.layoutW = displayMetrics.widthPixels;
-    }*/
 }

@@ -143,42 +143,17 @@
         </TableRow>
     </TableLayout>
     <LinearLayout
+        android:id="@+id/link_historical"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
-        <!--<Button
-            android:id="@+id/btn_historical_30m"
-            android:text="@string/historical_30m"
-            android:textSize="12sp"
-            android:textColor="@color/text_color_dark"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/button_history"/>-->
         <Button
-            android:id="@+id/btn_historical_60m"
-            android:text="@string/historical_1h"
-            android:textSize="12sp"
+            android:id="@+id/txt_link_historical"
             android:textColor="@color/text_color_dark"
-            android:layout_marginRight="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_history"/>
-        <Button
-            android:id="@+id/btn_historical_6h"
-            android:text="@string/historical_6h"
-            android:textSize="12sp"
-            android:textColor="@color/text_color_dark"
-            android:layout_marginRight="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_history"/>
-        <Button
-            android:id="@+id/btn_historical_12h"
-            android:text="@string/historical_12h"
-            android:textSize="12sp"
-            android:textColor="@color/text_color_dark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_history"/>
+            android:layout_width="match_parent"
+            android:background="@drawable/button_link_history"
+            android:layout_height="wrap_content" />
     </LinearLayout>
+
 </LinearLayout>

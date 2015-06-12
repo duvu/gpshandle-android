@@ -2,6 +2,7 @@ package com.umaps.gpshandleclient.cluster;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.model.MapPoint;
 import com.umaps.gpshandleclient.ui.MainActivity;
+import com.umaps.gpshandleclient.ui.MapFragment;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
 
@@ -36,7 +38,16 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
     Typeface icoMoon = null;
     MyApplication mApplication;
 
-    public TrackInfoWindowAdapter(Context context, CustomMapLayout customMapLayout){
+    public TrackInfoWindowAdapter (Fragment fragment, CustomMapLayout customMapLayout){
+        this.context = fragment.getActivity();
+        this.mApplication = MyApplication.getInstance();
+        mCallback = (MapFragment)fragment;
+        mapLayout = customMapLayout;
+        inflater = LayoutInflater.from(context);
+        icoMoon = mApplication.getIconFont();
+    }
+
+    /*public TrackInfoWindowAdapter(Context context, CustomMapLayout customMapLayout){
         this.context = context;
         this.mApplication = MyApplication.getInstance();
         mCallback = (MainActivity)context;
@@ -55,7 +66,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
             Log.e(TAG, "Cannot cast to MainActivity");
         }
         inflater = (LayoutInflater.from(context));
-    }
+    }*/
 
     @Override
     public View getInfoWindow(Marker marker) {
@@ -75,7 +86,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
             return null;
         }
         //-- jsonObject should not null now
-        Log.i(TAG, "##"+jsonObject.toString());
+        //Log.i(TAG, "##"+jsonObject.toString());
         try {
             if(jsonObject.getBoolean(IS_CLUSTER)){
                 //Log.i("INFO-WINDOW", "You've clicked on a cluster");
@@ -175,7 +186,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
         cSpeed.setText(mapPoint.getSpeedKPH()+"km/h");
         TextView cOdom = (TextView) view.findViewById(R.id.txt_odom_content);
         cOdom.setText(mapPoint.getOdoM()+"km");
-        final TextView contentAddr = (TextView) view.findViewById(R.id.txt_addr_content);
+        TextView contentAddr = (TextView) view.findViewById(R.id.txt_addr_content);
         contentAddr.setText(mapPoint.getAddress());
 
         //--Setup listener for historical button
@@ -198,7 +209,7 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
             }
         });*/
         //--
-        Button btn60min = (Button) view.findViewById(R.id.btn_historical_60m);
+        /*Button btn60min = (Button) view.findViewById(R.id.btn_historical_60m);
         btn60min.setOnTouchListener(
                 new OnInfoWindowElemTouchListener(
                         btn60min,
@@ -246,7 +257,26 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
                         mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
                     }
                 }
-        );
+        );*/
+        /*TextView icLink = (TextView) view.findViewById(R.id.ic_link_historical);
+        icLink.setTypeface(icoMoon);*/
+        Button txtLink = (Button) view.findViewById(R.id.txt_link_historical);
+        txtLink.setText(R.string.title_historical);
+
+        View vHistory = view.findViewById(R.id.link_historical);
+        Log.d(TAG, txtLink.getWidth() + "/" + txtLink.getHeight());
+        txtLink.setOnTouchListener(
+            new OnInfoWindowElemTouchListener(
+                vHistory,
+                context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
+                context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
+        ) {
+            @Override
+            protected void onClickConfirm(View view, Marker marker) {
+                Log.d(TAG, "Touched!");
+                mCallback.onTrackInfoWindowButton(id, desc);
+            }
+        });
         //----------------------------------------------------------------------------------------//
         if (mapLayout!=null){
             mapLayout.setMarkerWithWindowInfo(marker, view);
@@ -261,6 +291,6 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
     }
 
     public interface TrackInfoWindowCallback{
-        public void onTrackInfoWindowButton(String deviceId, String desc, long from, long to);
+        public void onTrackInfoWindowButton(String deviceId, String desc/*, long from, long to*/);
     }
 }

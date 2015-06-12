@@ -11,31 +11,6 @@ import org.json.JSONObject;
 public class MapPoint {
     public static final String SEP = "|";
 
-    /*public static final String ID = "id";
-    public static final String VIN = "vin";
-    public static final String DESC = "desc";
-    public static final String EPOCH = "epoch";
-    public static final String DATE = "date";
-    public static final String TIME = "time";
-    public static final String TIMEZONE = "timeZone";
-    public static final String STATUS = "status";
-    public static final String ICON = "icon";
-    public static final String LATITUDE = "latitude";
-    public static final String LONGITUDE = "longitude";
-    public static final String GPS_AGE = "gpsAge";
-    public static final String CREATION_AGE = "creationAge";
-    public static final String ACCURACY = "accuracy";
-    public static final String SAT_COUNT = "satCount";
-    public static final String SPEED = "speed";
-    public static final String HEADING = "heading";
-    public static final String ALTITUDE = "altitude";
-    public static final String ODOM = "odom";
-    public static final String IS_STOPPED = "isStopped";
-    public static final String GP_IO = "gpIO";
-    public static final String ADDRESS = "address";
-    public static final String BATTERY_LEVEL = "batteryLevel";
-    public static final String SIGNAL_STRENGTH = "ssi";*/
-    //----------------------------------------------------------------------------------------//
     private String  id;
     private String  vin;
     private String  desc;

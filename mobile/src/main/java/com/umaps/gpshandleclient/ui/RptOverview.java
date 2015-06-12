@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,7 +27,7 @@ import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.model.MyResponse;
-import com.umaps.gpshandleclient.reports.GPSColors;
+import com.umaps.gpshandleclient.util.GPSColors;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
 
 import org.json.JSONArray;
@@ -38,16 +39,25 @@ import java.util.ArrayList;
 /**
  * Created by beou on 04/06/2015.
  */
-public class OverviewChart extends Fragment {
+public class RptOverview extends Fragment {
     private static final String TAG = "OverviewChart";
     private PieChart mChart;
     private View mBarProgress;
     private View mProgress;
 
-    public static OverviewChart newInstance() {
-        return new OverviewChart();
+    private GpsOldRequest mRequest;
+    private static final String TAG_REQUEST = "tptOverview";
+
+    private View view;
+
+    MyApplication mApplication;
+
+    private Typeface mTf;
+
+    public static RptOverview newInstance() {
+        return new RptOverview();
     }
-    public OverviewChart(){
+    public RptOverview(){
         super();
     }
     @Override
@@ -63,18 +73,27 @@ public class OverviewChart extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "create overview report");
-        View view = inflater.inflate(R.layout.frag_overview_report, container, false);
+        view = inflater.inflate(R.layout.frag_overview_report, container, false);
         mBarProgress = view.findViewById(R.id.bar_progress);
         mProgress = view.findViewById(R.id.progress);
+        mApplication = MyApplication.getInstance();
+        mTf = mApplication.getIconFont();
 
+        //mCallback = (ReportPager) getParentFragment();
+
+        invalidated();
+        return view;
+    }
+
+    private void invalidated(){
         Utils.init(getResources());
         mChart = (PieChart) view.findViewById(R.id.event_count_chart);
         mChart.setHoleRadius(45f);
         mChart.setTransparentCircleRadius(50f);
         mChart.setRotationEnabled(false);
 
-        MyApplication mApplication = MyApplication.getInstance();
-        GpsOldRequest mRequest = new GpsOldRequest(getActivity());
+
+        mRequest = new GpsOldRequest(getActivity());
 
         mRequest.setAccountID(mApplication.getAccountID());
         mRequest.setUserID(mApplication.getUserID());
@@ -83,6 +102,7 @@ public class OverviewChart extends Fragment {
 
         String url = String.format(GpsOldRequest.CHART_STATE_URL, mApplication.getToken(), mApplication.getSelGroup());
         mRequest.setUrl(url);
+        mRequest.setRequestTag(TAG_REQUEST);
 
         //-- prepare piechart data
         PieData pieData = new PieData();
@@ -91,6 +111,7 @@ public class OverviewChart extends Fragment {
             @Override
             public void onResponse(JSONObject response) {
                 Log.i(TAG, response.toString());
+                showProgress(false);
                 int intRunning = 0;
                 int intIdling = 0;
                 int intStopped = 0;
@@ -160,7 +181,7 @@ public class OverviewChart extends Fragment {
                 Legend l = mChart.getLegend();
                 l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
                 mChart.invalidate();
-                showProgress(false);
+
             }
         });
         mRequest.setErrorHandler(new Response.ErrorListener() {
@@ -171,16 +192,19 @@ public class OverviewChart extends Fragment {
         });
         mRequest.exec();
         showProgress(true);
-        return view;
     }
 
     @Override
     public void onDetach(){
         super.onDetach();
         //mChart = null;
-        mBarProgress = null;
-        mProgress = null;
+        //mBarProgress = null;
+        //mProgress = null;
+        mRequest.cancel(TAG_REQUEST);
     }
+
+
+
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -217,4 +241,9 @@ public class OverviewChart extends Fragment {
             mChart.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
+
+
+    /*public interface RptOverviewCallback{
+        public void updateAllFragment();
+    }*/
 }

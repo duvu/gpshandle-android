@@ -1,8 +1,7 @@
-package com.umaps.gpshandleclient.view;
+package com.umaps.gpshandleclient.util;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +96,7 @@ public class DeviceGroupListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(final int groupPosition, boolean isExpandable, View convertView, ViewGroup parent) {
         if(convertView==null){
             LayoutInflater inflater = LayoutInflater.from(this.getContext());
-            convertView = inflater.inflate(R.layout.gps_device_group, null);
+            convertView = inflater.inflate(R.layout.gps_group, null);
         }
         String groupID          = "";
         String groupDescription = "";

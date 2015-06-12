@@ -157,7 +157,7 @@
                     android:layout_gravity="center"
                     android:textColor="@color/text_color_white"
                     android:background="@drawable/button"
-                    android:text="@string/btnlogin" />
+                    android:text="@string/button_login" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -1,9 +1,13 @@
 package com.umaps.gpshandleclient.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -11,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,13 +23,13 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -44,10 +49,9 @@ import com.umaps.gpshandleclient.model.MapPoint;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.model.TrackItem;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
-import com.umaps.gpshandleclient.util.HttpQueue;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
-import com.umaps.gpshandleclient.view.DeviceGroupListAdapter;
+import com.umaps.gpshandleclient.util.DeviceGroupListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,18 +61,20 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
  * Created by vu@umaps.vn on 30/01/2015.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback {
-    private final String TAG    = "MapMonitoringFragment";
+public class MapFragment extends Fragment implements OnMapReadyCallback,
+        TrackInfoWindowAdapter.TrackInfoWindowCallback  {
+    private static final String TAG    = "MapMonitoringFragment";
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private SupportMapFragment mapFragment;
     private ClusterManager<TrackItem> mClusterManager;
+
+    private static final String TAG_REQUEST = "TagRequest";
 
     TrackInfoWindowAdapter trackInfoWindowAdapter;
     TimerTask doAsynchronous = null;
@@ -76,9 +82,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     final Timer timer = new Timer();
 
     private MyApplication mApplication;
-    private GpsOldRequest mRequest;
+    private GpsOldRequest mRequestRealtime;
+    private GpsOldRequest mRequestHistory;
+    private GpsOldRequest mRequestGetGroup;
     private View view;
 
+    private boolean isRunning = false;
+
+    private View mBarProgress;
+    private View mProgress;
+    private View mView;
+    TextView txtDeviceGroup;
+    View mHistoryOptions;
     public static final MapFragment newInstance(){
         return new MapFragment();
     }
@@ -92,47 +107,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mApplication = MyApplication.getInstance();
         Typeface mTf = MyApplication.getIconFont();
-        view = inflater.inflate(R.layout.fragment_monitoring, container, false);
-        //view.findViewById(R.id.dev_list).setVisibility(View.GONE);
+        view = inflater.inflate(R.layout.frag_monitoring, container, false);
+        mBarProgress = view.findViewById(R.id.bar_progress);
+        mProgress = view.findViewById(R.id.progress);
+        mView = view.findViewById(R.id.map);
+        txtDeviceGroup = (TextView) view.findViewById(R.id.txt_device_group);
+        mHistoryOptions = view.findViewById(R.id.options_history);
 
-        TextView icRefresh = (TextView) view.findViewById(R.id.ic_refresh);
-        TextView txtRefresh = (TextView) view.findViewById(R.id.txt_refresh);
-        icRefresh.setTypeface(mTf);
-        icRefresh.setText(String.valueOf((char) 0xe607));
-        txtRefresh.setText(R.string.btn_refresh);
-
-        TextView icHistory = (TextView) view.findViewById(R.id.ic_history);
-        TextView txtHistory = (TextView) view.findViewById(R.id.txt_history);
-        icHistory.setTypeface(mTf);
-        icHistory.setText(String.valueOf((char) 0xe613));
-        txtHistory.setText(R.string.btn_history);
-
-        TextView txtDeviceGroup = (TextView) view.findViewById(R.id.txt_device_group);
         TextView tvDeviceGroupSearch = (TextView) view.findViewById(R.id.ic_device_group_search);
         tvDeviceGroupSearch.setTypeface(mTf);
         tvDeviceGroupSearch.setText(String.valueOf((char) 0xe629));
-        txtDeviceGroup.setText(R.string.device_list);
-        txtDeviceGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Onclick");
-                toggleDeviceList(/*view*/);
-            }
-        });
-        tvDeviceGroupSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleDeviceList(/*view*/);
-            }
-        });
+        txtDeviceGroup.setText(mApplication.getSelGroupDesc());
 
-        mRequest = new GpsOldRequest(getActivity());
-        mRequest.setAccountID(mApplication.getAccountID());
-        mRequest.setUserID(mApplication.getUserID());
-        mRequest.setPassword(mApplication.getPassword());
-        mRequest.setCommand(GpsOldRequest.CMD_GET_MAP_FLEET);
-        mRequest.setMethod(Request.Method.POST);
-        mRequest.setUrl(GpsOldRequest.MAPPING_URL);
+        View deviceGroup = view.findViewById(R.id.device_group);
+        deviceGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleDeviceList(/*view*/);
+            }
+        });
+        mApplication.setIsFleet(true);
+
 
         if (mapFragment == null) {
             mapFragment = new SupportMapFragment(){
@@ -152,7 +147,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
-
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        mBarProgress = null;
+        mProgress = null;
+        if (mRequestRealtime != null) {
+            try {
+                mRequestRealtime.cancel(TAG_REQUEST);
+            } catch (NullPointerException ne){
+                ne.printStackTrace();
+                return;
+            }
+        }
+    }
     @Override
     public void onResume(){
         super.onResume();
@@ -165,12 +173,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    PolylineOptions rectLine;
+    PolylineOptions historicalData;
     private float currentZoom = 12;
     private void setUpMap() {
         ((CustomMapLayout)view).init(mMap, getPixelsFromDp(getActivity(), 39));
         if (trackInfoWindowAdapter==null){
-            trackInfoWindowAdapter = new TrackInfoWindowAdapter(getActivity(), ((CustomMapLayout)view));
+            trackInfoWindowAdapter = new TrackInfoWindowAdapter(this, ((CustomMapLayout)view));
         }
         mMap.setInfoWindowAdapter(trackInfoWindowAdapter);
         //-- Setup UI
@@ -189,9 +197,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * function: realTimeTracking
      * return: void
      **/
+    boolean isShowing = false;
+    float zoom = 0;
+    CameraUpdate cu = null;
     public void realTimeTracking(){
-        mMap.clear();
+        isShowing = false;
         String groupId = mApplication.getSelGroup();
+        if (StringTools.isBlank(groupId) || "all".equalsIgnoreCase(groupId)){
+            txtDeviceGroup.setText(R.string.select_a_group);
+        }
+        txtDeviceGroup.setText(mApplication.getSelGroupDesc());
         JSONObject jsonParams = new JSONObject();
         try {
             jsonParams.put(StringTools.FLD_status, null);
@@ -203,12 +218,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mRequest.setParams(jsonParams);
-
+        mRequestRealtime = new GpsOldRequest(getActivity());
+        mRequestRealtime.setAccountID(mApplication.getAccountID());
+        mRequestRealtime.setUserID(mApplication.getUserID());
+        mRequestRealtime.setPassword(mApplication.getPassword());
+        mRequestRealtime.setCommand(GpsOldRequest.CMD_GET_MAP_FLEET);
+        mRequestRealtime.setMethod(Request.Method.POST);
+        mRequestRealtime.setUrl(GpsOldRequest.MAPPING_URL);
+        mRequestRealtime.setParams(jsonParams);
         Response.Listener<JSONObject> responseHandler = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.i(TAG, response.toString());
+                isRunning = false;
                 MyResponse mResponse = new MyResponse(response);
                 if (mResponse.isError()){
                     Toast.makeText(getActivity(), mResponse.getMessage(), Toast.LENGTH_LONG);
@@ -224,42 +246,41 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 LatLngBounds bounds;
                 MapPoint[] pts = mapData.getPoints();
                 if (pts.length <= 0) return;
-                LatLng lastLatLng = null;
+
                 mClusterManager.clearItems();
-                int i = 0;
-                for (i = 0; i < pts.length; i++) {
+                for (int i = 0; i < pts.length; i++) {
                     LatLng latLng = new LatLng(pts[i].getLatitude(), pts[i].getLongitude());
                     builder.include(latLng);
                     TrackItem to = new TrackItem(pts[i]);
                     mClusterManager.addItem(to);
                 }
-                float zoom = 0;
-                        /*if (isViewing()){
-                            //NO-OP
-                        } else {*/
-                //setViewing(true);
-                CameraUpdate cu = null;
-                bounds = builder.build();
-                LatLng sw = bounds.southwest;
-                LatLng ne = bounds.northeast;
-                double dt = SphericalUtil.computeDistanceBetween(sw, ne);
-                if (dt < 200){
-                    cu = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 14);
-                    mMap.moveCamera(cu);
+                if (!isShowing){
+                    bounds = builder.build();
+                    LatLng sw = bounds.southwest;
+                    LatLng ne = bounds.northeast;
+                    double dt = SphericalUtil.computeDistanceBetween(sw, ne);
+                    if (dt < 200){
+                        cu = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 14);
+                        mMap.moveCamera(cu);
+                    } else {
+                        cu = CameraUpdateFactory.newLatLngBounds(bounds, 100 /*padding*/);
+                        mMap.moveCamera(cu);
+                    }
+                    isShowing = true;
                 } else {
-                    cu = CameraUpdateFactory.newLatLngBounds(bounds, 100 /*padding*/);
-                    mMap.moveCamera(cu);
+                    //-- Noop
                 }
             }
         };
         Response.ErrorListener errorHandler = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                isRunning = false;
             }
         };
-        mRequest.setResponseHandler(responseHandler);
-        mRequest.setErrorHandler(errorHandler);
+        mRequestRealtime.setResponseHandler(responseHandler);
+        mRequestRealtime.setErrorHandler(errorHandler);
+        mRequestRealtime.setRequestTag(TAG_REQUEST);
         //Clear old task
         if (doAsynchronous != null) {
             doAsynchronous.cancel();
@@ -271,127 +292,146 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mRequest.exec();
+                        if (!isRunning) {
+                            mRequestRealtime.exec();
+                            isRunning = true;
+                        }
                     }
                 });
             }
         };
         timer.schedule(doAsynchronous, 0, mApplication.getTimeInterval());
 
-        mMap.setOnCameraChangeListener(mClusterManager);
-        mMap.setOnMarkerClickListener(mClusterManager);
-        mMap.setOnInfoWindowClickListener(mClusterManager);
-
         mClusterManager.setRenderer(new TrackClusterRenderer(getActivity(), mMap, mClusterManager));
         mClusterManager.setOnClusterClickListener(TrackClusterManager.getInstance());
         mClusterManager.setOnClusterInfoWindowClickListener(TrackClusterManager.getInstance());
         mClusterManager.setOnClusterItemClickListener(TrackClusterManager.getInstance());
         mClusterManager.setOnClusterItemInfoWindowClickListener(TrackClusterManager.getInstance());
+
+        mMap.setOnCameraChangeListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+        mMap.setOnInfoWindowClickListener(mClusterManager);
+        mMap.clear();
     }
 
     //-- startHistoricalTracking
-    public void startHistoricalTracking(String deviceId, long from, long to) throws JSONException {
-        Log.i(TAG, "startHistoricalTracking ...");
+    public void startHistoricalTracking(String deviceId, long from, long to) {
+        txtDeviceGroup.setText(mApplication.getSelDeviceDesc());
         if (doAsynchronous != null) {
             doAsynchronous.cancel();
             doAsynchronous = null;
         }
         JSONObject jsonParamsObject = new JSONObject();
-        jsonParamsObject.put(StringTools.FLD_deviceID, deviceId);
-        jsonParamsObject.put(StringTools.FLD_status, null);
-        jsonParamsObject.put(StringTools.FLD_timeFrom, from/*1421127296*/);
-        jsonParamsObject.put(StringTools.FLD_timeTo,   to/*1421137296*/);
-        jsonParamsObject.put(StringTools.FLD_inclZones, false);
-        jsonParamsObject.put(StringTools.FLD_inclDebug, false);
-        jsonParamsObject.put(StringTools.FLD_inclPOI, false);
-        jsonParamsObject.put(StringTools.FLD_inclTime, false);
-        //get historical data here
-        JSONObject jsonRequest = StringTools.createRequest(
-                mApplication.getAccountID(), mApplication.getUserID(), mApplication.getPassword(),
-                StringTools.CMD_GET_MAP_DEVICE,
-                Locale.getDefault().getLanguage(),
-                jsonParamsObject);
+        try {
+            jsonParamsObject.put(StringTools.FLD_deviceID, deviceId);
+            jsonParamsObject.put(StringTools.FLD_status, null);
+            jsonParamsObject.put(StringTools.FLD_timeFrom, from/*1421127296*/);
+            jsonParamsObject.put(StringTools.FLD_timeTo,   to/*1421137296*/);
+            jsonParamsObject.put(StringTools.FLD_inclZones, false);
+            jsonParamsObject.put(StringTools.FLD_inclDebug, false);
+            jsonParamsObject.put(StringTools.FLD_inclPOI, false);
+            jsonParamsObject.put(StringTools.FLD_inclTime, false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mRequestHistory = new GpsOldRequest(getActivity());
+        mRequestHistory.setAccountID(mApplication.getAccountID());
+        mRequestHistory.setUserID(mApplication.getUserID());
+        mRequestHistory.setPassword(mApplication.getPassword());
+        mRequestHistory.setUrl(GpsOldRequest.MAPPING_URL);
+        mRequestHistory.setParams(jsonParamsObject);
+        mRequestHistory.setCommand(GpsOldRequest.CMD_GET_MAP_DEVICE);
+        mRequestHistory.setMethod(Request.Method.POST);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.POST,
-                GpsOldRequest.MAPPING_URL,
-                jsonRequest,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i(TAG, response.toString());
-                        JSONObject jsonObject;
-                        try {
-                            jsonObject = response.getJSONObject(StringTools.KEY_RESULTS);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            return;
-                        }
-                        if (jsonObject == null) {
-                            return;
-                        }
-                        MapData mapData = new MapData(jsonObject);
-                        final MapPoint[] pts = mapData.getPoints();
-                        if (pts == null||pts.length==0){
-                            return;
-                        }
-                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                        LatLngBounds bounds;
-                        LatLng lastLatLng = null;
-                        for (int i = 0; i < pts.length; i++) {
-                            LatLng latLng = new LatLng(pts[i].getLatitude(), pts[i].getLongitude());
-                            builder.include(latLng);
-                            rectLine.add(latLng);
-                        }
+        mRequestHistory.setResponseHandler(new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i(TAG, response.toString());
+                JSONObject jsonObject;
+                try {
+                    jsonObject = response.getJSONObject(StringTools.KEY_RESULTS);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return;
+                }
+                if (jsonObject == null) {
+                    return;
+                }
+                MapData mapData = new MapData(jsonObject);
+                final MapPoint[] pts = mapData.getPoints();
+                if (pts == null || pts.length == 0) {
+                    return;
+                }
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                LatLngBounds bounds;
+                for (int i = 0; i < pts.length; i++) {
+                    LatLng latLng = new LatLng(pts[i].getLatitude(), pts[i].getLongitude());
+                    builder.include(latLng);
+                    historicalData.add(latLng);
+                }
 //                        CameraUpdate cu = null;
 //                        bounds = builder.build();
 //                        cu = CameraUpdateFactory.newLatLngBounds(bounds, 100 /*padding*/);
 //                        mMap.moveCamera(cu);
 
-                        CameraUpdate cu = null;
-                        bounds = builder.build();
-                        LatLng sw = bounds.southwest;
-                        LatLng ne = bounds.northeast;
-                        double dt = SphericalUtil.computeDistanceBetween(sw, ne);
-                        if (dt < 200){
-                            cu = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 14);
-                            mMap.moveCamera(cu);
-                        } else {
-                            cu = CameraUpdateFactory.newLatLngBounds(bounds, 100 /*padding*/);
-                            mMap.moveCamera(cu);
-                        }
+                CameraUpdate cu = null;
+                bounds = builder.build();
+                LatLng sw = bounds.southwest;
+                LatLng ne = bounds.northeast;
+                double dt = SphericalUtil.computeDistanceBetween(sw, ne);
+                if (dt < 200) {
+                    cu = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 14);
+                    mMap.moveCamera(cu);
+                } else {
+                    cu = CameraUpdateFactory.newLatLngBounds(bounds, 100 /*padding*/);
+                    mMap.moveCamera(cu);
+                }
 
-
-                        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                            @Override
-                            public void onCameraChange(CameraPosition cameraPosition) {
-                                if (currentZoom != cameraPosition.zoom) {
-                                    currentZoom = cameraPosition.zoom;
-                                    mMap.clear();
-                                    mMap.addPolyline(rectLine);
-                                    float step = (20 - cameraPosition.zoom) * 3;
-                                    if (step < 1) step = 1;
-                                    for (int i = 0; i < pts.length; i += step) {
-                                        LatLng latLng = new LatLng(pts[i].getLatitude(), pts[i].getLongitude());
-                                        mMap.addMarker(new MarkerOptions().position(latLng).title(""));
-                                    }
-                                }
-                            }
-                        });
-                    }
-                },
-                new Response.ErrorListener() {
+                mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //TODO
+                    public void onCameraChange(CameraPosition cameraPosition) {
+                        if (currentZoom != cameraPosition.zoom) {
+                            currentZoom = cameraPosition.zoom;
+                            mMap.clear();
+                            mMap.addPolyline(historicalData);
+                            float step = (20 - cameraPosition.zoom) * 3;
+                            if (step < 1) step = 1;
+
+
+                            for (int i = 0; i < pts.length; i += step) {
+                                //if (i >= pts.length) i = pts.length-1;
+                                LatLng latLng = new LatLng(pts[i].getLatitude(), pts[i].getLongitude());
+                                MarkerOptions flatMarkerOpt = new MarkerOptions()
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.direction_arrow))
+                                        .position(latLng)
+                                        .flat(true)
+                                        .anchor(0.5f, 0.5f)
+                                        .rotation((float) pts[i].getHeading());
+
+                                mMap.addMarker(flatMarkerOpt);
+                            }
+                        }
                     }
                 });
-        HttpQueue.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
-        mMap.clear();
-        rectLine = new PolylineOptions().width(3).color(Color.RED);
-        mMap.addPolyline(rectLine);
 
+            }
+        });
+        mRequestHistory.setErrorHandler(new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //TODO
+            }
+        });
+        mRequestHistory.setRequestTag(TAG_REQUEST);
+        mRequestHistory.exec();
+        mMap.clear();
+        historicalData = new PolylineOptions().width(3).color(Color.RED);
+        //mMap.addPolyline(historicalData);
     }
+
+    /**
+     * function toggle device list
+     **/
     private void toggleDeviceList(/*View mView*/){
         if (view == null){
             return;
@@ -404,111 +444,177 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             layout.setVisibility(View.VISIBLE);
         }
         Log.d(TAG, "toggleDeviceList: " + mApplication.getGroupList());
-        MyResponse mRes = new MyResponse(mApplication.getGroupList());
-        if (mRes.isError()){
-            //TODO update grouplist here
-            return;
-        }
-        List<Group> groupsList = new ArrayList<>();
-        HashMap<String, ArrayList< Device >> devicesInGroup = new HashMap<>();
-        try {
-            JSONArray mJSONArray = (JSONArray) mRes.getData();
-            for (int i = 0; i < mJSONArray.length(); i++){
-                JSONObject itemGroup = mJSONArray.getJSONObject(i);
-                String accountID        = itemGroup.getString("accountID");
-                String groupID          = itemGroup.getString("groupID");
-                String pushpinID        = itemGroup.getString("pushpinID");
-                String groupDescription = itemGroup.getString("description");
-                String groupDisplay     = itemGroup.getString("displayName");
-                int deviceCount         = itemGroup.getInt("deviceCount");
 
-                long currTimestamp = Calendar.getInstance().getTimeInMillis()/1000;
-                int countLive = 0;
-                JSONArray deviceList = null;
-                if (deviceCount>0) {
-                    deviceList = itemGroup.getJSONArray("devicesList");
-                }
-                if (deviceList == null){
-                    continue;
-                }
-
-                ArrayList<Device> mArrayDevice = new ArrayList<>();
-                for (int j = 0; j<deviceList.length(); j++){
-                    JSONObject jsonDevice   = deviceList.getJSONObject(j);
-                    boolean isActive        = jsonDevice.getBoolean("isActive");
-                    String icon             = jsonDevice.getString("pushpinID");
-                    String deviceID         = jsonDevice.getString("deviceID");
-                    String description      = jsonDevice.getString("description");
-                    Double lastBatteryLevel = jsonDevice.getDouble("lastBatteryLevel");
-                    long lastEventTimestamp = jsonDevice.getLong("lastEventTimestamp");
-
-                    boolean isLive          = (isActive && (currTimestamp-lastEventTimestamp<300));
-                    //--for group
-                    if(isActive && (currTimestamp - lastEventTimestamp < 300)){
-                        countLive++;
-                    }
-
-                    //--Create new Device Object Model
-                    Device device = new Device(deviceID, description, icon, isLive, lastEventTimestamp);
-                    device.setBatteryLevel(lastBatteryLevel);
-                    mArrayDevice.add(device);
-                }
-                Group group = new Group(accountID, groupID, (groupDisplay==null?groupDescription:groupDisplay),
-                        (groupDisplay==null?groupDescription:groupDisplay),
-                        pushpinID/*icon*/, countLive/*live*/, deviceCount);
-                groupsList.add(group);
-                devicesInGroup.put(groupID, mArrayDevice);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG, "toggleDeviceList1");
-        ExpandableListView expandableGroupList = (ExpandableListView) view.findViewById(R.id.expandable_group_list);
-        expandableGroupList.setClickable(true);
-        final DeviceGroupListAdapter groupListAdapter =
-                new DeviceGroupListAdapter(getActivity(), groupsList, devicesInGroup);
-        if (groupListAdapter != null){
-            groupListAdapter.setExpandableListView(expandableGroupList);
-            expandableGroupList.setAdapter(groupListAdapter);
-        }
-
-        final TextView tvDeviceGroup = (TextView) view.findViewById(R.id.txt_device_group);
-        //--setOnclickListener
-        expandableGroupList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+        mRequestGetGroup = new GpsOldRequest(getActivity());
+        mRequestGetGroup.setAccountID(mApplication.getAccountID());
+        mRequestGetGroup.setUserID(mApplication.getUserID());
+        mRequestGetGroup.setPassword(mApplication.getPassword());
+        mRequestGetGroup.setMethod(Request.Method.POST);
+        mRequestGetGroup.setUrl(GpsOldRequest.ADMIN_URL);
+        mRequestGetGroup.setCommand(GpsOldRequest.CMD_GET_GROUPS);
+        JSONObject params = createParams();
+        mRequestGetGroup.setParams(params);
+        mRequestGetGroup.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                Group group = (Group) groupListAdapter.getGroup(groupPosition);
-                Log.i("ABC", "OnGroupClicked!+" + group.getGroupId());
-                mApplication.setSelGroup(group.getGroupId());
-                mApplication.setIsFleet(true);
-                tvDeviceGroup.setText(mApplication.getSelGroup());
-                realTimeTracking();
-                layout.setVisibility(View.GONE);
-                return true;
-            }
-        });
-        expandableGroupList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Log.i(TAG, "onChildClick");
-                //-- Move to latest position of this devices
-                Device device = (Device) groupListAdapter.getChild(groupPosition, childPosition);
-                mApplication.setSelDevice(device.getDeviceID());
-                mApplication.setIsFleet(false);
-                tvDeviceGroup.setText(mApplication.getSelDevice());
-
-                long to = Calendar.getInstance().getTimeInMillis() / 1000;
-                long from = to - 60 * 60;   //1 hour
+            public void onResponse(JSONObject response) {
+                showProgress(false);
+                MyResponse mRes = new MyResponse(mApplication.getGroupList());
+                if (mRes.isError()) {
+                    return;
+                }
+                List<Group> groupsList = new ArrayList<>();
+                HashMap<String, ArrayList<Device>> devicesInGroup = new HashMap<>();
                 try {
-                    startHistoricalTracking(device.getDeviceID(), from, to);
+                    JSONArray mJSONArray = (JSONArray) mRes.getData();
+                    for (int i = 0; i < mJSONArray.length(); i++) {
+                        JSONObject itemGroup = mJSONArray.getJSONObject(i);
+                        String accountID = itemGroup.getString("accountID");
+                        String groupID = itemGroup.getString("groupID");
+                        String pushpinID = itemGroup.getString("pushpinID");
+                        String groupDescription = itemGroup.getString("description");
+                        String groupDisplay = itemGroup.getString("displayName");
+                        int deviceCount = itemGroup.getInt("deviceCount");
+
+                        long currTimestamp = Calendar.getInstance().getTimeInMillis() / 1000;
+                        int countLive = 0;
+                        JSONArray deviceList = null;
+                        if (deviceCount > 0) {
+                            deviceList = itemGroup.getJSONArray("devicesList");
+                        }
+                        if (deviceList == null) {
+                            continue;
+                        }
+
+                        ArrayList<Device> mArrayDevice = new ArrayList<>();
+                        for (int j = 0; j < deviceList.length(); j++) {
+                            JSONObject jsonDevice = deviceList.getJSONObject(j);
+                            boolean isActive = jsonDevice.getBoolean("isActive");
+                            String icon = jsonDevice.getString("pushpinID");
+                            String deviceID = jsonDevice.getString("deviceID");
+                            String description = jsonDevice.getString("description");
+                            Double lastBatteryLevel = jsonDevice.getDouble("lastBatteryLevel");
+                            long lastEventTimestamp = jsonDevice.getLong("lastEventTimestamp");
+
+                            boolean isLive = (isActive && (currTimestamp - lastEventTimestamp < 300));
+                            //--for group
+                            if (isActive && (currTimestamp - lastEventTimestamp < 300)) {
+                                countLive++;
+                            }
+
+                            //--Create new Device Object Model
+                            Device device = new Device(deviceID, description, icon, isLive, lastEventTimestamp);
+                            device.setBatteryLevel(lastBatteryLevel);
+                            mArrayDevice.add(device);
+                        }
+                        Group group = new Group(
+                                accountID,
+                                groupID,
+                                (groupDisplay == null ? groupDescription : groupDisplay),
+                                (groupDisplay == null ? groupDescription : groupDisplay),
+                                pushpinID/*icon*/,
+                                countLive/*live*/,
+                                deviceCount);
+                        groupsList.add(group);
+                        devicesInGroup.put(groupID, mArrayDevice);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                layout.setVisibility(View.GONE);
-                return true;
+                ExpandableListView expandableGroupList = (ExpandableListView) view.findViewById(R.id.expandable_group_list);
+                expandableGroupList.setClickable(true);
+                final DeviceGroupListAdapter groupListAdapter =
+                        new DeviceGroupListAdapter(getActivity(), groupsList, devicesInGroup);
+                if (groupListAdapter != null) {
+                    groupListAdapter.setExpandableListView(expandableGroupList);
+                    expandableGroupList.setAdapter(groupListAdapter);
+                }
+
+
+                //--setOnclickListener
+                expandableGroupList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                    @Override
+                    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                        Group group = (Group) groupListAdapter.getGroup(groupPosition);
+                        //Log.i(TAG, "OnGroupClicked!+" + group.getGroupId());
+                        mApplication.setSelGroup(group.getGroupId());
+                        mApplication.setSelGroupDesc(group.getDescription());
+                        mApplication.setIsFleet(true);
+                        mApplication.storeSettings();
+                        //tvDeviceGroup.setText(group.getDescription());
+                        realTimeTracking();
+                        layout.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
+                expandableGroupList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                    @Override
+                    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                        Log.i(TAG, "onChildClick");
+                        //-- Move to latest position of this devices
+                        Device device = (Device) groupListAdapter.getChild(groupPosition, childPosition);
+                        mApplication.setSelDevice(device.getDeviceID());
+                        mApplication.setSelDeviceDesc(device.getDescription());
+                        mApplication.setIsFleet(false);
+                        mApplication.storeSettings();
+                        //tvDeviceGroup.setText(mApplication.getSelDevice());
+                        //long to = Calendar.getInstance().getTimeInMillis() / 1000;
+                        //long from = to - 60 * 60;   //1 hour
+                        //startHistoricalTracking(device.getDeviceID(), from, to);
+                        onTrackInfoWindowButton(device.getDeviceID(), device.getDisplayName());
+                        layout.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
             }
         });
+        mRequestGetGroup.setRequestTag(TAG_REQUEST);
+        mRequestGetGroup.setErrorHandler(new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+        mRequestGetGroup.exec();
+        showProgress(true);
     }
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    public void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mBarProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+            mBarProgress.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mBarProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mBarProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+            mView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         if (mClusterManager==null) {
@@ -518,5 +624,117 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         setUpMap();
         realTimeTracking();
+    }
+
+    @Override
+    public void onTrackInfoWindowButton(final String deviceId, String desc) {
+        mApplication.setIsFleet(false);
+        mApplication.setSelDevice(deviceId);
+        txtDeviceGroup.setText(desc);
+        if (mHistoryOptions.getVisibility() == View.GONE){
+            mHistoryOptions.setVisibility(View.VISIBLE);
+        }
+
+        //-- show select time table
+        Button btn30min = (Button) view.findViewById(R.id.btn_historical_30m);
+        btn30min.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "got clicked on btn30min");
+                //--load 30 min historical data
+                /*if (mHistoryOptions.getVisibility() == View.VISIBLE) {
+                    mHistoryOptions.setVisibility(View.GONE);
+                }
+                long timeTo = Calendar.getInstance().getTimeInMillis() / 1000;
+                long timeFrom = timeTo - 30 * 60;
+                MapFragment.this.startHistoricalTracking(deviceId, timeFrom, timeTo);
+                return;*/
+                getHistory(deviceId, 30*60);
+            }
+        });
+
+        Button btn60min = (Button) view.findViewById(R.id.btn_historical_60m);
+        btn60min.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "got clicked on btn60min");
+                //--load 30 min historical data
+                /*if (mHistoryOptions.getVisibility() == View.VISIBLE) {
+                    mHistoryOptions.setVisibility(View.GONE);
+                }
+                long timeTo = Calendar.getInstance().getTimeInMillis() / 1000;
+                long timeFrom = timeTo - 60 * 60;
+                MapFragment.this.startHistoricalTracking(deviceId, timeFrom, timeTo);
+                return;*/
+                getHistory(deviceId, 60*60);
+            }
+        });
+        Button btn6h = (Button) view.findViewById(R.id.btn_historical_6h);
+        btn6h.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "got clicked on btn6h");
+                /*if (mHistoryOptions.getVisibility() == View.VISIBLE) {
+                    mHistoryOptions.setVisibility(View.GONE);
+                }
+                long timeTo = Calendar.getInstance().getTimeInMillis() / 1000;
+                long timeFrom = timeTo - 6 * 60 * 60;
+                MapFragment.this.startHistoricalTracking(deviceId, timeFrom, timeTo);
+                return;*/
+                getHistory(deviceId, 6*60*60);
+            }
+        });
+        Button btn12h = (Button) view.findViewById(R.id.btn_historical_12h);
+        btn12h.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "got clicked on btn6h");
+                /*if (mHistoryOptions.getVisibility() == View.VISIBLE) {
+                    mHistoryOptions.setVisibility(View.GONE);
+                }
+                long timeTo = Calendar.getInstance().getTimeInMillis() / 1000;
+                long timeFrom = timeTo - 12 * 60 * 60;
+                MapFragment.this.startHistoricalTracking(deviceId, timeFrom, timeTo);
+                return;*/
+                getHistory(deviceId, 12*60*60);
+            }
+        });
+    }
+
+    private void getHistory(String deviceId, long duration){
+        if (mHistoryOptions.getVisibility() == View.VISIBLE) {
+            mHistoryOptions.setVisibility(View.GONE);
+        }
+        long timeTo = Calendar.getInstance().getTimeInMillis() / 1000;
+        long timeFrom = timeTo - duration;
+        startHistoricalTracking(deviceId, timeFrom, timeTo);
+        return;
+    }
+
+    private JSONObject createParams(){
+        JSONObject jsonParamsObject = new JSONObject();
+        List<String> fields = new ArrayList<>();
+            fields.add("accountID");
+            fields.add("groupID");
+            fields.add("description");
+            fields.add("pushpinID");
+            fields.add("displayName");
+            fields.add("deviceCount");
+            fields.add("devicesList");
+        List<String> dFields = new ArrayList<String>();
+            dFields.add("deviceID");
+            dFields.add("description");
+            dFields.add("displayName");
+            dFields.add("pushpinID");
+            dFields.add("isActive");
+            dFields.add("lastBatteryLevel");
+            dFields.add("lastEventTimestamp");
+        try {
+            jsonParamsObject.put(StringTools.KEY_FIELDS, new JSONArray(fields));
+            jsonParamsObject.put(StringTools.KEY_DEV_FIELDS, new JSONArray(dFields));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonParamsObject;
     }
 }

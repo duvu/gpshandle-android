@@ -52,6 +52,9 @@ public class HttpQueue {
         getRequestQueue().add(request);
     }
 
+    public void cancel(String tag){
+        getRequestQueue().cancelAll(tag);
+    }
     public ImageLoader getImageLoader() {
         return mImageLoader;
     }

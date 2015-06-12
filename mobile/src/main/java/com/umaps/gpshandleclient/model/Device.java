@@ -1,5 +1,7 @@
 package com.umaps.gpshandleclient.model;
 
+import com.umaps.gpshandleclient.util.StringTools;
+
 import java.util.Calendar;
 
 /**
@@ -39,14 +41,14 @@ public class Device {
     }
 
     public String getDisplayName() {
-        return displayName;
+        return (StringTools.isBlank(displayName)?getDescription():displayName);
     }
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
     public String getDescription() {
-        return description;
+        return (StringTools.isBlank(description)?getDeviceID():description);
     }
 
     public void setDescription(String description) {
