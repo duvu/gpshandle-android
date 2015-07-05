@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
+    <!--<item>
         <shape>
             <solid
                 android:color="@color/group_size_background"/>
@@ -13,5 +13,5 @@
                 android:height="40dp"
                 android:width="40dp"/>
         </shape>
-    </item>
+    </item>-->
 </selector>

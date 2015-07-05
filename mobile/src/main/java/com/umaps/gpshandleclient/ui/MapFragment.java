@@ -144,6 +144,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             mMap = mapFragment.getMap();
             mapFragment.getMapAsync(this);
         }
+
+        View lGroupAll = view.findViewById(R.id.l_group_all);
+        lGroupAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mApplication.setSelGroup("all");
+                mApplication.setSelGroupDesc(String.valueOf(getText(R.string.txt_group_all)));
+                mApplication.setIsFleet(true);
+                mApplication.storeSettings();
+                realTimeTracking();
+            }
+        });
         return view;
     }
 
@@ -164,6 +176,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onResume(){
         super.onResume();
+        if ((mMap != null) && (mClusterManager!=null)) {
+            realTimeTracking();
+        }
     }
     @Override
     public void onPause(){
@@ -315,7 +330,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     //-- startHistoricalTracking
-    public void startHistoricalTracking(String deviceId, long from, long to) {
+    public void startHistoricalTracking(final String deviceId, long from, long to) {
         txtDeviceGroup.setText(mApplication.getSelDeviceDesc());
         if (doAsynchronous != null) {
             doAsynchronous.cancel();
@@ -347,19 +362,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onResponse(JSONObject response) {
                 Log.i(TAG, response.toString());
-                JSONObject jsonObject;
-                try {
-                    jsonObject = response.getJSONObject(StringTools.KEY_RESULTS);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
+                MyResponse myResponse = new MyResponse(response);
+                if (myResponse.isError()) {
+                    Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
                     return;
                 }
+
+                JSONObject jsonObject = (JSONObject) myResponse.getData();
                 if (jsonObject == null) {
                     return;
                 }
                 MapData mapData = new MapData(jsonObject);
+                if (mapData == null) {
+                    return;
+                }
                 final MapPoint[] pts = mapData.getPoints();
                 if (pts == null || pts.length == 0) {
+                    Toast.makeText(getActivity(),
+                        getString(R.string.no_history_events) + "for device: " + mApplication.getSelDeviceDesc(),
+                        Toast.LENGTH_LONG).show();
+                    realTimeTracking();
                     return;
                 }
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -458,11 +481,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onResponse(JSONObject response) {
                 showProgress(false);
-                MyResponse mRes = new MyResponse(mApplication.getGroupList());
+                MyResponse mRes = new MyResponse(response);
                 if (mRes.isError()) {
                     return;
                 }
-                List<Group> groupsList = new ArrayList<>();
+                ArrayList<Group> groupsList = new ArrayList<>();
                 HashMap<String, ArrayList<Device>> devicesInGroup = new HashMap<>();
                 try {
                     JSONArray mJSONArray = (JSONArray) mRes.getData();
@@ -495,9 +518,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                             Double lastBatteryLevel = jsonDevice.getDouble("lastBatteryLevel");
                             long lastEventTimestamp = jsonDevice.getLong("lastEventTimestamp");
 
+                            Log.i(TAG, currTimestamp+"/"+lastEventTimestamp);
                             boolean isLive = (isActive && (currTimestamp - lastEventTimestamp < 300));
                             //--for group
-                            if (isActive && (currTimestamp - lastEventTimestamp < 300)) {
+                            if (isLive) {
                                 countLive++;
                             }
 
@@ -520,18 +544,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                ExpandableListView expandableGroupList = (ExpandableListView) view.findViewById(R.id.expandable_group_list);
-                expandableGroupList.setClickable(true);
-                final DeviceGroupListAdapter groupListAdapter =
-                        new DeviceGroupListAdapter(getActivity(), groupsList, devicesInGroup);
-                if (groupListAdapter != null) {
-                    groupListAdapter.setExpandableListView(expandableGroupList);
-                    expandableGroupList.setAdapter(groupListAdapter);
-                }
-
+                final ExpandableListView expGroupList = (ExpandableListView) view.findViewById(R.id.expandable_group_list);
+                expGroupList.setClickable(true);
+                final DeviceGroupListAdapter groupListAdapter = new DeviceGroupListAdapter(getActivity(), groupsList, devicesInGroup);
+                expGroupList.setAdapter(groupListAdapter);
+                groupListAdapter.setExpGroupList(expGroupList);
 
                 //--setOnclickListener
-                expandableGroupList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                expGroupList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                     @Override
                     public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                         Group group = (Group) groupListAdapter.getGroup(groupPosition);
@@ -540,13 +560,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                         mApplication.setSelGroupDesc(group.getDescription());
                         mApplication.setIsFleet(true);
                         mApplication.storeSettings();
-                        //tvDeviceGroup.setText(group.getDescription());
                         realTimeTracking();
                         layout.setVisibility(View.GONE);
                         return true;
                     }
                 });
-                expandableGroupList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                expGroupList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                     @Override
                     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                         Log.i(TAG, "onChildClick");
@@ -556,10 +575,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                         mApplication.setSelDeviceDesc(device.getDescription());
                         mApplication.setIsFleet(false);
                         mApplication.storeSettings();
-                        //tvDeviceGroup.setText(mApplication.getSelDevice());
-                        //long to = Calendar.getInstance().getTimeInMillis() / 1000;
-                        //long from = to - 60 * 60;   //1 hour
-                        //startHistoricalTracking(device.getDeviceID(), from, to);
                         onTrackInfoWindowButton(device.getDeviceID(), device.getDisplayName());
                         layout.setVisibility(View.GONE);
                         return true;

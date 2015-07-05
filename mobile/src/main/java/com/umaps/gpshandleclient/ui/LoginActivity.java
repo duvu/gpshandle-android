@@ -22,6 +22,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
+import com.umaps.gpshandleclient.model.Account;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
 import com.umaps.gpshandleclient.util.StringTools;
@@ -41,7 +42,9 @@ public class LoginActivity extends FragmentActivity {
     private View mLoginForm;
     private View mBarProgress;
     private View mProgress;
-    private GpsOldRequest mRequest;
+    private GpsOldRequest mRequestToken;
+    private GpsOldRequest mRequestAcl;
+    private GpsOldRequest mRequestAcc;
     MyApplication mApplication;
 
     @Override
@@ -73,8 +76,9 @@ public class LoginActivity extends FragmentActivity {
         final EditText edtPassword = (EditText) findViewById(R.id.edt_password);
         edtPassword.setText(mApplication.getPassword());
 
-
-        mRequest = new GpsOldRequest(this);
+        mRequestAcl = new GpsOldRequest(this);
+        mRequestAcc = new GpsOldRequest(this);
+        mRequestToken = new GpsOldRequest(this);
         Button btnLogin = (Button) findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,11 +98,84 @@ public class LoginActivity extends FragmentActivity {
                 mApplication.setUserID(userID);
                 mApplication.setPassword(password);
 
+                mRequestAcc.setAccountID(accountID);
+                mRequestAcc.setUserID(userID);
+                mRequestAcc.setPassword(password);
+                mRequestAcc.setCommand(GpsOldRequest.CMD_GET_ACCOUNT);
+                mRequestAcc.setMethod(Request.Method.POST);
+                mRequestAcc.setUrl(GpsOldRequest.ADMIN_URL);
+                String[] lf = new String[] {"isAccountManager"};
+                JSONObject accParam = Account.createParam(lf);
+                mRequestAcc.setParams(accParam);
+                mRequestAcc.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        MyResponse mRes = new MyResponse(response);
+                        if (mRes.isError()) return;
+                        JSONObject result = (JSONObject)mRes.getData();
+                        try {
+                            boolean isManager = result.getBoolean("isAccountManager");
+                            mApplication.setManager(isManager);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        mApplication.storeSettings();
+                        showProgress(false);
+                        Intent movingIntent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(movingIntent);
+                        finish();
+                    }
+                });
+                mRequestAcc.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //TODO
+                    }
+                });
 
-                mRequest.setAccountID(accountID);
-                mRequest.setUserID(userID);
-                mRequest.setPassword(password);
-                //mRequest.updateToken();
+
+                mRequestAcl.setAccountID(accountID);
+                mRequestAcl.setUserID(userID);
+                mRequestAcl.setPassword(password);
+                mRequestAcl.setCommand(GpsOldRequest.CMD_GET_USER_ACL);
+                mRequestAcl.setMethod(Request.Method.POST);
+                mRequestAcl.setUrl(GpsOldRequest.ADMIN_URL);
+                JSONObject jsonParams = new JSONObject();
+                mRequestAcl.setParams(jsonParams);
+                mRequestAcl.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        MyResponse mResponse = new MyResponse(response);
+                        if (mResponse.isError()) {
+                            Toast.makeText(LoginActivity.this, mResponse.getMessage(), Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        JSONArray aclList = (JSONArray) mResponse.getData();
+                        if (aclList == null) return;
+                        for (int i = 0; i < aclList.length(); i++) {
+                            JSONObject acl = null;
+                            try {
+                                acl = aclList.getJSONObject(i);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                continue;
+                            }
+                            mApplication.storeAcls(acl);
+                        }
+                        mRequestAcc.exec();
+
+                    }
+                });
+                mRequestAcl.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //TODO
+                    }
+                });
+                //-- getToken
+                mRequestToken.setAccountID(accountID);
+                mRequestToken.setUserID(userID);
+                mRequestToken.setPassword(password);
                 JSONObject params = new JSONObject();
                 try {
                     params.put(GpsOldRequest.KEY_ACCOUNT_ID, accountID);
@@ -108,9 +185,9 @@ public class LoginActivity extends FragmentActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //mRequest.setParams(params);
-                mRequest.setUrl(GpsOldRequest.TOKEN_URL);
-                mRequest.setMethod(Request.Method.POST);
+                //mRequestToken.setParams(params);
+                mRequestToken.setUrl(GpsOldRequest.TOKEN_URL);
+                mRequestToken.setMethod(Request.Method.POST);
                 Response.Listener<JSONObject> tokeHanler = new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -130,52 +207,11 @@ public class LoginActivity extends FragmentActivity {
                         mApplication.setIsSignedIn(true);
                         mApplication.setToken(token);
                         mApplication.setExpireOn(expiredOn);
-
-                        Log.w(TAG, "Expire: " + expiredOn);
-
-                        mApplication.storeSettings();
-
-                        Intent movingIntent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(movingIntent);
-                        showProgress(false);
-                        finish();
+                        //mApplication.storeSettings();
+                        mRequestAcl.exec();
                     }
                 };
-                mRequest.setResponseHandler(tokeHanler);
-
-                /*mRequest.setCommand(GpsOldRequest.CMD_GET_USER_ACL);
-                mRequest.setMethod(Request.Method.POST);
-                mRequest.setUrl(GpsOldRequest.ADMIN_URL);
-                JSONObject jsonParams = new JSONObject();
-                mRequest.setParams(jsonParams);
-                Response.Listener<JSONObject> responseHandler = new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        MyResponse mResponse = new MyResponse(response);
-                        if (mResponse.isError()) {
-                            Toast.makeText(LoginActivity.this, mResponse.getMessage(), Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        JSONArray aclList = (JSONArray) mResponse.getData();
-                        if (aclList == null) return;
-                        for (int i = 0; i< aclList.length(); i++){
-                            JSONObject acl = null;
-                            try {
-                                acl = aclList.getJSONObject(i);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                continue;
-                            }
-                            mApplication.storeAcls(acl);
-                        }
-
-                        mApplication.storeSettings();
-                        Intent movingIntent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(movingIntent);
-                        showProgress(false);
-                        finish();
-                    }
-                };*/
+                mRequestToken.setResponseHandler(tokeHanler);
                 Response.ErrorListener errorHandler = new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
@@ -184,9 +220,8 @@ public class LoginActivity extends FragmentActivity {
                         Toast.makeText(getApplicationContext(), R.string.failure_login, Toast.LENGTH_LONG).show();
                     }
                 };
-                //mRequest.setResponseHandler(responseHandler);
-                mRequest.setErrorHandler(errorHandler);
-                mRequest.exec(params);
+                mRequestToken.setErrorHandler(errorHandler);
+                mRequestToken.exec(params);
                 showProgress(true);
             }
         });

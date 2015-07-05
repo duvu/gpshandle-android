@@ -17,7 +17,7 @@
             android:visibility="gone" />
     </LinearLayout>
     <ExpandableListView
-        android:id="@+id/exp_accounts_list"
+        android:id="@+id/exp_list"
         android:groupIndicator="@null"
         android:layout_marginBottom="?attr/actionBarSize"
         android:layout_width="wrap_content"

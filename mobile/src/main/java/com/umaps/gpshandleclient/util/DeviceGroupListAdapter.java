@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,32 +17,33 @@ import com.umaps.gpshandleclient.model.Group;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by vu@umaps.vn on 01/11/2014.
  */
 public class DeviceGroupListAdapter extends BaseExpandableListAdapter {
     private static final String TAG = "DeviceGroupListAdapter";
-    private Context context;
-    private List<Group> groups; //Header gpshandle_device_group
-    private HashMap<String, ArrayList<Device>> devicesInGroup; //List of devices
     Typeface mTf = null;
-    private ExpandableListView expandableListView;
-    MyApplication mApplication;
+    private Context context;
+    private ArrayList<Group> groups;
+    private HashMap<String, ArrayList<Device>> devicesInGroup;
+    LayoutInflater mInflater;
+    View gView;
+    View dView;
+    TextView txtIndicator;
 
-    public DeviceGroupListAdapter(Context context, List<Group> groups, HashMap<String, ArrayList<Device>> devicesInGroup){
+    ExpandableListView expGroupList;
+
+    public DeviceGroupListAdapter(Context context, ArrayList<Group> groups, HashMap<String, ArrayList<Device>> devicesInGroup){
         this.context = context;
         this.groups = groups;
         this.devicesInGroup = devicesInGroup;
-        this.mApplication = MyApplication.getInstance();
-        this.mTf = mApplication.getIconFont();
+        this.mTf = MyApplication.getIconFont();
+        mInflater = LayoutInflater.from(context);
     }
-
-    public void setExpandableListView(ExpandableListView expandableListview){
-        this.expandableListView = expandableListview;
+    public void setExpGroupList(ExpandableListView expGroupList){
+        this.expGroupList = expGroupList;
     }
-
     @Override
     public int getGroupCount() {
         if (groups!=null){
@@ -95,55 +95,55 @@ public class DeviceGroupListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(final int groupPosition, boolean isExpandable, View convertView, ViewGroup parent) {
         if(convertView==null){
-            LayoutInflater inflater = LayoutInflater.from(this.getContext());
-            convertView = inflater.inflate(R.layout.gps_group, null);
-        }
-        String groupID          = "";
-        String groupDescription = "";
-        String groupIcon        = "";
-        int groupSize           = 0;
-        int countLive           = 0;
-        if (groups!=null) {
-            groupID          = groups.get(groupPosition).getGroupId();
-            groupDescription = groups.get(groupPosition).getDescription();
-            groupIcon        = groups.get(groupPosition).getIcon();
-            groupSize        = groups.get(groupPosition).getDeviceCount();
-            countLive        = groups.get(groupPosition).getLive();
+            gView = mInflater.inflate(R.layout.device_group, null);
+        } else {
+            gView = convertView;
         }
 
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.group_list_image);
+        if (groups == null) return  gView;
+
+        String groupID          = groups.get(groupPosition).getGroupId();
+        String groupDescription = groups.get(groupPosition).getDescription();
+        String groupIcon        = groups.get(groupPosition).getIcon();
+        int groupSize           = groups.get(groupPosition).getDeviceCount();
+        int countLive           = groups.get(groupPosition).getLive();
+
+        ImageView imageView = (ImageView) gView.findViewById(R.id.img_group);
         imageView.setImageResource(R.drawable.ic_directions_car_group_grey600_36dp);
 
-        //TextView tvGrpID = (TextView) convertView.findViewById(R.id.listView_grpID);
-        TextView tvGrpDesc = (TextView) convertView.findViewById(R.id.listView_grpDesc);
+        //TextView tvGrpID = (TextView) view.findViewById(R.id.listView_grpID);
+        TextView tvGrpDesc = (TextView) gView.findViewById(R.id.txt_group_description);
         //tvGrpID.setText("["+groupID+"]");
         tvGrpDesc.setText(groupDescription);
 
         //--set group_size
-        TextView tvGroupSize = (TextView) convertView.findViewById(R.id.gps_group_size);
-        tvGroupSize.setText(countLive+"/"+groupSize);
+        TextView tvGroupSize = (TextView) gView.findViewById(R.id.gps_group_size);
+        tvGroupSize.setText(countLive + "/" + groupSize);
 
-        final ImageButton btnExpand = (ImageButton) convertView.findViewById(R.id.btn_group_indicator);
-        btnExpand.setOnClickListener(new View.OnClickListener() {
+        txtIndicator = (TextView) gView.findViewById(R.id.ic_indicator);
+        txtIndicator.setTypeface(mTf);
+        txtIndicator.setText(String.valueOf((char) 0xe6ee));
+        txtIndicator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (expandableListView.isGroupExpanded(groupPosition)){
-                    expandableListView.collapseGroup(groupPosition);
-                    btnExpand.setImageResource(R.drawable.ic_expand_more_grey600_36dp);
-                }else {
-                    expandableListView.expandGroup(groupPosition);
-                    btnExpand.setImageResource(R.drawable.ic_expand_less_grey600_36dp);
+                if (expGroupList.isGroupExpanded(groupPosition)) {
+                    expGroupList.collapseGroup(groupPosition);
+                    txtIndicator.setText(String.valueOf((char) 0xe6ed));
+                } else {
+                    expGroupList.expandGroup(groupPosition, true);
+                    txtIndicator.setText(String.valueOf((char) 0xe6ee));
                 }
             }
         });
-        return convertView;
+        return gView;
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         if(convertView == null){
-            LayoutInflater inflater = LayoutInflater.from(this.getContext());
-            convertView = inflater.inflate(R.layout.gps_device, null);
+            dView = mInflater.inflate(R.layout.device, null);
+        } else {
+            dView = convertView;
         }
         //-- deviceID and deviceDescription
         String deviceID     = "";
@@ -164,47 +164,37 @@ public class DeviceGroupListAdapter extends BaseExpandableListAdapter {
             batteryLevel = device.getBatteryLevel();
         }
 
-        View devState = (View) convertView.findViewById(R.id.ic_device_status);
-
-        TextView deviceIDTextView = (TextView) convertView.findViewById(R.id.listView_deviceID);
-        TextView deviceDescriptionTextView = (TextView) convertView.findViewById(R.id.listView_deviceDesc);
-        deviceIDTextView.setText(deviceID);
-        deviceDescriptionTextView.setText(description);
-        //TextView liveStateView  = (TextView) convertView.findViewById(R.id.device_status);
-        TextView batteryView    = (TextView) convertView.findViewById(R.id.ic_device_battery);
-        TextView batteryText    = (TextView) convertView.findViewById(R.id.txt_device_battery);
-        //liveStateView.setTypeface(mTf);
-        batteryView.setTypeface(mTf);
-        //liveStateView.setText(String.valueOf((char)0xe6a4));
-//        circleImageView.addShadow();
-        /*CircleImageView circleImageView = (CircleImageView) convertView.findViewById(R.id.device_live_state);
-        circleImageView.setBorderWidth(1);
-        */
+        View devState = dView.findViewById(R.id.ic_lv_device_status);
         if (isLive) {
-            devState.setBackgroundColor(context.getResources().getColor(R.color.green));
+            devState.setBackgroundColor(this.context.getResources().getColor(R.color.green));
         } else {
-            devState.setBackgroundColor(context.getResources().getColor(R.color.bad));
+            devState.setBackgroundColor(this.context.getResources().getColor(R.color.bad));
         }
+
+        TextView deviceIDTextView = (TextView) dView.findViewById(R.id.txt_lv_device_id);
+        deviceIDTextView.setText(deviceID);
+        TextView deviceDescriptionTextView = (TextView) dView.findViewById(R.id.txt_lv_device_description);
+        deviceDescriptionTextView.setText(description);
+
+        TextView batteryView    = (TextView) dView.findViewById(R.id.ic_device_battery);
+        TextView batteryText    = (TextView) dView.findViewById(R.id.txt_device_battery);
+        batteryView.setTypeface(mTf);
         batteryView.setText(String.valueOf((char)0xe659));
-
-        //String batString = (batteryLevel*100 <10)?(batteryLevel*100+" "):(batteryLevel*100+"");
-
-        batteryText.setText(padRight(batteryLevel*100, 3)+"%");
-        if (batteryLevel < 0.2){
+        batteryText.setText(padRight(batteryLevel *100)+"%");
+        if (batteryLevel <= 0.2){
             batteryView.setTextColor(context.getResources().getColor(R.color.bad));
             batteryText.setTextColor(context.getResources().getColor(R.color.bad));
-        } else if ((batteryLevel < 0.7)) {
+        } else if ((batteryLevel <= 0.7)) {
             batteryView.setTextColor(context.getResources().getColor(R.color.warning));
             batteryText.setTextColor(context.getResources().getColor(R.color.warning));
+        } else {
+            batteryView.setTextColor(context.getResources().getColor(R.color.green));
+            batteryText.setTextColor(context.getResources().getColor(R.color.green));
         }
-        return convertView;
+        return dView;
     }
-    public String padRight(double s, int n) {
-        String mStr = String.format("%1$,.0f", s);
-        if(mStr.length() < 2){
-            mStr = "0"+mStr;
-        }
-        return mStr;
+    public String padRight(double s) {
+        return String.format("%1$,.0f", s);
     }
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
@@ -213,29 +203,4 @@ public class DeviceGroupListAdapter extends BaseExpandableListAdapter {
     //--------------------------------------------------------------------------------------------//
     //--End override
     //--------------------------------------------------------------------------------------------//
-
-    //Getter/Setter
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(ArrayList<Group> groups) {
-        this.groups = groups;
-    }
-
-    public HashMap<String, ArrayList<Device>> getDevicesInGroup() {
-        return devicesInGroup;
-    }
-
-    public void setGDevices(HashMap<String, ArrayList<Device>> gDevices) {
-        this.devicesInGroup = gDevices;
-    }
 }

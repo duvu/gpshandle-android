@@ -29,22 +29,38 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/base_color"
-        android:layout_alignParentBottom="true"
-        android:minHeight="?attr/actionBarSize">
+        android:layout_alignParentBottom="true">
+        <LinearLayout
+            android:id="@+id/l_group_all"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/text_view_button">
+            <TextView
+                android:id="@+id/txt_group_all"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="@string/txt_group_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/device_group"
             android:orientation="horizontal"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:background="@drawable/text_view_button">
             <TextView
                 android:id="@+id/txt_device_group"
                 android:textSize="15sp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
@@ -59,7 +75,7 @@
     <LinearLayout
         android:id="@+id/dev_list"
         android:orientation="vertical"
-        android:background="@color/primary_background"
+        android:background="@color/base_background"
         android:layout_marginBottom="?attr/actionBarSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -80,7 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/base_color_light"
+        android:background="@color/base_background"
         android:layout_marginBottom="?attr/actionBarSize">
         <LinearLayout
             android:orientation="horizontal"
@@ -90,6 +106,7 @@
                 android:id="@+id/btn_historical_30m"
                 android:text="@string/historical_30m"
                 android:textSize="12sp"
+                android:textColor="@color/text_color_dark"
                 android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -99,6 +116,7 @@
                 android:id="@+id/btn_historical_60m"
                 android:text="@string/historical_1h"
                 android:textSize="12sp"
+                android:textColor="@color/text_color_dark"
                 android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -108,6 +126,7 @@
                 android:id="@+id/btn_historical_6h"
                 android:text="@string/historical_6h"
                 android:textSize="12sp"
+                android:textColor="@color/text_color_dark"
                 android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,6 +136,7 @@
                 android:id="@+id/btn_historical_12h"
                 android:text="@string/historical_12h"
                 android:textSize="12sp"
+                android:textColor="@color/text_color_dark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

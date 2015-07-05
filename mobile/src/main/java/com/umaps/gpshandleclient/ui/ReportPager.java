@@ -47,7 +47,7 @@ public class ReportPager extends Fragment {
     private static final String TAG_REQUEST = "ReportPager";
 
     private View view;
-    private View mView;
+    private ViewPager mViewPager;
     private View mBarProgress;
     private View mProgress;
 
@@ -66,7 +66,7 @@ public class ReportPager extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_pager_report, container, false);
-        mView = view.findViewById(R.id.view_pager_report);
+        mViewPager = (ViewPager)view.findViewById(R.id.view_pager_report);
         mApplication = MyApplication.getInstance();
         mTf = mApplication.getIconFont();
         mBarProgress = view.findViewById(R.id.bar_progress);
@@ -74,11 +74,22 @@ public class ReportPager extends Fragment {
 
         updateAllFragment();
 
+        View lGroupAll =  view.findViewById(R.id.l_group_all);
+        lGroupAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mApplication.setSelGroup("all");
+                mApplication.setSelGroupDesc(String.valueOf(getText(R.string.txt_group_all)));
+                mApplication.storeSettings();
+                updateAllFragment();
+            }
+        });
+
         View deviceGroup = view.findViewById(R.id.device_group);
         deviceGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleDeviceList(/*view*/);
+                toggleDeviceList();
             }
         });
 
@@ -94,7 +105,6 @@ public class ReportPager extends Fragment {
     }
 
     public void updateAllFragment() {
-        ViewPager mViewPager = (ViewPager) view.findViewById(R.id.view_pager_report);
 
         TextView tvDeviceGroupSearch = (TextView) view.findViewById(R.id.ic_device_group_search);
         TextView txtDeviceGroup = (TextView) view.findViewById(R.id.txt_device_group);
@@ -105,12 +115,56 @@ public class ReportPager extends Fragment {
         List<Fragment> fragments = getFragments();
         PagerAdapter mPageAdapter = new PagerAdapter(getChildFragmentManager(), fragments);
         mViewPager.setAdapter(mPageAdapter);
+
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            View rO = view.findViewById(R.id.selected_rpt_overview);
+            View rE = view.findViewById(R.id.selected_rpt_event_count);
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        rO.setBackgroundColor(getResources().getColor(R.color.selected));
+                        rE.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                        break;
+                    case 1:
+                        rO.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                        rE.setBackgroundColor(getResources().getColor(R.color.selected));
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        View lRptOverview = view.findViewById(R.id.l_rpt_overview);
+        View lRptEventCount = view.findViewById(R.id.l_rpt_event_count);
+        lRptOverview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(0, true);
+            }
+        });
+        lRptEventCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(1, true);
+            }
+        });
     }
 
     /**
      * function toggle device list
      **/
-    private void toggleDeviceList(/*View mView*/){
+    private void toggleDeviceList(){
         if (view == null){
             return;
         }
@@ -121,8 +175,6 @@ public class ReportPager extends Fragment {
         } else {
             layout.setVisibility(View.VISIBLE);
         }
-        Log.d(TAG, "toggleDeviceList: " + mApplication.getGroupList());
-
         mRequestGetGroup = new GpsOldRequest(getActivity());
         mRequestGetGroup.setAccountID(mApplication.getAccountID());
         mRequestGetGroup.setUserID(mApplication.getUserID());
@@ -136,7 +188,7 @@ public class ReportPager extends Fragment {
             @Override
             public void onResponse(JSONObject response) {
                 showProgress(false);
-                MyResponse mRes = new MyResponse(mApplication.getGroupList());
+                MyResponse mRes = new MyResponse(response);
                 if (mRes.isError()) {
                     return;
                 }
@@ -181,10 +233,7 @@ public class ReportPager extends Fragment {
                         mApplication.setSelGroup(groupsList.get(position).getGroupId());
                         mApplication.setSelGroupDesc(groupsList.get(position).getDisplayName());
                         mApplication.storeSettings();
-                        //invalidated();
-                        //get
                         updateAllFragment();
-                        //-- hide layout
                         layout.setVisibility(View.GONE);
                     }
                 });
@@ -212,12 +261,12 @@ public class ReportPager extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mView.animate().setDuration(shortAnimTime).alpha(
+            mViewPager.setVisibility(show ? View.GONE : View.VISIBLE);
+            mViewPager.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    mViewPager.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
 
@@ -234,7 +283,7 @@ public class ReportPager extends Fragment {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mBarProgress.setVisibility(show ? View.VISIBLE : View.GONE);
-            mView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mViewPager.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
     private JSONObject createParams(){

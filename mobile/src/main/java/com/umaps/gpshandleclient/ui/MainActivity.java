@@ -2,10 +2,7 @@ package com.umaps.gpshandleclient.ui;
 
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
@@ -17,21 +14,11 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 public class MainActivity extends ActionBarActivity{
     private static final String TAG = "MainActivity";
@@ -52,6 +39,7 @@ public class MainActivity extends ActionBarActivity{
         }
 
         setToolbar();
+
         View monitor = findViewById(R.id.monitor);
         TextView icMonitor = (TextView) findViewById(R.id.ic_monitor);
         TextView txtMonitor = (TextView) findViewById(R.id.txt_monitor);
@@ -77,7 +65,7 @@ public class MainActivity extends ActionBarActivity{
         monitor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction()
+                fragmentManager.beginTransaction()
                         .replace(R.id.container, MapFragment.newInstance())
                         .addToBackStack("realTime").commit();
             }
@@ -86,7 +74,7 @@ public class MainActivity extends ActionBarActivity{
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction()
+                fragmentManager.beginTransaction()
                         .replace(R.id.container, ReportPager.newInstance())
                         .commit();
             }
@@ -95,8 +83,8 @@ public class MainActivity extends ActionBarActivity{
         admin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, AdminPager.newInstance())
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, AdmDispatcher.newInstance())
                         .commit();
             }
         });

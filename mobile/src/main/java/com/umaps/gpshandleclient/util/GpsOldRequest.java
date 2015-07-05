@@ -40,14 +40,20 @@ public class GpsOldRequest {
     public static final String KEY_ACCOUNT_ID      = "accountID";
     public static final String KEY_USER_ID         = "userID";
 
-    public static final String CMD_GET_USER_ACL     = "getUserAcl";
-    public static final String CMD_GET_ACCOUNT      = "getAccount";
-    public static final String CMD_GET_USERS        = "getUsers";
-    public static final String CMD_GET_GROUPS       = "getGroups";
-    public static final String CMD_GET_DEVICES      = "getDevices";
-    public static final String CMD_GET_MAP_FLEET    = "getMapFleet";
-    public static final String CMD_GET_MAP_DEVICE   = "getMapDevice";
-    public static final String CMD_GET_CHART_SUMMARY = "chartSummary";
+    public static final String CMD_GET_USER_ACL                 = "getUserAcl";
+    public static final String CMD_GET_ACCOUNT                  = "getAccount";
+    public static final String CMD_GET_AUTHORIZED_ACCOUNTS      = "getAuthorizedAccounts";
+    public static final String CMD_GET_AUTHORIZED_USERS         = "getAuthorizedUsers";
+    public static final String CMD_GET_USERS                    = "getUsers";
+    public static final String CMD_GET_GROUPS                   = "getGroups";
+    public static final String CMD_GET_DEVICES                  = "getDevices";
+    public static final String CMD_GET_MAP_FLEET                = "getMapFleet";
+    public static final String CMD_GET_MAP_DEVICE               = "getMapDevice";
+    public static final String CMD_GET_CHART_SUMMARY            = "chartSummary";
+
+    public static final String CMD_CREATE_DEVICE                = "createDevice";
+    public static final String CMD_UPDATE_DEVICE                = "updateDevice";
+    public static final String CMD_DELETE_DEVICE                = "deleteDevice";
 
     private Context context;
     private HttpQueue mQueue;

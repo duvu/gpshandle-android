@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.umaps.gpshandleclient.util.StringTools;
 
@@ -15,11 +16,14 @@ import org.json.JSONObject;
  * Created by vu@umaps.vn on 30/01/2015.
  */
 public class MyApplication extends Application {
+    private static final String TAG = "MyApplication";
+
     private static MyApplication instance = null;
     private static Typeface mIconFont = null;
     private static Typeface mTextFont = null;
 
     private static final String GPS_HANDLE_CLIENT       = "GPS_HANDLE_CLIENT";
+
     public static final String ACL_ADMIN_ACCOUNT        = "acl.service.admin.account";
     public static final String ACL_ADMIN_DEVICE         = "acl.service.admin.device";
     public static final String ACL_ADMIN_DRIVER         = "acl.service.admin.driver";
@@ -90,6 +94,8 @@ public class MyApplication extends Application {
     private String userID;
     private String password;
 
+    private boolean isManager;
+
     private String locale = "en";
     private String token; //--
     private long expireOn;
@@ -143,6 +149,13 @@ public class MyApplication extends Application {
         this.password = password;
     }
 
+    public boolean isAccountManger(){
+        return this.isManager;
+    }
+    public void  setManager(boolean isManager) {
+        this.isManager = isManager;
+    }
+
     public String getLocale() {
         return locale;
     }
@@ -184,7 +197,7 @@ public class MyApplication extends Application {
     }
 
     public String getSelGroupDesc() {
-        return (StringTools.isBlank(selGroup)||selGroup.equalsIgnoreCase("all"))? "All":selGroupDesc;
+        return (StringTools.isBlank(selGroup)||selGroup.equalsIgnoreCase("all"))? String.valueOf(getText(R.string.txt_group_all)):selGroupDesc;
     }
 
     public void setSelGroupDesc(String selGroupDesc) {
@@ -246,6 +259,23 @@ public class MyApplication extends Application {
         this.setIsFleet(prefs.getBoolean(IS_FLEET, true));
         this.setGroupList(prefs.getString(LOADED_GROUP, ""));
         this.setIsSignedIn(prefs.getBoolean(IS_SIGNED_IN, false));
+
+        //-- Acl
+        this.setAclAdminAccount(prefs.getInt(ACL_ADMIN_ACCOUNT, 0));
+        this.setAclAdminDevice(prefs.getInt(ACL_ADMIN_DEVICE, 0));
+        this.setAclAdminDriver(prefs.getInt(ACL_ADMIN_DRIVER, 0));
+        this.setAclAdminGeozone(prefs.getInt(ACL_ADMIN_GEOZONE, 0));
+        this.setAclAdminGroup(prefs.getInt(ACL_ADMIN_GROUP, 0));
+        this.setAclAdminRole(prefs.getInt(ACL_ADMIN_ROLE, 0));
+        this.setAclAdminRule(prefs.getInt(ACL_ADMIN_RULE, 0));
+        this.setAclAdminUser(prefs.getInt(ACL_ADMIN_USER, 0));
+        this.setAclAdminUserManager(prefs.getInt(ACL_ADMIN_USER_MANAGER, 0));
+        this.setAclMapHistory(prefs.getInt(ACL_MAP_HISTORY, 0));
+        this.setAclMapMonitor(prefs.getInt(ACL_MAP_MONITOR, 0));
+        this.setAclReportDetail(prefs.getInt(ACL_REPORT_DETAIL, 0));
+        this.setAclReportGeozone(prefs.getInt(ACL_REPORT_GEOZONE, 0));
+        this.setAclReportParking(prefs.getInt(ACL_REPORT_PARKING, 0));
+        this.setAclReportSummary(prefs.getInt(ACL_REPORT_SUMMARY, 0));
     }
 
     public void storeSettings(){
@@ -265,6 +295,23 @@ public class MyApplication extends Application {
         editor.putBoolean(IS_FLEET, this.isFleet());
         editor.putString(LOADED_GROUP, this.getGroupList());
         editor.putBoolean(IS_SIGNED_IN, this.isSignedIn());
+
+        //-- Acl
+        editor.putInt(ACL_ADMIN_ACCOUNT, getAclAdminAccount());
+        editor.putInt(ACL_ADMIN_DEVICE, getAclAdminDevice());
+        editor.putInt(ACL_ADMIN_DRIVER, getAclAdminDriver());
+        editor.putInt(ACL_ADMIN_GEOZONE, getAclAdminGeozone());
+        editor.putInt(ACL_ADMIN_GROUP, getAclAdminGroup());
+        editor.putInt(ACL_ADMIN_ROLE, getAclAdminRole());
+        editor.putInt(ACL_ADMIN_RULE, getAclAdminRule());
+        editor.putInt(ACL_ADMIN_USER, getAclAdminUser());
+        editor.putInt(ACL_ADMIN_USER_MANAGER, getAclAdminUserManager());
+        editor.putInt(ACL_MAP_HISTORY, getAclMapHistory());
+        editor.putInt(ACL_MAP_MONITOR, getAclMapMonitor());
+        editor.putInt(ACL_REPORT_DETAIL, getAclReportDetail());
+        editor.putInt(ACL_REPORT_GEOZONE, getAclReportGeozone());
+        editor.putInt(ACL_REPORT_PARKING, getAclReportParking());
+        editor.putInt(ACL_REPORT_SUMMARY, getAclReportSummary());
         editor.commit();
     }
 
@@ -402,9 +449,9 @@ public class MyApplication extends Application {
     }
 
     public void storeAcls(JSONObject acl) {
-        String name = null;
+        Log.i(TAG, acl.toString());
         try {
-            name = acl.getString("name");
+            String name = acl.getString("name");
             int value = acl.getInt("value");
             String description = acl.getString("description");
             if (name.equalsIgnoreCase(ACL_ADMIN_ACCOUNT))           { setAclAdminAccount(value); }

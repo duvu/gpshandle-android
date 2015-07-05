@@ -3,18 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <PreferenceCategory
-        android:title="@string/inline_preference">
-        <CheckBoxPreference
-            android:key="checkbox_preference"
-            android:title="@string/title_checkbox_preference"
-            android:summary="@string/summary_checkbox_preference" />
 
-    </PreferenceCategory>
+    <SeekBarPreference
+        android:key="key_interval"
+        android:title="@string/title_setting_interval"
+        android:max="3600"
+        android:defaultValue="30"
+        android:paddingBottom="12dp" />
+
     <PreferenceScreen
         android:key="settings_about"
         android:title="@string/title_settings_about"
         android:persistent="false">
-
     </PreferenceScreen>
 </PreferenceScreen>

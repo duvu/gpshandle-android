@@ -8,18 +8,22 @@
 0% — 00
 -->
 <resources>
-    <color name="base_color">#ff01054d</color>
-    <color name="base_color_inverse">#ffffffff</color>
+    <color name="base_color">#ffc95506</color>
+    <color name="base_color_dark">#ff753206</color>
     <color name="base_color_light">#b4b2b2ff</color>
+    <color name="child_tab_color">#b7b5aeaf</color>
+    <color name="base_background">#fff5f5f5</color>
+    <color name="base_color_inverse">#ffffffff</color>
+    <color name="wait_transparent">#e1ffffff</color>
+    <color name="selected">#d6ff8532</color>
 
+    <color name="disable">#ffa69fa8</color>
 
-    <color name="primary_background">#ffd2d2d2</color>
     <color name="toolbar_text">#ffffffff</color>
     <color name="cluster_popup_background">#ffffffff</color>
 
+    <color name="details_background">#ffe2e2e2</color>
 
-
-    <color name="group_size_background">#cc44b3f3</color>
     <color name="text_color_dark">#ff1e1e1e</color>
     <color name="text_color_white">#ffffffff</color>
     <color name="white_opacity_80">#CCFFFFFF</color>

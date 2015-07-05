@@ -21,11 +21,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.model.Account;
+import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.model.MyResponse;
+import com.umaps.gpshandleclient.model.User;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -34,34 +36,33 @@ import java.util.Date;
 /**
  * Created by beou on 08/06/2015.
  */
-public class AdmAccount extends Fragment {
-    private static final String TAG = "AdmAccount";
+public class AdmUser extends Fragment {
+    private static final String TAG = "AdmUser";
 
     private GpsOldRequest mRequest;
-    private static final String TAG_REQUEST = "admAccount";
+    private static final String TAG_REQUEST = "AdmUser";
     private View mBarProgress;
     private View mProgress;
     View view;
-
-    int previousGroup = -1;
-
     ExpandableListView expListView;
     private MyApplication mApplication;
     private Typeface mTf;
-    public static AdmAccount newInstance(){
-        return new AdmAccount();
+
+    int previousGroup = -1;
+
+    public static AdmUser newInstance(){
+        return new AdmUser();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_adm_account, container, false);
+        view = inflater.inflate(R.layout.frag_adm_user, container, false);
         mBarProgress    = view.findViewById(R.id.bar_progress);
         mProgress       = view.findViewById(R.id.progress);
-        //mLayoutAccount  = view.findViewById(R.id.account_info_layout);
         mApplication    = MyApplication.getInstance();
         mTf             = MyApplication.getIconFont();
 
-        expListView = (ExpandableListView)view.findViewById(R.id.exp_accounts_list);
+        expListView = (ExpandableListView)view.findViewById(R.id.exp_list);
         expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
 
             @Override
@@ -72,7 +73,6 @@ public class AdmAccount extends Fragment {
                 previousGroup = groupPosition;
             }
         });
-
         expListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
             @Override
             public void onGroupCollapse(int groupPosition) {
@@ -89,9 +89,9 @@ public class AdmAccount extends Fragment {
         mRequest.setPassword(mApplication.getPassword());
         mRequest.setUrl(GpsOldRequest.ADMIN_URL);
         mRequest.setMethod(Request.Method.POST);
-        mRequest.setCommand(GpsOldRequest.CMD_GET_AUTHORIZED_ACCOUNTS);
+        mRequest.setCommand(GpsOldRequest.CMD_GET_AUTHORIZED_USERS);
+        mRequest.setParams(User.createParams());
 
-        mRequest.setParams(Account.createParam());
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -100,9 +100,20 @@ public class AdmAccount extends Fragment {
                 if (mRes.isError()) return;
 
                 JSONArray jsonArray = (JSONArray) mRes.getData();
-                ArrayList<Account> accounts = Account.getListFromJson(jsonArray);
-                AccountListAdapter accountListAdapter = new AccountListAdapter(getActivity(), accounts);
-                expListView.setAdapter(accountListAdapter);
+                ArrayList<User> userArrayList = new ArrayList<User>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    User user = null;
+                    try {
+                        user = new User(jsonArray.getJSONObject(i));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (user != null) {
+                        userArrayList.add(user);
+                    }
+                }
+                ExpListAdapter expListAdapter = new ExpListAdapter(getActivity(), userArrayList);
+                expListView.setAdapter(expListAdapter);
                 showProgress(false);
             }
         });
@@ -125,55 +136,54 @@ public class AdmAccount extends Fragment {
     }
 
     private void setBottomToolbar(){
-        TextView icAddAccount = (TextView) view.findViewById(R.id.ic_add);
-        icAddAccount.setTypeface(mTf);
-        icAddAccount.setText(String.valueOf((char) 0xe717));
-        TextView txtAddAccount = (TextView) view.findViewById(R.id.txt_add);
-        txtAddAccount.setText(R.string.add);
+        TextView icAdd = (TextView) view.findViewById(R.id.ic_add);
+        icAdd.setTypeface(mTf);
+        icAdd.setText(String.valueOf((char) 0xe717));
+        TextView txtAdd = (TextView) view.findViewById(R.id.txt_add);
+        txtAdd.setText(R.string.add);
 
-        TextView icEditAccount = (TextView) view.findViewById(R.id.ic_edit);
-        icEditAccount.setTypeface(mTf);
-        icEditAccount.setText(String.valueOf((char) 0xe714));
+        TextView icEdit = (TextView) view.findViewById(R.id.ic_edit);
+        icEdit.setTypeface(mTf);
+        icEdit.setText(String.valueOf((char) 0xe714));
         TextView txtEditAccount = (TextView) view.findViewById(R.id.txt_edit);
         txtEditAccount.setText(R.string.edit);
 
-        TextView icDeleteAccount = (TextView) view.findViewById(R.id.ic_delete);
-        icDeleteAccount.setTypeface(mTf);
-        icDeleteAccount.setText(String.valueOf((char) 0xe608));
+        TextView icDelete = (TextView) view.findViewById(R.id.ic_delete);
+        icDelete.setTypeface(mTf);
+        icDelete.setText(String.valueOf((char) 0xe608));
         TextView txtDeleteAccount = (TextView) view.findViewById(R.id.txt_delete);
         txtDeleteAccount.setText(R.string.delete);
 
-        if (mApplication.isAccountManger()) {
-            View addAccount = view.findViewById(R.id.add);
-            View deleteAccount = view.findViewById(R.id.delete);
-            View editAccount = view.findViewById(R.id.edit);
+        if (mApplication.getAclAdminUserManager() > 2) {
+            View add = view.findViewById(R.id.add);
+            View delete = view.findViewById(R.id.delete);
+            View edit = view.findViewById(R.id.edit);
 
-            addAccount.setOnClickListener(new View.OnClickListener() {
+            add.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
                     //TODO
                 }
             });
-            editAccount.setOnClickListener(new View.OnClickListener() {
+            edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //TODO
                 }
             });
         } else {
-            icAddAccount.setTextColor(getResources().getColor(R.color.disable));
-            txtAddAccount.setTextColor(getResources().getColor(R.color.disable));
+            icAdd.setTextColor(getResources().getColor(R.color.disable));
+            txtAdd.setTextColor(getResources().getColor(R.color.disable));
 
-            icDeleteAccount.setTextColor(getResources().getColor(R.color.disable));
+            icDelete.setTextColor(getResources().getColor(R.color.disable));
             txtDeleteAccount.setTextColor(getResources().getColor(R.color.disable));
 
-            icEditAccount.setTextColor(getResources().getColor(R.color.disable));
+            icEdit.setTextColor(getResources().getColor(R.color.disable));
             txtEditAccount.setTextColor(getResources().getColor(R.color.disable));
         }
+
     }
-
-
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -211,32 +221,34 @@ public class AdmAccount extends Fragment {
         }
     }
 
-    private class AccountListAdapter extends BaseExpandableListAdapter {
+    public class ExpListAdapter extends BaseExpandableListAdapter {
+        private static final String TAG = "ExpListAdapter";
         Typeface mTf = null;
         private Context context;
-        private ArrayList<Account> accounts;
+        private ArrayList<User> objects;
         LayoutInflater mInflater;
         View groupView;
         View detailsView;
         TextView icIndicator;
 
-        public AccountListAdapter(Context context, ArrayList<Account> accounts){
+        public ExpListAdapter(Context context, ArrayList<User> objects){
             this.context = context;
-            this.accounts = accounts;
+            this.objects = objects;
             this.mTf = MyApplication.getIconFont();
             mInflater = LayoutInflater.from(context);
         }
+
         @Override
         public int getGroupCount() {
-            if (accounts!=null){
-                return accounts.size();
+            if (objects!=null){
+                return objects.size();
             }
             return 0;
         }
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            if ((accounts!=null)) {
+            if ((objects!=null)) {
                 return 1;
             }
             return 0;
@@ -244,16 +256,16 @@ public class AdmAccount extends Fragment {
 
         @Override
         public Object getGroup(int groupPosition) {
-            if (accounts != null) {
-                return accounts.get(groupPosition);
+            if (objects != null) {
+                return objects.get(groupPosition);
             }
             return null;
         }
 
         @Override
         public Object getChild(int groupPosition, int childPosition) {
-            if ((accounts!= null)) {
-                return accounts.get(groupPosition);
+            if ((objects!= null)) {
+                return objects.get(groupPosition);
             }
             return null;
         }
@@ -270,93 +282,98 @@ public class AdmAccount extends Fragment {
 
         @Override
         public boolean hasStableIds() {
-            return false;
+            return true;
         }
 
         //View - Most-Important
         @Override
         public View getGroupView(final int groupPosition, boolean isExpandable, View convertView, ViewGroup parent) {
             if(convertView==null){
-                groupView = mInflater.inflate(R.layout.account_header, null);
+                groupView = mInflater.inflate(R.layout.user_header, null);
             } else {
                 groupView = convertView;
             }
-            if (accounts == null) return null;
 
-            String id          = accounts.get(groupPosition).getId();
-            String description = accounts.get(groupPosition).getDescription();
-            int count = accounts.get(groupPosition).getDevice_count();
+            if (objects == null) return groupView;
 
-            TextView txtAccountId = (TextView) groupView.findViewById(R.id.txt_account_id);
+            String id          = objects.get(groupPosition).getId();
+            String description = objects.get(groupPosition).getDescription();
+
+            TextView txtAccountId = (TextView) groupView.findViewById(R.id.txt_user_id);
             txtAccountId.setText(id);
 
-            TextView txtAccountDesc = (TextView) groupView.findViewById(R.id.txt_account_desc);
+            TextView txtAccountDesc = (TextView) groupView.findViewById(R.id.txt_user_desc);
             txtAccountDesc.setText(description);
 
+            int dc = 0;
+            ArrayList<Group> lg = objects.get(groupPosition).getGroupList();
+            if (lg != null) {
+                for (int i = 0; i < lg.size(); i++) {
+                    dc += lg.get(i).getDeviceCount();
+                }
+            }
+
             TextView txtDeviceCount = (TextView) groupView.findViewById(R.id.txt_device_count);
-            txtDeviceCount.setText(String.valueOf(count));
+            txtDeviceCount.setText(String.valueOf(dc));
 
             icIndicator = (TextView) groupView.findViewById(R.id.ic_indicator);
             icIndicator.setTypeface(mTf);
             icIndicator.setText(String.valueOf((char) 0xe6ee));
-            //expListView.collapseGroup(groupPosition);
-            /*icIndicator.setText(String.valueOf((char)0xe6ed));
-            icIndicator.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (expListView.isGroupExpanded(groupPosition)){
-                        expListView.collapseGroup(groupPosition);
-                        icIndicator.setText(String.valueOf((char)0xe6ed));
-                    } else {
-                        expListView.expandGroup(groupPosition);
-                        icIndicator.setText(String.valueOf((char)0xe6ee));
-                    }
-                }
-            });*/
-            //expListView.collapseGroup(groupPosition);
+
             return groupView;
         }
 
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
             if(convertView == null){
-                detailsView = mInflater.inflate(R.layout.account_details, null);
+                detailsView = mInflater.inflate(R.layout.user_details, null);
             } else {
                 detailsView = convertView;
             }
 
-            Account account = accounts.get(groupPosition);
+            User user = objects.get(groupPosition);
 
-            TextView txtAccountId = (TextView) detailsView.findViewById(R.id.txt_account_id_content);
-            txtAccountId.setText(account.getId());
-            TextView txtAccountDesc = (TextView) detailsView.findViewById(R.id.txt_account_desc_content);
-            txtAccountDesc.setText(account.getDescription());
-            TextView txtAccountDisplay = (TextView) detailsView.findViewById(R.id.txt_account_display_content);
-            txtAccountDisplay.setText(account.getDisplay_name());
-            TextView txtContactName = (TextView) detailsView.findViewById(R.id.txt_account_contact_name_content);
-            txtContactName.setText(account.getContact_name());
-            TextView txtContactEmail = (TextView) detailsView.findViewById(R.id.txt_account_contact_email_content);
-            txtContactEmail.setText(account.getContact_email());
-            TextView txtContactPhone = (TextView) detailsView.findViewById(R.id.txt_account_contact_phone_content);
-            txtContactPhone.setText(account.getContact_phone());
-            TextView txtDeviceCount = (TextView) detailsView.findViewById(R.id.txt_account_device_count_content);
-            txtDeviceCount.setText("" + account.getDevice_count());
-            TextView txtLastLogin = (TextView) detailsView.findViewById(R.id.txt_account_last_login_content);
-            Date lastLogin = new Date(account.getLast_login_time() * 1000);
+            TextView txtAccountId = (TextView) detailsView.findViewById(R.id.txt_user_id_content);
+            txtAccountId.setText(user.getId());
+            TextView txtAccountDesc = (TextView) detailsView.findViewById(R.id.txt_user_desc_content);
+            txtAccountDesc.setText(user.getDescription());
+            TextView txtAccountDisplay = (TextView) detailsView.findViewById(R.id.txt_user_display_content);
+            txtAccountDisplay.setText(user.getDisplayName());
+            TextView txtContactName = (TextView) detailsView.findViewById(R.id.txt_user_contact_name_content);
+            txtContactName.setText(user.getContactName());
+            TextView txtContactEmail = (TextView) detailsView.findViewById(R.id.txt_user_contact_email_content);
+            txtContactEmail.setText(user.getContactEmail());
+            TextView txtContactPhone = (TextView) detailsView.findViewById(R.id.txt_user_contact_phone_content);
+            txtContactPhone.setText(user.getContactPhone());
+            /*TextView txtDeviceCount = (TextView) detailsView.findViewById(R.id.txt_user_device_count_content);
+            txtDeviceCount.setText("" + user.get());*/
+            TextView txtLastLogin = (TextView) detailsView.findViewById(R.id.txt_user_last_login_content);
+            Date lastLogin = new Date(user.getLastLoginTime() * 1000);
             txtLastLogin.setText(lastLogin.toString());
-            TextView txtCreatedOn = (TextView) detailsView.findViewById(R.id.txt_account_creation_content);
-            Date createdOn = new Date(account.getCreation_time() * 1000);
+            TextView txtCreatedOn = (TextView) detailsView.findViewById(R.id.txt_user_creation_content);
+            Date createdOn = new Date(user.getCreationTime() * 1000);
             txtCreatedOn.setText(createdOn.toString());
+            TextView txtManagedGroups = (TextView) detailsView.findViewById(R.id.txt_managed_groups_content);
+
+            ArrayList<Group> grL = user.getGroupList();
+            if (grL!=null){
+                StringBuffer lG = new StringBuffer();
+                for (int i = 0; i < grL.size(); i++) {
+                    lG.append(grL.get(i).getDescription()).append("\n");
+                }
+                txtManagedGroups.setText(lG);
+            } else {
+                txtManagedGroups.setText(R.string.managed_group_none);
+            }
+
             return detailsView;
         }
-        public String padRight(double s) {
-            return String.format("%1$,.0f", s);
-        }
+
         @Override
         public boolean isChildSelectable(int groupPosition, int childPosition) {
             return true;
         }
-        /*@Override
+/*        @Override
         public void onGroupCollapsed(int groupPosition) {
             //icIndicator.setText(String.valueOf((char)0xe6ee)); //0xe6ee
             groupView.setBackgroundColor(context.getResources().getColor(R.color.unselected));
@@ -366,5 +383,8 @@ public class AdmAccount extends Fragment {
             //icIndicator.setText(String.valueOf((char)0xe6ed)); //0xe6ee
             groupView.setBackgroundColor(context.getResources().getColor(R.color.selected));
         }*/
+        //--------------------------------------------------------------------------------------------//
+        //--End override
+        //--------------------------------------------------------------------------------------------//
     }
 }

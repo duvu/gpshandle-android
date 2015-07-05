@@ -1,7 +1,13 @@
 package com.umaps.gpshandleclient.model;
 
+import com.umaps.gpshandleclient.util.StringTools;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by beou on 09/06/2015.
@@ -41,6 +47,56 @@ public class Account {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static ArrayList<Account> getListFromJson(JSONArray jsonArray){
+        ArrayList<Account> accounts = new ArrayList<Account>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            Account account = null;
+            try {
+                account = new Account((JSONObject) jsonArray.getJSONObject(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (account!=null) {
+                accounts.add(account);
+            }
+        }
+        return accounts;
+    }
+
+    public static JSONObject createParam(String[] fields) {
+        JSONObject params = new JSONObject();
+        List<String> lFields = new ArrayList<>();
+        for (int i = 0; i < fields.length; i++){
+            lFields.add(fields[i]);
+        }
+        try {
+            return  params.put(StringTools.KEY_FIELDS, new JSONArray(lFields));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static JSONObject createParam(){
+        List<String> fields = new ArrayList<>();
+        fields.add(ACCOUNT_ID);
+        fields.add(DESCRIPTION);
+        fields.add(DISPLAY_NAME);
+        fields.add(CONTACT_NAME);
+        fields.add(CONTACT_EMAIL);
+        fields.add(CONTACT_PHONE);
+        fields.add(DEVICE_COUNT);
+        fields.add(LAST_LOGIN_TIME);
+        fields.add(CREATION_TIME);
+        JSONObject params = new JSONObject();
+        try {
+            params.put(StringTools.KEY_FIELDS, new JSONArray(fields));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return params;
     }
 
     public String getId() {

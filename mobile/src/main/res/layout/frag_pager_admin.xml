@@ -2,8 +2,95 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/adm_tabbar"
+        android:orientation="horizontal"
+        android:background="@color/child_tab_color"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <RelativeLayout
+            android:id="@+id/l_account"
+            android:orientation="vertical"
+            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/txt_account"
+                android:text="@string/account_text"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <View
+                android:id="@+id/selected_account"
+                android:background="@color/selected"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/l_user"
+            android:orientation="vertical"
+            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/txt_user"
+                android:text="@string/user_text"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <View
+                android:id="@+id/selected_user"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/l_group"
+            android:orientation="vertical"
+            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/txt_group"
+                android:text="@string/group_text"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <View
+                android:id="@+id/selected_group"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/l_device"
+            android:orientation="vertical"
+            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/txt_device"
+                android:text="@string/device_text"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <View
+                android:id="@+id/selected_device"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"/>
+        </RelativeLayout>
+    </LinearLayout>
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager_admin"
+        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </android.support.v4.view.ViewPager>

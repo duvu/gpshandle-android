@@ -152,7 +152,9 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
 
         icDeviceStatus.setText(String.valueOf((char)0xe6af));
         long currentTimestamp = Calendar.getInstance().getTimeInMillis()/1000;
-        if (((currentTimestamp - mapPoint.getEpoch()) > 300)&&((currentTimestamp - mapPoint.getEpoch()) < 1800)){
+        if (currentTimestamp - mapPoint.getEpoch() <= 300) {
+            icDeviceStatus.setTextColor(context.getResources().getColor(R.color.green));
+        } else if (((currentTimestamp - mapPoint.getEpoch()) > 300)&&((currentTimestamp - mapPoint.getEpoch()) < 1800)){
             icDeviceStatus.setTextColor(context.getResources().getColor(R.color.warning));
         } else if ((currentTimestamp - mapPoint.getEpoch()) > 1800){
             icDeviceStatus.setTextColor(context.getResources().getColor(R.color.bad));

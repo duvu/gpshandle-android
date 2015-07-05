@@ -17,11 +17,12 @@
             android:visibility="gone" />
     </LinearLayout>
     <ExpandableListView
-        android:id="@+id/exp_accounts_list"
+        android:id="@+id/list_view_device_groups"
         android:groupIndicator="@null"
         android:layout_marginBottom="?attr/actionBarSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
@@ -35,19 +36,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <LinearLayout
-                android:id="@+id/add"
+                android:id="@+id/add_group"
                 android:orientation="vertical"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:id="@+id/ic_add"
+                    android:id="@+id/ic_add_group"
                     android:textSize="26sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <TextView
-                    android:id="@+id/txt_add"
+                    android:id="@+id/txt_add_group"
                     android:textSize="12sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
@@ -55,19 +56,19 @@
             </LinearLayout>
             <View style="@style/separator"/>
             <LinearLayout
-                android:id="@+id/edit"
+                android:id="@+id/edit_group"
                 android:orientation="vertical"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:id="@+id/ic_edit"
+                    android:id="@+id/ic_edit_group"
                     android:textSize="26sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <TextView
-                    android:id="@+id/txt_edit"
+                    android:id="@+id/txt_edit_group"
                     android:textSize="12sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
@@ -75,19 +76,19 @@
             </LinearLayout>
             <View style="@style/separator"/>
             <LinearLayout
-                android:id="@+id/delete"
+                android:id="@+id/delete_group"
                 android:orientation="vertical"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:id="@+id/ic_delete"
+                    android:id="@+id/ic_delete_group"
                     android:textSize="26sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <TextView
-                    android:id="@+id/txt_delete"
+                    android:id="@+id/txt_delete_group"
                     android:textSize="12sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"

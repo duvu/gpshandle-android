@@ -17,37 +17,57 @@
             android:visibility="gone" />
     </LinearLayout>
     <ExpandableListView
-        android:id="@+id/exp_accounts_list"
+        android:id="@+id/list_view_devices"
         android:groupIndicator="@null"
         android:layout_marginBottom="?attr/actionBarSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/base_color"
-        android:layout_alignParentBottom="true"
-        android:minHeight="?attr/actionBarSize">
+        android:layout_alignParentBottom="true">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_marginRight="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <LinearLayout
-                android:id="@+id/add"
+                android:id="@+id/add_device"
                 android:orientation="vertical"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
                 <TextView
-                    android:id="@+id/ic_add"
+                    android:id="@+id/ic_add_device"
+                    android:textSize="26sp"
+                    android:layout_gravity="center|center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/txt_add_device"
+                    android:textSize="12sp"
+                    android:layout_gravity="center|center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <View style="@style/separator"/>
+            <LinearLayout
+                android:id="@+id/edit_device"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/ic_edit_device"
                     android:textSize="26sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <TextView
-                    android:id="@+id/txt_add"
+                    android:id="@+id/txt_edit_device"
                     android:textSize="12sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
@@ -55,39 +75,19 @@
             </LinearLayout>
             <View style="@style/separator"/>
             <LinearLayout
-                android:id="@+id/edit"
+                android:id="@+id/delete_device"
                 android:orientation="vertical"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
                 <TextView
-                    android:id="@+id/ic_edit"
+                    android:id="@+id/ic_delete_device"
                     android:textSize="26sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <TextView
-                    android:id="@+id/txt_edit"
-                    android:textSize="12sp"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-            <View style="@style/separator"/>
-            <LinearLayout
-                android:id="@+id/delete"
-                android:orientation="vertical"
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/ic_delete"
-                    android:textSize="26sp"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:id="@+id/txt_delete"
+                    android:id="@+id/txt_delete_device"
                     android:textSize="12sp"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
@@ -95,4 +95,19 @@
             </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
+    <include layout="@layout/device_add_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="?attr/actionBarSize"/>
+    <include layout="@layout/device_edit_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="?attr/actionBarSize"/>
+    <include layout="@layout/device_delete_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="?attr/actionBarSize"/>
 </RelativeLayout>

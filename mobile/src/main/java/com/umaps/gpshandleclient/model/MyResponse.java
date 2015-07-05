@@ -15,7 +15,8 @@ public class MyResponse {
     public static final String KEY_STATUS_CODE          = "code";
     public static final String KEY_STATUS_MESSAGE       = "message";
 
-    public static final String CODE_SUCCESSFULL         = "successful";
+    public static final String CODE_SUCCESSFULL         = "SUCCESSFUL";
+    public static final String CODE_NOT_AUTHORIZED      = "NOT_AUTHORIZED";
 
     private String code;
     private String message;
@@ -66,6 +67,12 @@ public class MyResponse {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public boolean isExpire() {
+        if (StringTools.isBlank(this.code)) return true;
+        if (this.code.equalsIgnoreCase(CODE_NOT_AUTHORIZED)) return true;
+        return false;
     }
 
     public boolean isError(){

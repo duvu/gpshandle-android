@@ -13,7 +13,7 @@ import java.util.List;
 public class MapData {
     private static final String MAPPING_DATA_SETS       = "DataSets";
     private static final String MAPPING_DATA_POINTS     = "Points";
-    private MapPoint[] points;
+    private MapPoint[] points = null;
     public MapPoint[] getPoints() {
         return points;
     }
@@ -22,16 +22,20 @@ public class MapData {
     }
     public MapData(JSONObject jsonData){
         try {
-            List<MapPoint> pts = new ArrayList<>();
             JSONArray dataSets = jsonData.getJSONArray(MAPPING_DATA_SETS);
-            for (int j=0; j < dataSets.length(); j++){
-                JSONArray _pts = dataSets.getJSONObject(j).getJSONArray(MAPPING_DATA_POINTS);
-                for(int i=0; i<_pts.length(); i++){
-                    MapPoint pt = new MapPoint(_pts.getString(i));
-                    pts.add(pt);
+            if (dataSets.length() <= 0){
+                //--noop
+            } else {
+                List<MapPoint> pts = new ArrayList<>();
+                for (int j = 0; j < dataSets.length(); j++) {
+                    JSONArray _pts = dataSets.getJSONObject(j).getJSONArray(MAPPING_DATA_POINTS);
+                    for (int i = 0; i < _pts.length(); i++) {
+                        MapPoint pt = new MapPoint(_pts.getString(i));
+                        pts.add(pt);
+                    }
                 }
+                this.setPoints(pts.toArray(new MapPoint[pts.size()]));
             }
-            this.setPoints(pts.toArray(new MapPoint[pts.size()]));
         } catch (JSONException e) {
             e.printStackTrace();
         }

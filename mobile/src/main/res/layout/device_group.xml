@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
+    <ImageView
+        android:id="@+id/img_group"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"/>
+    <TextView
+        android:id="@+id/txt_group_description"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/img_group"
+        android:textColor="@color/text_color_dark"/>
+    <TextView
+        android:id="@+id/gps_group_size"
+        android:textSize="12sp"
+        android:layout_height="40dp"
+        android:layout_width="40dp"
+        android:gravity="center"
+        android:layout_toLeftOf="@+id/ic_indicator"
+        android:textColor="@color/text_color_dark"
+        android:background="@drawable/bg_group_size"/>
+    <TextView
+        android:id="@+id/ic_indicator"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textColor="@color/text_color_dark"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"/>
+</RelativeLayout>

@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -62,13 +63,11 @@ public class RptOverview extends Fragment {
     }
     @Override
     public void onAttach(Activity activity) {
-        Log.d(TAG, "onAttach ...");
         super.onAttach(activity);
     }
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate ...");
     }
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -112,11 +111,14 @@ public class RptOverview extends Fragment {
             public void onResponse(JSONObject response) {
                 Log.i(TAG, response.toString());
                 showProgress(false);
+                MyResponse mRes = new MyResponse(response);
                 int intRunning = 0;
                 int intIdling = 0;
                 int intStopped = 0;
-                MyResponse mRes = new MyResponse(response);
-                if (mRes.isError()) return;
+                if (mRes.isExpire()) {
+                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                    return;
+                };
                 JSONArray mData = (JSONArray)mRes.getData();
                 for (int i = 0; i < mData.length(); i++){
                     String stringData = null;
