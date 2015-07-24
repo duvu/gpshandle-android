@@ -70,7 +70,7 @@
     <string name="txt_account_last_login">Last Login Time</string>
     <string name="txt_created_on">Created On</string>
     <string name="rpt_event_count_desc">Event/Distance chart</string>
-    <string name="txt_user_id">User ID</string>
+    <string name="txt_user_id">User ID*</string>
 
     <string name="title_settings_about">About</string>
     <string name="no_history_events">No history event(s)</string>
@@ -111,7 +111,15 @@
     <string name="failure_create_device">Failed to create device</string>
     <string name="_must_input_unique_id">You must enter an UniqueID</string>
     <string name="you_must_select_a_device">You must select a device!</string>
-    <string name="are_you_sure">Are you sure to delete the device</string>
+    <string name="are_you_sure">Are you sure to delete</string>
     <string name="txt_delete">Delete</string>
     <string name="you_dont_have_permission">You don\'t have permission!</string>
+    <string name="hint_enter_group_desc">Enter description of group</string>
+    <string name="_must_input_description">You must input a description or display name</string>
+    <string name="failure_create_group">Failed to create group</string>
+    <string name="hint_enter_user_id">Enter an user id</string>
+    <string name="hint_enter_user_desc">Enter a description for user</string>
+    <string name="txt_user_password">Password*</string>
+    <string name="txt_user_contact_email">Contact Email*</string>
+    <string name="failure_delete">Failed to delete</string>
 </resources>

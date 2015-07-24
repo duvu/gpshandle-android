@@ -315,7 +315,7 @@ public class Device {
         this.context = context;
     }
 
-    public static JSONObject createParams(){
+    public static JSONObject getParams(){
 
         JSONObject jsonParamsObject = new JSONObject();
         List<String> fields = new ArrayList<>();
@@ -373,8 +373,23 @@ public class Device {
         edtRequest.setMethod(Request.Method.POST);
         edtRequest.setParams(buildParams());
         edtRequest.setCommand(GpsOldRequest.CMD_UPDATE_DEVICE);
-
         return edtRequest;
+    }
+
+    public GpsOldRequest getRequestDelete() {
+        GpsOldRequest deleteRequest = new GpsOldRequest(context);
+        if (myApplication == null) {
+            myApplication = MyApplication.getInstance();
+        }
+        deleteRequest.setAccountID(myApplication.getAccountID());
+        deleteRequest.setUserID(myApplication.getUserID());
+        deleteRequest.setPassword(myApplication.getPassword());
+        deleteRequest.setLocale(myApplication.getLocale());
+        deleteRequest.setUrl(GpsOldRequest.ADMIN_URL);
+        deleteRequest.setMethod(Request.Method.POST);
+        deleteRequest.setParams(buildParams());
+        deleteRequest.setCommand(GpsOldRequest.CMD_DELETE_DEVICE);
+        return deleteRequest;
     }
 
     private JSONObject buildParams(){

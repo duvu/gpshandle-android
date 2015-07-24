@@ -4,7 +4,6 @@ package com.umaps.gpshandleclient.ui;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,26 +20,28 @@ import java.util.List;
  */
 public class AdmDispatcher extends Fragment {
     private static final String TAG = "AdminDispatcher";
+    private MyApplication mApplication;
+    private View view;
+    private ViewPager mViewPager;
+
     public static AdmDispatcher newInstance(){
         return new AdmDispatcher();
     }
+
     public AdmDispatcher(){
         super();
     }
-    MyApplication mApplication;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.frag_pager_admin, container, false);
-        final ViewPager mViewPager = (ViewPager) view.findViewById(R.id.view_pager_admin);
+        view = inflater.inflate(R.layout.frag_pager_admin, container, false);
+
+        mViewPager = (ViewPager) view.findViewById(R.id.view_pager_admin);
         mApplication = MyApplication.getInstance();
 
-        List<Fragment> fragments = getFragments();
+        List<Fragment> fragments = setupFragments();
         PagerAdapter mPageAdapter = new PagerAdapter(getChildFragmentManager(), fragments);
         mViewPager.setAdapter(mPageAdapter);
-
-
-
 
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             View aV = view.findViewById(R.id.selected_account);
@@ -52,7 +53,6 @@ public class AdmDispatcher extends Fragment {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
             }
-
             @Override
             public void onPageSelected(int position) {
                 switch (position) {
@@ -88,7 +88,9 @@ public class AdmDispatcher extends Fragment {
 
             }
         });
-
+        return view;
+    }
+    private List<Fragment> setupFragments() {
         View lA = view.findViewById(R.id.l_account);
         View lU = view.findViewById(R.id.l_user);
         View lG = view.findViewById(R.id.l_group);
@@ -119,19 +121,15 @@ public class AdmDispatcher extends Fragment {
                 mViewPager.setCurrentItem(3, true);
             }
         });
-        return view;
-    }
-    private List<Fragment> getFragments() {
+
         List<Fragment> frags = new ArrayList<>();
-        Log.i(TAG, "ACL Account: " + mApplication.getAclAdminAccount());
-        Log.i(TAG, "ACL User: " + mApplication.getAclAdminUser());
-        if (mApplication.getAclAdminAccount() > 1) {
-            AdmAccount admAccount = AdmAccount.newInstance();
-            frags.add(admAccount);
-        }
+
+        AdmAccount admAccount = AdmAccount.newInstance();
         AdmUser admUser = AdmUser.newInstance();
         AdmGroup admGroup = AdmGroup.newInstance();
         AdmDevice admDevice = AdmDevice.newInstance();
+
+        frags.add(admAccount);
         frags.add(admUser);
         frags.add(admGroup);
         frags.add(admDevice);

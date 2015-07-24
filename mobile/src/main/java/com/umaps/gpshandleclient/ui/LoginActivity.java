@@ -194,6 +194,8 @@ public class LoginActivity extends FragmentActivity {
                         Log.i(TAG, response.toString());
                         MyResponse mRes = new MyResponse(response);
                         if (mRes.isError()){
+                            showProgress(false);
+                            Toast.makeText(getApplicationContext(), getText(R.string.failure_login), Toast.LENGTH_LONG).show();
                             return;
                         }
                         String token = null;

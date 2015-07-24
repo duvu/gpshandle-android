@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="server_url">
-        <item value="umaps.vn">Server Umaps</item>
-        <item value="gpshandle.com">Server Gpshandle</item>
-    </string-array>
-</resources>

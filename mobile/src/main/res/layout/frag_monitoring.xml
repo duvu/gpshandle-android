@@ -18,8 +18,6 @@
             android:layout_gravity="center"
             android:visibility="gone" />
     </LinearLayout>
-
-
     <FrameLayout
         android:id="@+id/map"
         android:layout_width="match_parent"

@@ -449,7 +449,7 @@ public class MyApplication extends Application {
     }
 
     public void storeAcls(JSONObject acl) {
-        Log.i(TAG, acl.toString());
+        //Log.i(TAG, acl.toString());
         try {
             String name = acl.getString("name");
             int value = acl.getInt("value");

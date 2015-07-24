@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.model.Device;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.HttpQueue;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
@@ -50,15 +52,16 @@ public class AdmDevice extends Fragment {
     private Typeface mTf;
 
     int previousGroup = -1;
+
     private View layoutAdd;
     private View layoutEdit;
     private View layoutDelete;
 
-    View addDevice;
-    View editDevice;
-    View deleteDevice;
+    private View addDevice;
+    private View editDevice;
+    private View deleteDevice;
 
-    private GpsOldRequest mRequest;
+    //private GpsOldRequest mRequest;
     public static AdmDevice newInstance(){
         return new AdmDevice();
     }
@@ -91,17 +94,16 @@ public class AdmDevice extends Fragment {
                 }
             }
         });
-
         setBottomToolbar();
 
-        mRequest = new GpsOldRequest(getActivity());
+        GpsOldRequest mRequest = new GpsOldRequest(getActivity());
         mRequest.setAccountID(mApplication.getAccountID());
         mRequest.setUserID(mApplication.getUserID());
         mRequest.setPassword(mApplication.getPassword());
         mRequest.setMethod(Request.Method.POST);
         mRequest.setUrl(GpsOldRequest.ADMIN_URL);
         mRequest.setCommand(GpsOldRequest.CMD_GET_DEVICES);
-        JSONObject params = Device.createParams();
+        JSONObject params = Device.getParams();
         mRequest.setParams(params);
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
@@ -133,6 +135,7 @@ public class AdmDevice extends Fragment {
         mRequest.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                showProgress(false);
                 Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -144,7 +147,7 @@ public class AdmDevice extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        mRequest.cancel(TAG_REQUEST);
+        HttpQueue.getInstance(getActivity()).cancel(TAG_REQUEST);
         showProgress(false);
     }
 
@@ -214,84 +217,110 @@ public class AdmDevice extends Fragment {
         layoutEdit = view.findViewById(R.id.l_edit_device);
         layoutDelete = view.findViewById(R.id.l_delete_device);
 
-        addDevice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mApplication.getAclAdminDevice() < 3) {
-                    Toast.makeText(getActivity(), getResources().getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
-                    return;
-                }
 
-                if (layoutAdd.getVisibility() == View.VISIBLE) {
-                    layoutAdd.setVisibility(View.GONE);
-                    expListView.setVisibility(View.VISIBLE);
-                    addDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
-                } else {
-                    layoutDelete.setVisibility(View.GONE);
-                    layoutEdit.setVisibility(View.GONE);
-                    layoutAdd.setVisibility(View.VISIBLE);
-                    expListView.setVisibility(View.GONE);
-                    addDevice.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
-                    editDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
-                    deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
-                    setupLayoutAdd();
-                }
-            }
-        });
-        editDevice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mApplication.getAclAdminDevice() < 2 ) {
-                    Toast.makeText(getActivity(), getResources().getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (layoutEdit.getVisibility() == View.VISIBLE) {
-                    layoutEdit.setVisibility(View.GONE);
-                    expListView.setVisibility(View.VISIBLE);
-                    editDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
-                } else {
-                    if (previousGroup == -1) {
-                        Toast.makeText(getActivity(), getResources().getText(R.string.you_must_select_a_device), Toast.LENGTH_LONG).show();
+        if (mApplication.getAclAdminDevice() > 2) {
+            addDevice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (layoutAdd.getVisibility() == View.VISIBLE) {
+                        layoutAdd.setVisibility(View.GONE);
+                        expListView.setVisibility(View.VISIBLE);
+                        addDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
                     } else {
                         layoutDelete.setVisibility(View.GONE);
-                        layoutEdit.setVisibility(View.VISIBLE);
-                        layoutAdd.setVisibility(View.GONE);
-                        expListView.setVisibility(View.GONE);
-                        addDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
-                        editDevice.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
-                        deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
-                        setupLayoutEdit();
-                    }
-                }
-            }
-        });
-        deleteDevice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mApplication.getAclAdminDevice() < 3 ) {
-                    Toast.makeText(getActivity(), getResources().getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (layoutDelete.getVisibility() == View.VISIBLE) {
-                    layoutDelete.setVisibility(View.GONE);
-                    expListView.setVisibility(View.VISIBLE);
-                    deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
-                } else {
-                    if (previousGroup == -1) {
-                        Toast.makeText(getActivity(), getResources().getText(R.string.you_must_select_a_device), Toast.LENGTH_LONG).show();
-                    } else {
-                        layoutDelete.setVisibility(View.VISIBLE);
                         layoutEdit.setVisibility(View.GONE);
-                        layoutAdd.setVisibility(View.GONE);
+                        layoutAdd.setVisibility(View.VISIBLE);
                         expListView.setVisibility(View.GONE);
-                        addDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        addDevice.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
                         editDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
-                        deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
-                        setupLayoutDelete();
+                        deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        setupLayoutAdd();
                     }
                 }
-            }
-        });
+            });
+
+            deleteDevice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (layoutDelete.getVisibility() == View.VISIBLE) {
+                        layoutDelete.setVisibility(View.GONE);
+                        //expListView.setVisibility(View.VISIBLE);
+                        deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                    } else {
+                        if (previousGroup == -1) {
+                            Toast.makeText(getActivity(), getResources().getText(R.string.you_must_select_a_device), Toast.LENGTH_LONG).show();
+                        } else {
+                            layoutDelete.setVisibility(View.VISIBLE);
+                            layoutEdit.setVisibility(View.GONE);
+                            layoutAdd.setVisibility(View.GONE);
+                            if (expListView.getVisibility() == View.GONE) {
+                                expListView.setVisibility(View.VISIBLE);
+                            }
+                            addDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            editDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
+                            setupLayoutDelete();
+                        }
+                    }
+                }
+            });
+        } else {
+            icAddDevice.setTextColor(getResources().getColor(R.color.disable));
+            txtAddDevice.setTextColor(getResources().getColor(R.color.disable));
+            icDeleteDevice.setTextColor(getResources().getColor(R.color.disable));
+            txtDeleteDevice.setTextColor(getResources().getColor(R.color.disable));
+
+            addDevice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
+            deleteDevice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+        if (mApplication.getAclAdminDevice() > 1) {
+            editDevice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mApplication.getAclAdminDevice() < 2) {
+                        Toast.makeText(getActivity(), getResources().getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (layoutEdit.getVisibility() == View.VISIBLE) {
+                        layoutEdit.setVisibility(View.GONE);
+                        expListView.setVisibility(View.VISIBLE);
+                        editDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                    } else {
+                        if (previousGroup == -1) {
+                            Toast.makeText(getActivity(), getResources().getText(R.string.you_must_select_a_device), Toast.LENGTH_LONG).show();
+                        } else {
+                            layoutDelete.setVisibility(View.GONE);
+                            layoutEdit.setVisibility(View.VISIBLE);
+                            layoutAdd.setVisibility(View.GONE);
+                            expListView.setVisibility(View.GONE);
+                            addDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            editDevice.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
+                            deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            setupLayoutEdit();
+                        }
+                    }
+                }
+            });
+        } else {
+            icEditDevice.setTextColor(getResources().getColor(R.color.disable));
+            txtEditDevice.setTextColor(getResources().getColor(R.color.disable));
+            editDevice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getString(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     private void setupLayoutAdd(){
@@ -349,15 +378,23 @@ public class AdmDevice extends Fragment {
                 d.setNotes(notes);
 
                 GpsOldRequest crtRequest = d.getRequestCreate();
-
+                crtRequest.setRequestTag(TAG_REQUEST);
                 crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        showProgress(false);
                         MyResponse myResponse = new MyResponse(response);
                         if (myResponse.isSuccess()) {
                             layoutAdd.setVisibility(View.GONE);
                             expListView.setVisibility(View.VISIBLE);
                             addDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        }
+                        //update device list
+                        {
+                            String tag = "android:switcher:"+R.id.view_pager_admin+":"+3;
+                            AdmDevice frg = (AdmDevice)getFragmentManager().findFragmentByTag(tag);
+                            FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                            aTrans.detach(frg).attach(frg).commit();
                         }
                         Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
 
@@ -366,10 +403,12 @@ public class AdmDevice extends Fragment {
                 crtRequest.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
                         Toast.makeText(getActivity(), getActivity().getResources().getText(R.string.failure_create_device), Toast.LENGTH_LONG).show();
                     }
                 });
                 crtRequest.exec();
+                showProgress(true);
             }
         });
 
@@ -385,7 +424,7 @@ public class AdmDevice extends Fragment {
 
     private void setupLayoutEdit() {
         ExpListAdapter adt = (ExpListAdapter) expListView.getExpandableListAdapter();//.getAdapter();
-        Device d = (Device)adt.getGroup(previousGroup);
+        final Device d = (Device)adt.getGroup(previousGroup);
         //--
         final EditText edtUniqueID = (EditText) layoutEdit.findViewById(R.id.txt_device_unique_id_content);
         edtUniqueID.setText(d.getUniqueID());
@@ -438,7 +477,6 @@ public class AdmDevice extends Fragment {
 
                 boolean activated = swActive.isChecked();
 
-                Device d = new Device(getActivity());
                 d.setUniqueID(uniqueID);
                 d.setDeviceID(deviceID);
                 d.setDescription(description);
@@ -451,14 +489,23 @@ public class AdmDevice extends Fragment {
                 d.setNotes(notes);
 
                 GpsOldRequest edtRequest = d.getRequestEdit();
+                edtRequest.setRequestTag(TAG_REQUEST);
                 edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        showProgress(false);
                         MyResponse myResponse = new MyResponse(response);
                         if (myResponse.isSuccess()) {
                             layoutEdit.setVisibility(View.GONE);
                             expListView.setVisibility(View.VISIBLE);
                             editDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        }
+                        //update device list
+                        {
+                            String tag = "android:switcher:"+R.id.view_pager_admin+":"+3;
+                            AdmDevice frg = (AdmDevice)getFragmentManager().findFragmentByTag(tag);
+                            FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                            aTrans.detach(frg).attach(frg).commit();
                         }
                         Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
                     }
@@ -467,11 +514,12 @@ public class AdmDevice extends Fragment {
                 edtRequest.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
                         Toast.makeText(getActivity(), getResources().getText(R.string.failure_create_device), Toast.LENGTH_LONG).show();
                     }
                 });
-
                 edtRequest.exec();
+                showProgress(true);
             }
         });
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -486,12 +534,11 @@ public class AdmDevice extends Fragment {
 
     private void setupLayoutDelete() {
         ExpListAdapter adt = (ExpListAdapter) expListView.getExpandableListAdapter();//.getAdapter();
-        Device d = (Device)adt.getGroup(previousGroup);
+        final Device d = (Device)adt.getGroup(previousGroup);
         TextView txtConfirm = (TextView)layoutDelete.findViewById(R.id.delete_confirm);
         StringBuffer sb = new StringBuffer();
         sb.append(getResources().getString(R.string.are_you_sure));
-        sb.append(d.getDescription());
-
+        sb.append(": ").append(d.getDescription());
         txtConfirm.setText(sb);
 
         Button btnDelete = (Button) layoutDelete.findViewById(R.id.btn_delete);
@@ -500,9 +547,38 @@ public class AdmDevice extends Fragment {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO
+                GpsOldRequest deleteRequest = d.getRequestDelete();
+                deleteRequest.setRequestTag(TAG_REQUEST);
+                deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        showProgress(false);
+                        MyResponse myResponse = new MyResponse(response);
+                        if (myResponse.isSuccess()) {
+                            layoutDelete.setVisibility(View.GONE);
+                            deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
 
-                //Delete device
+                            //update device list
+                            {
+                                previousGroup = -1;
+                                String tag = "android:switcher:"+R.id.view_pager_admin+":"+3;
+                                AdmDevice frg = (AdmDevice)getFragmentManager().findFragmentByTag(tag);
+                                FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                                aTrans.detach(frg).attach(frg).commit();
+                            }
+                        }
+                        Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                deleteRequest.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
+                        Toast.makeText(getActivity(), getText(R.string.failure_create_device), Toast.LENGTH_LONG).show();
+                    }
+                });
+                deleteRequest.exec();
+                showProgress(true);
             }
         });
 
@@ -510,8 +586,7 @@ public class AdmDevice extends Fragment {
             @Override
             public void onClick(View v) {
                 layoutDelete.setVisibility(View.GONE);
-                expListView.setVisibility(View.VISIBLE);
-                layoutDelete.setBackgroundColor(getResources().getColor(R.color.base_color));
+                deleteDevice.setBackgroundColor(getResources().getColor(R.color.base_color));
             }
         });
     }
@@ -622,6 +697,12 @@ public class AdmDevice extends Fragment {
             } else {
                 txtDeviceActive.setTextColor(getResources().getColor(R.color.bad));
             }
+            txtDeviceActive.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggleDeviceState(groupPosition);
+                }
+            });
             icIndicator = (TextView) groupView.findViewById(R.id.ic_indicator);
             icIndicator.setTypeface(mTf);
             icIndicator.setText(String.valueOf((char) 0xe6ee));
@@ -630,7 +711,7 @@ public class AdmDevice extends Fragment {
         }
 
         @Override
-        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
             if(convertView == null) {
                 detailsView = mInflater.inflate(R.layout.device_details, null);
             } else {
@@ -664,8 +745,14 @@ public class AdmDevice extends Fragment {
             TextView txtAccountDisplay = (TextView) detailsView.findViewById(R.id.txt_device_display_content);
             txtAccountDisplay.setText(displayName);
 
-            TextView txtIsActive = (TextView) detailsView.findViewById(R.id.txt_is_active_content);
-            txtIsActive.setText(String.valueOf(isActive));
+            Switch txtIsActive = (Switch) detailsView.findViewById(R.id.txt_is_active_content);
+            txtIsActive.setChecked(isActive);
+            txtIsActive.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggleDeviceState(groupPosition);
+                }
+            });
 
             TextView txtSerialNumber = (TextView) detailsView.findViewById(R.id.txt_device_serial_number_content);
             txtSerialNumber.setText(serialNumber);
@@ -695,6 +782,48 @@ public class AdmDevice extends Fragment {
         @Override
         public boolean isChildSelectable(int groupPosition, int childPosition) {
             return true;
+        }
+
+        private void toggleDeviceState(int groupPosition){
+            if (mApplication.getAclAdminDevice() < 2) {
+                Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            Device d = objects.get(groupPosition);
+            if (d.isActive()){
+                d.setActive(false);
+            } else {
+                d.setActive(true);
+            }
+
+            GpsOldRequest updateDevice = d.getRequestEdit();
+            updateDevice.setResponseHandler(new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    showProgress(false);
+                    MyResponse myResponse = new MyResponse(response);
+                    if (myResponse.isSuccess()) {
+                        //update device list
+                        {
+                            String tag = "android:switcher:"+R.id.view_pager_admin+":"+3;
+                            AdmDevice frg = (AdmDevice)getFragmentManager().findFragmentByTag(tag);
+                            FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                            aTrans.detach(frg).attach(frg).commit();
+                        }
+                    }
+                    Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+            updateDevice.setErrorHandler(new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //ToDo
+                    showProgress(false);
+                }
+            });
+            updateDevice.exec();
+            showProgress(true);
         }
     }
 }

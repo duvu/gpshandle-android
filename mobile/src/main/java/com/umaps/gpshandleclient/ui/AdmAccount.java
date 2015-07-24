@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -55,9 +56,9 @@ public class AdmAccount extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_adm_account, container, false);
+
         mBarProgress    = view.findViewById(R.id.bar_progress);
         mProgress       = view.findViewById(R.id.progress);
-        //mLayoutAccount  = view.findViewById(R.id.account_info_layout);
         mApplication    = MyApplication.getInstance();
         mTf             = MyApplication.getIconFont();
 
@@ -97,7 +98,11 @@ public class AdmAccount extends Fragment {
             public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
                 MyResponse mRes = new MyResponse(response);
-                if (mRes.isError()) return;
+                if (mRes.isError()){
+                    showProgress(false);
+                    Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 JSONArray jsonArray = (JSONArray) mRes.getData();
                 ArrayList<Account> accounts = Account.getListFromJson(jsonArray);

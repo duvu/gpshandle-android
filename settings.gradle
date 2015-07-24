@@ -1,1 +1,1 @@
-include ':mobile', ':tv', ':gpshandlesdk'
+include ':mobile'

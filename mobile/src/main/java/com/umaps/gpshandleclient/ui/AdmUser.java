@@ -8,13 +8,18 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -25,6 +30,8 @@ import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.model.User;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.HttpQueue;
+import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +45,6 @@ import java.util.Date;
  */
 public class AdmUser extends Fragment {
     private static final String TAG = "AdmUser";
-
-    private GpsOldRequest mRequest;
     private static final String TAG_REQUEST = "AdmUser";
     private View mBarProgress;
     private View mProgress;
@@ -49,7 +54,13 @@ public class AdmUser extends Fragment {
     private Typeface mTf;
 
     int previousGroup = -1;
+    private View layoutAdd;
+    private View layoutEdit;
+    private View layoutDelete;
 
+    private View addUser;
+    private View editUser;
+    private View deleteUser;
     public static AdmUser newInstance(){
         return new AdmUser();
     }
@@ -83,7 +94,7 @@ public class AdmUser extends Fragment {
         });
         setBottomToolbar();
 
-        mRequest = new GpsOldRequest(getActivity());
+        GpsOldRequest mRequest = new GpsOldRequest(getActivity());
         mRequest.setAccountID(mApplication.getAccountID());
         mRequest.setUserID(mApplication.getUserID());
         mRequest.setPassword(mApplication.getPassword());
@@ -95,10 +106,9 @@ public class AdmUser extends Fragment {
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(TAG, response.toString());
+                showProgress(false);
                 MyResponse mRes = new MyResponse(response);
                 if (mRes.isError()) return;
-
                 JSONArray jsonArray = (JSONArray) mRes.getData();
                 ArrayList<User> userArrayList = new ArrayList<User>();
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -114,16 +124,14 @@ public class AdmUser extends Fragment {
                 }
                 ExpListAdapter expListAdapter = new ExpListAdapter(getActivity(), userArrayList);
                 expListView.setAdapter(expListAdapter);
-                showProgress(false);
             }
         });
         mRequest.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                showProgress(false);
             }
         });
-
         mRequest.setRequestTag(TAG_REQUEST);
         mRequest.exec();
         showProgress(true);
@@ -132,7 +140,8 @@ public class AdmUser extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        mRequest.cancel(TAG_REQUEST);
+        HttpQueue.getInstance(getActivity()).cancel(TAG_REQUEST);
+        showProgress(false);
     }
 
     private void setBottomToolbar(){
@@ -145,43 +154,334 @@ public class AdmUser extends Fragment {
         TextView icEdit = (TextView) view.findViewById(R.id.ic_edit);
         icEdit.setTypeface(mTf);
         icEdit.setText(String.valueOf((char) 0xe714));
-        TextView txtEditAccount = (TextView) view.findViewById(R.id.txt_edit);
-        txtEditAccount.setText(R.string.edit);
+        TextView txtEdit = (TextView) view.findViewById(R.id.txt_edit);
+        txtEdit.setText(R.string.edit);
 
         TextView icDelete = (TextView) view.findViewById(R.id.ic_delete);
         icDelete.setTypeface(mTf);
         icDelete.setText(String.valueOf((char) 0xe608));
-        TextView txtDeleteAccount = (TextView) view.findViewById(R.id.txt_delete);
-        txtDeleteAccount.setText(R.string.delete);
+        TextView txtDelete = (TextView) view.findViewById(R.id.txt_delete);
+        txtDelete.setText(R.string.delete);
+
+
+        addUser = view.findViewById(R.id.add);
+        editUser = view.findViewById(R.id.edit);
+        deleteUser = view.findViewById(R.id.delete);
+
+        layoutAdd = view.findViewById(R.id.l_add_user);
+        layoutEdit = view.findViewById(R.id.l_edit_user);
+        layoutDelete = view.findViewById(R.id.l_delete_user);
 
         if (mApplication.getAclAdminUserManager() > 2) {
-            View add = view.findViewById(R.id.add);
-            View delete = view.findViewById(R.id.delete);
-            View edit = view.findViewById(R.id.edit);
-
-            add.setOnClickListener(new View.OnClickListener() {
-
+            addUser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO
+                    if (layoutAdd.getVisibility() == View.VISIBLE) {
+                        layoutAdd.setVisibility(View.GONE);
+                        expListView.setVisibility(View.VISIBLE);
+                        addUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                    } else {
+                        layoutDelete.setVisibility(View.GONE);
+                        layoutEdit.setVisibility(View.GONE);
+                        layoutAdd.setVisibility(View.VISIBLE);
+                        expListView.setVisibility(View.GONE);
+                        addUser.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
+                        editUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        deleteUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        setupLayoutAdd();
+                    }
                 }
             });
-            edit.setOnClickListener(new View.OnClickListener() {
+            deleteUser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO
+                    if (layoutDelete.getVisibility() == View.VISIBLE) {
+                        layoutDelete.setVisibility(View.GONE);
+                        deleteUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                    } else {
+                        if (previousGroup == -1) {
+                            Toast.makeText(getActivity(), getResources().getText(R.string.you_must_select_a_device), Toast.LENGTH_LONG).show();
+                        } else {
+                            layoutDelete.setVisibility(View.VISIBLE);
+                            layoutEdit.setVisibility(View.GONE);
+                            layoutAdd.setVisibility(View.GONE);
+                            if (expListView.getVisibility() == View.GONE) {
+                                expListView.setVisibility(View.VISIBLE);
+                            }
+                            addUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            editUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            deleteUser.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
+                            setupLayoutDelete();
+                        }
+                    }
                 }
             });
         } else {
             icAdd.setTextColor(getResources().getColor(R.color.disable));
             txtAdd.setTextColor(getResources().getColor(R.color.disable));
-
             icDelete.setTextColor(getResources().getColor(R.color.disable));
-            txtDeleteAccount.setTextColor(getResources().getColor(R.color.disable));
+            txtDelete.setTextColor(getResources().getColor(R.color.disable));
 
-            icEdit.setTextColor(getResources().getColor(R.color.disable));
-            txtEditAccount.setTextColor(getResources().getColor(R.color.disable));
+            addUser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
+            deleteUser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
         }
+
+        if (mApplication.getAclAdminGroup() > 1) {
+            editUser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mApplication.getAclAdminDevice() < 2) {
+                        Toast.makeText(getActivity(), getResources().getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (layoutEdit.getVisibility() == View.VISIBLE) {
+                        layoutEdit.setVisibility(View.GONE);
+                        expListView.setVisibility(View.VISIBLE);
+                        editUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                    } else {
+                        if (previousGroup == -1) {
+                            Toast.makeText(getActivity(), getResources().getText(R.string.you_must_select_a_device), Toast.LENGTH_LONG).show();
+                        } else {
+                            layoutDelete.setVisibility(View.GONE);
+                            layoutEdit.setVisibility(View.VISIBLE);
+                            layoutAdd.setVisibility(View.GONE);
+                            expListView.setVisibility(View.GONE);
+                            addUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            editUser.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
+                            deleteUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            setupLayoutEdit();
+                        }
+                    }
+                }
+            });
+        } else {
+            icEdit.setTextColor(getResources().getColor(R.color.disable));
+            txtEdit.setTextColor(getResources().getColor(R.color.disable));
+            editUser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getString(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    private void setupLayoutAdd(){
+        Button btnSave = (Button) layoutAdd.findViewById(R.id.btn_save);
+        Button btnCancel = (Button) layoutAdd.findViewById(R.id.btn_cancel);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText edtUserId = (EditText) layoutAdd.findViewById(R.id.txt_user_id_content);
+                EditText edtPassword = (EditText) layoutAdd.findViewById(R.id.txt_user_password_content);
+                EditText edtDescription = (EditText) layoutAdd.findViewById(R.id.txt_user_desc_content);
+                EditText edtDisplayName = (EditText) layoutAdd.findViewById(R.id.txt_user_display_content);
+                Switch swActivated = (Switch) layoutAdd.findViewById(R.id.txt_is_active_content);
+                EditText edtContactName = (EditText) layoutAdd.findViewById(R.id.txt_user_contact_name_content);
+                EditText edtContactEmail = (EditText) layoutAdd.findViewById(R.id.txt_user_contact_email_content);
+                EditText edtContactPhone = (EditText) layoutAdd.findViewById(R.id.txt_user_contact_phone_content);
+                EditText edtManagedGroup = (EditText) layoutAdd.findViewById(R.id.txt_managed_groups_content);
+
+                User u = new User(getActivity());
+                u.setId(edtUserId.getText().toString());
+                u.setPassword(edtPassword.getText().toString());
+                u.setDescription(edtDescription.getText().toString());
+                u.setDisplayName(edtDisplayName.getText().toString());
+                u.setIsActive(swActivated.isChecked());
+                u.setContactName(edtContactName.getText().toString());
+                u.setContactEmail(edtContactEmail.getText().toString());
+                u.setContactPhone(edtContactPhone.getText().toString());
+                GpsOldRequest crtRequest = u.getRequestCreate();
+
+                crtRequest.setRequestTag(TAG_REQUEST);
+                crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        showProgress(false);
+                        MyResponse myResponse = new MyResponse(response);
+                        if (myResponse.isSuccess()) {
+                            layoutAdd.setVisibility(View.GONE);
+                            expListView.setVisibility(View.VISIBLE);
+                            addUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        }
+                        //update group list
+                        {
+                            String tag = "android:switcher:"+R.id.view_pager_admin+":"+1;
+                            AdmUser frg = (AdmUser)getFragmentManager().findFragmentByTag(tag);
+                            FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                            aTrans.detach(frg).attach(frg).commit();
+                        }
+                        Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                crtRequest.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
+                    }
+                });
+                crtRequest.exec();
+                showProgress(true);
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutAdd.setVisibility(View.GONE);
+                expListView.setVisibility(View.VISIBLE);
+                addUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+            }
+        });
+    }
+    private void setupLayoutEdit(){
+        ExpListAdapter adt = (ExpListAdapter) expListView.getExpandableListAdapter();//.getAdapter();
+        final User u = (User)adt.getGroup(previousGroup);
+
+        final EditText edtUserId          = (EditText) layoutEdit.findViewById(R.id.txt_user_id_content);
+        final EditText edtPassword        = (EditText) layoutEdit.findViewById(R.id.txt_user_password_content);
+        final EditText edtDescription     = (EditText) layoutEdit.findViewById(R.id.txt_user_desc_content);
+        final EditText edtDisplayName     = (EditText) layoutEdit.findViewById(R.id.txt_user_display_content);
+        final Switch swActivated          = (Switch)   layoutEdit.findViewById(R.id.txt_is_active_content);
+        final EditText edtContactName     = (EditText) layoutEdit.findViewById(R.id.txt_user_contact_name_content);
+        final EditText edtContactEmail    = (EditText) layoutEdit.findViewById(R.id.txt_user_contact_email_content);
+        final EditText edtContactPhone    = (EditText) layoutEdit.findViewById(R.id.txt_user_contact_phone_content);
+        EditText edtManagedGroup          = (EditText) layoutEdit.findViewById(R.id.txt_managed_groups_content);
+
+        edtUserId.setText(u.getId());
+        edtPassword.setText(u.getPassword());
+        edtDescription.setText(u.getDescription());
+        edtDisplayName.setText(u.getDisplayName());
+        swActivated.setChecked(u.isActive());
+        edtContactName.setText(u.getContactName());
+        edtContactEmail.setText(u.getContactEmail());
+        edtContactPhone.setText(u.getContactPhone());
+
+        Button btnSave = (Button) layoutEdit.findViewById(R.id.btn_save);
+        Button btnCancel = (Button) layoutEdit.findViewById(R.id.btn_cancel);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                u.setContext(getActivity());
+                u.setId(edtUserId.getText().toString());
+                u.setPassword(edtPassword.getText().toString());
+                u.setDescription(edtDescription.getText().toString());
+                u.setDisplayName(edtDisplayName.getText().toString());
+                u.setIsActive(swActivated.isChecked());
+                u.setContactName(edtContactName.getText().toString());
+                u.setContactEmail(edtContactEmail.getText().toString());
+                u.setContactPhone(edtContactPhone.getText().toString());
+                GpsOldRequest edtRequest = u.getRequestEdit();
+                edtRequest.setRequestTag(TAG_REQUEST);
+
+                edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        showProgress(false);
+                        MyResponse myResponse = new MyResponse(response);
+                        if (myResponse.isSuccess()) {
+                            layoutEdit.setVisibility(View.GONE);
+                            expListView.setVisibility(View.VISIBLE);
+                            editUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        }
+                        //update group list
+                        {
+                            String tag = "android:switcher:" + R.id.view_pager_admin + ":" + 1;
+                            AdmUser frg = (AdmUser) getFragmentManager().findFragmentByTag(tag);
+                            FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                            aTrans.detach(frg).attach(frg).commit();
+                        }
+                        Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                edtRequest.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
+                    }
+                });
+                edtRequest.exec();
+                showProgress(true);
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutEdit.setVisibility(View.GONE);
+                expListView.setVisibility(View.VISIBLE);
+                editUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+            }
+        });
+    }
+    private void setupLayoutDelete(){
+        Button btnDelete = (Button) layoutDelete.findViewById(R.id.btn_delete);
+        Button btnCancel = (Button) layoutDelete.findViewById(R.id.btn_cancel);
+
+        ExpListAdapter adt = (ExpListAdapter) expListView.getExpandableListAdapter();//.getAdapter();
+        final User u = (User)adt.getGroup(previousGroup);
+        TextView txtConfirm = (TextView)layoutDelete.findViewById(R.id.delete_confirm);
+        StringBuffer sb = new StringBuffer();
+        sb.append(getResources().getString(R.string.are_you_sure));
+        sb.append(": ").append(u.getDescription());
+        txtConfirm.setText(sb);
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                u.setContext(getActivity());
+                GpsOldRequest deleteRequest = u.getRequestDelete();
+                deleteRequest.setRequestTag(TAG_REQUEST);
+                deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        showProgress(false);
+                        MyResponse myResponse = new MyResponse(response);
+                        if (myResponse.isSuccess()) {
+                            layoutDelete.setVisibility(View.GONE);
+                            deleteUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            {
+                                previousGroup = -1; //reset
+                                String tag = "android:switcher:"+R.id.view_pager_admin+":"+1;
+                                AdmUser frg = (AdmUser)getFragmentManager().findFragmentByTag(tag);
+                                FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                                aTrans.detach(frg).attach(frg).commit();
+                            }
+                        }
+                        Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                deleteRequest.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
+                        Toast.makeText(getActivity(), getText(R.string.failure_delete), Toast.LENGTH_LONG).show();
+                    }
+                });
+                deleteRequest.exec();
+                showProgress(true);
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutDelete.setVisibility(View.GONE);
+                deleteUser.setBackgroundColor(getResources().getColor(R.color.base_color));
+            }
+        });
 
     }
     /**
@@ -333,27 +633,28 @@ public class AdmUser extends Fragment {
 
             User user = objects.get(groupPosition);
 
-            TextView txtAccountId = (TextView) detailsView.findViewById(R.id.txt_user_id_content);
+            TextView txtAccountId       = (TextView) detailsView.findViewById(R.id.txt_user_id_content);
+            TextView txtAccountDesc     = (TextView) detailsView.findViewById(R.id.txt_user_desc_content);
+            TextView txtAccountDisplay  = (TextView) detailsView.findViewById(R.id.txt_user_display_content);
+            Switch swActivated          = (Switch)   detailsView.findViewById(R.id.txt_is_active_content);
+            TextView txtContactName     = (TextView) detailsView.findViewById(R.id.txt_user_contact_name_content);
+            TextView txtContactEmail    = (TextView) detailsView.findViewById(R.id.txt_user_contact_email_content);
+            TextView txtContactPhone    = (TextView) detailsView.findViewById(R.id.txt_user_contact_phone_content);
+            TextView txtLastLogin       = (TextView) detailsView.findViewById(R.id.txt_user_last_login_content);
+            TextView txtCreatedOn       = (TextView) detailsView.findViewById(R.id.txt_user_creation_content);
+            TextView txtManagedGroups   = (TextView) detailsView.findViewById(R.id.txt_managed_groups_content);
+
             txtAccountId.setText(user.getId());
-            TextView txtAccountDesc = (TextView) detailsView.findViewById(R.id.txt_user_desc_content);
             txtAccountDesc.setText(user.getDescription());
-            TextView txtAccountDisplay = (TextView) detailsView.findViewById(R.id.txt_user_display_content);
             txtAccountDisplay.setText(user.getDisplayName());
-            TextView txtContactName = (TextView) detailsView.findViewById(R.id.txt_user_contact_name_content);
+            swActivated.setChecked(user.isActive());
             txtContactName.setText(user.getContactName());
-            TextView txtContactEmail = (TextView) detailsView.findViewById(R.id.txt_user_contact_email_content);
             txtContactEmail.setText(user.getContactEmail());
-            TextView txtContactPhone = (TextView) detailsView.findViewById(R.id.txt_user_contact_phone_content);
             txtContactPhone.setText(user.getContactPhone());
-            /*TextView txtDeviceCount = (TextView) detailsView.findViewById(R.id.txt_user_device_count_content);
-            txtDeviceCount.setText("" + user.get());*/
-            TextView txtLastLogin = (TextView) detailsView.findViewById(R.id.txt_user_last_login_content);
             Date lastLogin = new Date(user.getLastLoginTime() * 1000);
             txtLastLogin.setText(lastLogin.toString());
-            TextView txtCreatedOn = (TextView) detailsView.findViewById(R.id.txt_user_creation_content);
             Date createdOn = new Date(user.getCreationTime() * 1000);
             txtCreatedOn.setText(createdOn.toString());
-            TextView txtManagedGroups = (TextView) detailsView.findViewById(R.id.txt_managed_groups_content);
 
             ArrayList<Group> grL = user.getGroupList();
             if (grL!=null){

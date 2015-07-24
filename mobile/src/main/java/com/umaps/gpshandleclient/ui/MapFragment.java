@@ -260,7 +260,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 LatLngBounds bounds;
                 MapPoint[] pts = mapData.getPoints();
-                if (pts.length <= 0) return;
+                if ((pts == null) || (pts.length <= 0)) return;
 
                 mClusterManager.clearItems();
                 for (int i = 0; i < pts.length; i++) {

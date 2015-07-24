@@ -47,27 +47,6 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
         icoMoon = mApplication.getIconFont();
     }
 
-    /*public TrackInfoWindowAdapter(Context context, CustomMapLayout customMapLayout){
-        this.context = context;
-        this.mApplication = MyApplication.getInstance();
-        mCallback = (MainActivity)context;
-        mapLayout = customMapLayout;
-        inflater = (LayoutInflater.from(context));
-        icoMoon = mApplication.getIconFont();
-    }
-    public TrackInfoWindowAdapter(Context context){
-        this.context = context;
-        this.mApplication = MyApplication.getInstance();
-        icoMoon = mApplication.getIconFont();
-
-        try {
-            mCallback = (MainActivity) context;
-        } catch (ClassCastException e){
-            Log.e(TAG, "Cannot cast to MainActivity");
-        }
-        inflater = (LayoutInflater.from(context));
-    }*/
-
     @Override
     public View getInfoWindow(Marker marker) {
         this.marker = marker;
@@ -191,77 +170,6 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
         TextView contentAddr = (TextView) view.findViewById(R.id.txt_addr_content);
         contentAddr.setText(mapPoint.getAddress());
 
-        //--Setup listener for historical button
-        //----------------------------------------------------------------------------------------//
-        /*Button btn30min = (Button) view.findViewById(R.id.btn_historical_30m);
-        btn30min.setOnTouchListener(
-            new OnInfoWindowElemTouchListener(
-                btn30min,
-                context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
-                context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
-            ) {
-            @Override
-            protected void onClickConfirm(View view, Marker marker) {
-                Log.i(TAG, "got clicked on btn30min");
-                //--load 30 min historical data
-                long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
-                long timeFrom = timeTo - 30 * 60;
-
-                mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
-            }
-        });*/
-        //--
-        /*Button btn60min = (Button) view.findViewById(R.id.btn_historical_60m);
-        btn60min.setOnTouchListener(
-                new OnInfoWindowElemTouchListener(
-                        btn60min,
-                        context.getResources().getDrawable(R.drawable.button_history),
-                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
-                ) {
-                    @Override
-                    protected void onClickConfirm(View view, Marker marker) {
-                        //--load 60 min historical data
-                        Log.i(TAG, "got clicked on btn60min");
-                        long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
-                        long timeFrom = timeTo - 60 * 60;
-                        mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
-                    }
-                }
-        );
-        Button btn6h = (Button) view.findViewById(R.id.btn_historical_6h);
-        btn6h.setOnTouchListener(
-                new OnInfoWindowElemTouchListener(
-                        btn6h,
-                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
-                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
-                ) {
-                    @Override
-                    protected void onClickConfirm(View view, Marker marker) {
-                        Log.i(TAG, "got clicked on btn6h");
-                        long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
-                        long timeFrom = timeTo - 6 * 60 * 60;
-                        mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
-                    }
-                }
-        );
-        Button btn12h = (Button) view.findViewById(R.id.btn_historical_12h);
-        btn12h.setOnTouchListener(
-                new OnInfoWindowElemTouchListener(
-                        btn12h,
-                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
-                        context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
-                ) {
-                    @Override
-                    protected void onClickConfirm(View view, Marker marker) {
-                        Log.i(TAG, "got clicked on btn12h");
-                        long timeTo = Calendar.getInstance().getTimeInMillis()/1000;
-                        long timeFrom = timeTo - 12 * 60 * 60;
-                        mCallback.onTrackInfoWindowButton(id, desc, timeFrom, timeTo);
-                    }
-                }
-        );*/
-        /*TextView icLink = (TextView) view.findViewById(R.id.ic_link_historical);
-        icLink.setTypeface(icoMoon);*/
         Button txtLink = (Button) view.findViewById(R.id.txt_link_historical);
         txtLink.setText(R.string.title_historical);
 

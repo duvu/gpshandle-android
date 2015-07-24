@@ -25,21 +25,20 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/base_color"
-        android:layout_alignParentBottom="true"
-        android:minHeight="?attr/actionBarSize">
+        android:layout_alignParentBottom="true">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_marginRight="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <LinearLayout
                 android:id="@+id/add"
                 android:orientation="vertical"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/ic_add"
                     android:textSize="26sp"
@@ -59,7 +58,7 @@
                 android:orientation="vertical"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/ic_edit"
                     android:textSize="26sp"
@@ -79,7 +78,7 @@
                 android:orientation="vertical"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/ic_delete"
                     android:textSize="26sp"
@@ -95,4 +94,19 @@
             </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
+    <include layout="@layout/user_add_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="?attr/actionBarSize"/>
+    <include layout="@layout/user_edit_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="?attr/actionBarSize"/>
+    <include layout="@layout/user_delete_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="?attr/actionBarSize"/>
 </RelativeLayout>

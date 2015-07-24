@@ -22,7 +22,7 @@ import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity{
     private static final String TAG = "MainActivity";
-    Typeface mTf = null;
+    private Typeface mTf = null;
     private MyApplication mApplication;
 
 
@@ -31,14 +31,70 @@ public class MainActivity extends ActionBarActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mApplication = MyApplication.getInstance();
-        mTf = mApplication.getIconFont();
+        mTf = MyApplication.getIconFont();
 
         if (!isUserSignedIn()){
             startLoginActivity();
             finish();
         }
-
         setToolbar();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, MapFragment.newInstance())
+                .addToBackStack("realTime").commit();
+    }
+
+    private void doLogout(){
+        mApplication.setIsSignedIn(false);
+        startLoginActivity();
+    }
+
+    private void startLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
+    // retrieve access token from preferences
+    public boolean isUserSignedIn() {
+        boolean hasUserData =
+                (
+                    (!StringTools.isBlank(mApplication.getAccountID())) &&
+                    (!StringTools.isBlank(mApplication.getUserID())) &&
+                    (!StringTools.isBlank(mApplication.getPassword()))
+                ) || (!StringTools.isBlank(mApplication.getToken()));
+        long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
+        long expireOn = mApplication.getExpireOn();
+
+        Log.i(TAG, "Current Time: " + currentTime);
+        Log.i(TAG, "Expired On: " + expireOn);
+
+        boolean isExpired = (expireOn <= currentTime);
+
+        return !isExpired && hasUserData && mApplication.isSignedIn();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        //mRequestGetGroup.exec();
+    }
+
+    private void setToolbar(){
+        //-- set toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+        /*int h = getSupportActionBar().getHeight();
+        h = (h < 60) ? 60 : h;
+        Drawable dr = getResources().getDrawable(R.drawable.ic_launcher);
+        Bitmap bitmap = ((BitmapDrawable)dr).getBitmap();
+        Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, h, h, true));
+        toolbar.setNavigationIcon(d);*/
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         View monitor = findViewById(R.id.monitor);
         TextView icMonitor = (TextView) findViewById(R.id.ic_monitor);
@@ -104,17 +160,16 @@ public class MainActivity extends ActionBarActivity{
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        //TODO
                         int id = item.getItemId();
                         switch (id){
                             case R.id.action_logout:
                                 doLogout();
                                 break;
-                            case R.id.action_settings:
+                            /*case R.id.action_settings:
                                 fragmentManager.beginTransaction()
                                         .replace(R.id.container, new SettingsFragment())
                                         .addToBackStack("Settings").commit();
-                                break;
+                                break;*/
                         }
                         return false;
                     }
@@ -122,64 +177,6 @@ public class MainActivity extends ActionBarActivity{
                 popup.show();
             }
         });
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, MapFragment.newInstance())
-                .addToBackStack("realTime").commit();
-    }
-
-    private void doLogout(){
-        mApplication.setIsSignedIn(false);
-        startLoginActivity();
-    }
-
-    private void startLoginActivity() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-    }
-    // retrieve access token from preferences
-    public boolean isUserSignedIn() {
-        boolean hasUserData =
-                (
-                    (!StringTools.isBlank(mApplication.getAccountID())) &&
-                    (!StringTools.isBlank(mApplication.getUserID())) &&
-                    (!StringTools.isBlank(mApplication.getPassword()))
-                ) || (!StringTools.isBlank(mApplication.getToken()));
-        long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
-        long expireOn = mApplication.getExpireOn();
-
-        Log.i(TAG, "Current Time: " + currentTime);
-        Log.i(TAG, "Expired On: " + expireOn);
-
-        boolean isExpired = (expireOn <= currentTime);
-
-        return !isExpired && hasUserData && mApplication.isSignedIn();
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        //mRequestGetGroup.exec();
-    }
-
-    private void setToolbar(){
-        //-- set toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(toolbar);
-        /*int h = getSupportActionBar().getHeight();
-        h = (h < 60) ? 60 : h;
-        Drawable dr = getResources().getDrawable(R.drawable.ic_launcher);
-        Bitmap bitmap = ((BitmapDrawable)dr).getBitmap();
-        Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, h, h, true));
-        toolbar.setNavigationIcon(d);*/
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override

@@ -1,5 +1,10 @@
 package com.umaps.gpshandleclient.model;
 
+import android.content.Context;
+
+import com.android.volley.Request;
+import com.umaps.gpshandleclient.MyApplication;
+import com.umaps.gpshandleclient.util.GpsOldRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
@@ -32,6 +37,11 @@ public class Group {
     private String displayName;
     private long lastUpdateTime;
     private long creationTime;
+    private String notes;
+
+    Context context;
+    MyApplication mApplication;
+
 
     private String icon;
     private int live = 0;
@@ -41,13 +51,14 @@ public class Group {
 
     public Group(JSONObject itemGroup){
         try {
-            this.accountId      = (itemGroup.has(ACCOUNT_ID) ? itemGroup.getString(ACCOUNT_ID) : "");
-            this.groupId        = (itemGroup.has(GROUP_ID) ? itemGroup.getString(GROUP_ID) : "");
-            this.description    = (itemGroup.has(DESCRIPTION) ? itemGroup.getString(DESCRIPTION) : "");
+            this.accountId      = itemGroup.has(ACCOUNT_ID) ? itemGroup.getString(ACCOUNT_ID) : "";
+            this.groupId        = itemGroup.has(GROUP_ID) ? itemGroup.getString(GROUP_ID) : "";
+            this.description    = itemGroup.has(DESCRIPTION) ? itemGroup.getString(DESCRIPTION) : "";
             this.displayName    = itemGroup.has(DISPLAY_NAME) ? itemGroup.getString(DISPLAY_NAME) : "";
             this.lastUpdateTime = itemGroup.has(LAST_UPDATE_TIME) ? itemGroup.getLong(LAST_UPDATE_TIME) : 0L;
-            this.creationTime = itemGroup.has(CREATION_TIME) ? itemGroup.getLong(CREATION_TIME) : 0L;
+            this.creationTime   = itemGroup.has(CREATION_TIME) ? itemGroup.getLong(CREATION_TIME) : 0L;
             this.deviceCount    = itemGroup.has(DEVICE_COUNT) ? itemGroup.getInt(DEVICE_COUNT) : 0;
+            this.notes          = itemGroup.has(NOTES) ? itemGroup.getString(NOTES) : "";
             if (itemGroup.has(DEVICE_LIST)){
                 deviceArrayList = new ArrayList<Device>();
                 JSONArray dA = itemGroup.getJSONArray(DEVICE_LIST);
@@ -60,6 +71,12 @@ public class Group {
             e.printStackTrace();
         }
     }
+
+    public Group(Context context) {
+        this.context = context;
+        mApplication = MyApplication.getInstance();
+    }
+
     public Group(String accountID, String groupId, String description,
                  String displayName, String icon, int live, int deviceCount){
         this.setAccountId(accountID);
@@ -128,12 +145,28 @@ public class Group {
         this.creationTime = creationTime;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
     public ArrayList<Device> getDeviceArrayList() {
         return deviceArrayList;
     }
 
     public void setDeviceArrayList(ArrayList<Device> deviceArrayList) {
         this.deviceArrayList = deviceArrayList;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
     }
 
     public int getLive() {
@@ -163,5 +196,67 @@ public class Group {
             e.printStackTrace();
         }
         return jsonParamsObject;
+    }
+
+    private JSONObject buildParams(){
+        JSONObject j = new JSONObject();
+        try {
+            j.put(GROUP_ID, this.groupId);
+            j.put(DESCRIPTION, this.description);
+            j.put(DISPLAY_NAME, this.displayName);
+            j.put(NOTES, this.notes);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return j;
+    }
+
+    public GpsOldRequest getRequestCreate(){
+        if (this.context == null) return null;
+        GpsOldRequest r = new GpsOldRequest(context);
+        if (mApplication == null) {
+            mApplication = MyApplication.getInstance();
+        }
+        r.setAccountID(mApplication.getAccountID());
+        r.setUserID(mApplication.getUserID());
+        r.setPassword(mApplication.getPassword());
+        r.setCommand(GpsOldRequest.CMD_CREATE_GROUP);
+        r.setMethod(Request.Method.POST);
+        r.setUrl(GpsOldRequest.ADMIN_URL);
+        r.setParams(buildParams());
+        return r;
+    }
+
+    public GpsOldRequest getRequestEdit() {
+        if (this.context == null) return null;
+
+        GpsOldRequest r = new GpsOldRequest(context);
+        if (mApplication == null) {
+            mApplication = MyApplication.getInstance();
+        }
+        r.setAccountID(mApplication.getAccountID());
+        r.setUserID(mApplication.getUserID());
+        r.setPassword(mApplication.getPassword());
+        r.setCommand(GpsOldRequest.CMD_UPDATE_GROUP);
+        r.setMethod(Request.Method.POST);
+        r.setUrl(GpsOldRequest.ADMIN_URL);
+        r.setParams(buildParams());
+        return r;
+    }
+    public GpsOldRequest getRequestDelete() {
+        if (this.context == null) return null;
+
+        GpsOldRequest r = new GpsOldRequest(context);
+        if (mApplication == null) {
+            mApplication = MyApplication.getInstance();
+        }
+        r.setAccountID(mApplication.getAccountID());
+        r.setUserID(mApplication.getUserID());
+        r.setPassword(mApplication.getPassword());
+        r.setCommand(GpsOldRequest.CMD_DELETE_GROUP);
+        r.setMethod(Request.Method.POST);
+        r.setUrl(GpsOldRequest.ADMIN_URL);
+        r.setParams(buildParams());
+        return r;
     }
 }

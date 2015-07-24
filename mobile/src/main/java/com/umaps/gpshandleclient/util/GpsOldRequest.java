@@ -55,6 +55,14 @@ public class GpsOldRequest {
     public static final String CMD_UPDATE_DEVICE                = "updateDevice";
     public static final String CMD_DELETE_DEVICE                = "deleteDevice";
 
+    public static final String CMD_CREATE_GROUP                 = "createGroup";
+    public static final String CMD_UPDATE_GROUP                 = "updateGroup";
+    public static final String CMD_DELETE_GROUP                 = "deleteGroup";
+
+    public static final String CMD_CREATE_USER                  = "createUser";
+    public static final String CMD_UPDATE_USER                  = "updateUser";
+    public static final String CMD_DELETE_USER                  = "deleteUser";
+
     private Context context;
     private HttpQueue mQueue;
 
@@ -210,8 +218,7 @@ public class GpsOldRequest {
 
     public void exec(JSONObject params){
         Log.i(TAG, url);
-        JsonObjectRequest jObjReq =
-                new JsonObjectRequest(method, url, params, responseHandler, errorHandler);
+        JsonObjectRequest jObjReq = new JsonObjectRequest(method, url, params, responseHandler, errorHandler);
         if (!StringTools.isBlank(requestTag)){
             jObjReq.setTag(requestTag);
         }

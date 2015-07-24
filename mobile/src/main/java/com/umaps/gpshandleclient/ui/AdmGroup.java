@@ -8,11 +8,15 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +29,8 @@ import com.umaps.gpshandleclient.model.Device;
 import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.HttpQueue;
+import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,8 +43,8 @@ import java.util.Date;
  * Created by beou on 08/06/2015.
  */
 public class AdmGroup extends Fragment {
-    private static final String TAG = "AdmDevice";
-    private static final String TAG_REQUEST = "AdmDevice";
+    private static final String TAG = "AdmGroup";
+    private static final String TAG_REQUEST = "AdmGroup";
     private View mBarProgress;
     private View mProgress;
     private View view;
@@ -46,8 +52,17 @@ public class AdmGroup extends Fragment {
 
     private MyApplication mApplication;
     private Typeface mTf;
+
     int previousGroup = -1;
-    private GpsOldRequest mRequest;
+
+    private View layoutAdd;
+    private View layoutEdit;
+    private View layoutDelete;
+
+    private View addGroup;
+    private View editGroup;
+    private View deleteGroup;
+
     public static AdmGroup newInstance(){
         return new AdmGroup();
     }
@@ -83,8 +98,7 @@ public class AdmGroup extends Fragment {
         });
 
         setBottomToolbar();
-
-        mRequest = new GpsOldRequest(getActivity());
+        GpsOldRequest mRequest = new GpsOldRequest(getActivity());
         mRequest.setAccountID(mApplication.getAccountID());
         mRequest.setUserID(mApplication.getUserID());
         mRequest.setPassword(mApplication.getPassword());
@@ -124,6 +138,7 @@ public class AdmGroup extends Fragment {
         mRequest.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                showProgress(false);
                 Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -135,7 +150,8 @@ public class AdmGroup extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        mRequest.cancel(TAG_REQUEST);
+        HttpQueue.getInstance(getActivity()).cancel(TAG_REQUEST);
+        showProgress(false);
     }
 
     private void setBottomToolbar(){
@@ -156,8 +172,318 @@ public class AdmGroup extends Fragment {
         icDeleteGroup.setText(String.valueOf((char) 0xe608));
         TextView txtDeleteGroup = (TextView) view.findViewById(R.id.txt_delete_group);
         txtDeleteGroup.setText(R.string.delete);
+
+        addGroup = view.findViewById(R.id.add_group);
+        editGroup = view.findViewById(R.id.edit_group);
+        deleteGroup = view.findViewById(R.id.delete_group);
+
+        layoutAdd = view.findViewById(R.id.l_add_group);
+        layoutEdit = view.findViewById(R.id.l_edit_group);
+        layoutDelete = view.findViewById(R.id.l_delete_group);
+
+        if (mApplication.getAclAdminGroup() > 2) {
+            addGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (layoutAdd.getVisibility() == View.VISIBLE) {
+                        layoutAdd.setVisibility(View.GONE);
+                        expListView.setVisibility(View.VISIBLE);
+                        addGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                    } else {
+                        layoutDelete.setVisibility(View.GONE);
+                        layoutEdit.setVisibility(View.GONE);
+                        layoutAdd.setVisibility(View.VISIBLE);
+                        expListView.setVisibility(View.GONE);
+                        addGroup.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
+                        editGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        deleteGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        setupLayoutAdd();
+                    }
+                }
+            });
+
+            deleteGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (layoutDelete.getVisibility() == View.VISIBLE) {
+                        layoutDelete.setVisibility(View.GONE);
+                        //expListView.setVisibility(View.VISIBLE);
+                        deleteGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                    } else {
+                        if (previousGroup == -1) {
+                            Toast.makeText(getActivity(), getResources().getText(R.string.you_must_select_a_device), Toast.LENGTH_LONG).show();
+                        } else {
+                            layoutDelete.setVisibility(View.VISIBLE);
+                            layoutEdit.setVisibility(View.GONE);
+                            layoutAdd.setVisibility(View.GONE);
+                            if (expListView.getVisibility() == View.GONE) {
+                                expListView.setVisibility(View.VISIBLE);
+                            }
+                            addGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            editGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            deleteGroup.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
+                            setupLayoutDelete();
+                        }
+                    }
+                }
+            });
+        } else {
+            icAddGroup.setTextColor(getResources().getColor(R.color.disable));
+            txtAddGroup.setTextColor(getResources().getColor(R.color.disable));
+            icDeleteGroup.setTextColor(getResources().getColor(R.color.disable));
+            txtDeleteGroup.setTextColor(getResources().getColor(R.color.disable));
+
+            addGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
+            deleteGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        if (mApplication.getAclAdminGroup() > 1) {
+            editGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mApplication.getAclAdminDevice() < 2) {
+                        Toast.makeText(getActivity(), getResources().getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (layoutEdit.getVisibility() == View.VISIBLE) {
+                        layoutEdit.setVisibility(View.GONE);
+                        expListView.setVisibility(View.VISIBLE);
+                        editGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                    } else {
+                        if (previousGroup == -1) {
+                            Toast.makeText(getActivity(), getResources().getText(R.string.you_must_select_a_device), Toast.LENGTH_LONG).show();
+                        } else {
+                            layoutDelete.setVisibility(View.GONE);
+                            layoutEdit.setVisibility(View.VISIBLE);
+                            layoutAdd.setVisibility(View.GONE);
+                            expListView.setVisibility(View.GONE);
+                            addGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            editGroup.setBackgroundColor(getResources().getColor(R.color.base_color_dark));
+                            deleteGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            setupLayoutEdit();
+                        }
+                    }
+                }
+            });
+        } else {
+            icEditGroup.setTextColor(getResources().getColor(R.color.disable));
+            txtEditGroup.setTextColor(getResources().getColor(R.color.disable));
+            editGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), getString(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
+    private void setupLayoutAdd(){
+        Button btnSave = (Button) layoutAdd.findViewById(R.id.btn_save);
+        Button btnCancel = (Button) layoutAdd.findViewById(R.id.btn_cancel);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                EditText edtDescription = (EditText) layoutAdd.findViewById(R.id.txt_group_desc_content);
+                String description = edtDescription.getText().toString();
+                EditText edtDisplayName = (EditText) layoutAdd.findViewById(R.id.txt_group_display_content);
+                String displayName = edtDisplayName.getText().toString();
+                if (StringTools.isBlank(description) && StringTools.isBlank(displayName)) {
+                    Toast.makeText(getActivity(), getResources().getText(R.string._must_input_description), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                EditText edtNotes = (EditText) layoutAdd.findViewById(R.id.txt_notes_content);
+                String notes = edtNotes.getText().toString();
+
+                Group g = new Group(getActivity());
+                g.setDescription(description);
+                g.setDisplayName(displayName);
+                g.setNotes(notes);
+
+                GpsOldRequest crtRequest = g.getRequestCreate();
+                crtRequest.setRequestTag(TAG_REQUEST);
+                crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        showProgress(false);
+                        MyResponse myResponse = new MyResponse(response);
+                        if (myResponse.isSuccess()) {
+                            layoutAdd.setVisibility(View.GONE);
+                            expListView.setVisibility(View.VISIBLE);
+                            addGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        }
+                        //update group list
+                        {
+                            String tag = "android:switcher:"+R.id.view_pager_admin+":"+2;
+                            AdmGroup frg = (AdmGroup)getFragmentManager().findFragmentByTag(tag);
+                            FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                            aTrans.detach(frg).attach(frg).commit();
+                        }
+                        Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
+
+                    }
+                });
+                crtRequest.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
+                        Toast.makeText(getActivity(), getActivity().getResources().getText(R.string.failure_create_group), Toast.LENGTH_LONG).show();
+                    }
+                });
+                crtRequest.exec();
+                showProgress(true);
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutAdd.setVisibility(View.GONE);
+                expListView.setVisibility(View.VISIBLE);
+                addGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+            }
+        });
+    }
+
+    private void setupLayoutEdit() {
+        ExpListAdapter adt = (ExpListAdapter) expListView.getExpandableListAdapter();//.getAdapter();
+        final Group g = (Group)adt.getGroup(previousGroup);
+
+        final EditText edtDescription = (EditText) layoutEdit.findViewById(R.id.txt_group_desc_content);
+        edtDescription.setText(g.getDescription());
+
+        final EditText edtDisplayName = (EditText) layoutEdit.findViewById(R.id.txt_group_display_content);
+        edtDisplayName.setText(g.getDisplayName());
+
+        final EditText edtNotes = (EditText) layoutEdit.findViewById(R.id.txt_notes_content);
+        edtNotes.setText(g.getNotes());
+
+        Button btnSave = (Button) layoutEdit.findViewById(R.id.btn_save);
+        Button btnCancel = (Button) layoutEdit.findViewById(R.id.btn_cancel);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String description = edtDescription.getText().toString();
+                String displayName = edtDisplayName.getText().toString();
+                String notes = edtNotes.getText().toString();
+                g.setContext(getActivity());
+                g.setDescription(description);
+                g.setDisplayName(displayName);
+                g.setNotes(notes);
+
+                GpsOldRequest edtRequest = g.getRequestEdit();
+                edtRequest.setRequestTag(TAG_REQUEST);
+                edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        showProgress(false);
+                        MyResponse myResponse = new MyResponse(response);
+                        if (myResponse.isSuccess()) {
+                            layoutEdit.setVisibility(View.GONE);
+                            expListView.setVisibility(View.VISIBLE);
+                            editGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                        }
+                        //update group list
+                        {
+                            String tag = "android:switcher:"+R.id.view_pager_admin+":"+2;
+                            AdmGroup frg = (AdmGroup)getFragmentManager().findFragmentByTag(tag);
+                            FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                            aTrans.detach(frg).attach(frg).commit();
+                        }
+                        Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                edtRequest.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
+                        Toast.makeText(getActivity(), getResources().getText(R.string.failure_create_group), Toast.LENGTH_LONG).show();
+                    }
+                });
+                edtRequest.exec();
+                showProgress(true);
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutEdit.setVisibility(View.GONE);
+                expListView.setVisibility(View.VISIBLE);
+                editGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+            }
+        });
+    }
+    private void setupLayoutDelete() {
+        ExpListAdapter adt = (ExpListAdapter) expListView.getExpandableListAdapter();//.getAdapter();
+        final Group g = (Group)adt.getGroup(previousGroup);
+        TextView txtConfirm = (TextView)layoutDelete.findViewById(R.id.delete_confirm);
+        StringBuffer sb = new StringBuffer();
+        sb.append(getResources().getString(R.string.are_you_sure));
+        sb.append(": ").append(g.getDescription());
+        txtConfirm.setText(sb);
+
+        Button btnDelete = (Button) layoutDelete.findViewById(R.id.btn_delete);
+        Button btnCancel = (Button) layoutDelete.findViewById(R.id.btn_cancel);
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                g.setContext(getActivity());
+                GpsOldRequest deleteRequest = g.getRequestDelete();
+                deleteRequest.setRequestTag(TAG_REQUEST);
+                deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        showProgress(false);
+                        MyResponse myResponse = new MyResponse(response);
+                        if (myResponse.isSuccess()) {
+                            layoutDelete.setVisibility(View.GONE);
+                            deleteGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+                            {
+                                previousGroup = -1; //reset
+                                String tag = "android:switcher:"+R.id.view_pager_admin+":"+2;
+                                AdmGroup frg = (AdmGroup)getFragmentManager().findFragmentByTag(tag);
+                                FragmentTransaction aTrans = getFragmentManager().beginTransaction();
+                                aTrans.detach(frg).attach(frg).commit();
+                            }
+                        }
+                        Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                deleteRequest.setErrorHandler(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showProgress(false);
+                        Toast.makeText(getActivity(), getText(R.string.failure_create_group), Toast.LENGTH_LONG).show();
+                    }
+                });
+                deleteRequest.exec();
+                showProgress(true);
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutDelete.setVisibility(View.GONE);
+                deleteGroup.setBackgroundColor(getResources().getColor(R.color.base_color));
+            }
+        });
+    }
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -301,8 +627,6 @@ public class AdmGroup extends Fragment {
 
             Group group = objects.get(groupPosition);
 
-            TextView txtAccountId = (TextView) detailsView.findViewById(R.id.txt_group_id_content);
-            txtAccountId.setText(group.getGroupId());
             TextView txtAccountDesc = (TextView) detailsView.findViewById(R.id.txt_group_desc_content);
             txtAccountDesc.setText(group.getDescription());
             TextView txtAccountDisplay = (TextView) detailsView.findViewById(R.id.txt_group_display_content);
