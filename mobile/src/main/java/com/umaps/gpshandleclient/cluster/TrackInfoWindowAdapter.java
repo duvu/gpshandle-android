@@ -55,24 +55,24 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
         if (StringTools.isBlank(info)){
             return null;
         }
-        JSONObject jsonObject = null;
+        JSONObject snipet = null;
         try {
-            jsonObject = new JSONObject(info);
+            snipet = new JSONObject(info);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if(jsonObject==null){
+        if(snipet==null){
             return null;
         }
-        //-- jsonObject should not null now
-        //Log.i(TAG, "##"+jsonObject.toString());
+        //-- snipet should not null now
+        //Log.i(TAG, "##"+snipet.toString());
         try {
-            if(jsonObject.getBoolean(IS_CLUSTER)){
+            if(snipet.getBoolean(IS_CLUSTER)){
                 //Log.i("INFO-WINDOW", "You've clicked on a cluster");
-                return getInfoWindowForCluster(jsonObject.getJSONObject(ITEM_DATA));
+                return getInfoWindowForCluster(snipet.getJSONObject(ITEM_DATA));
             }
             else {
-                return getInfoWindowForItem(jsonObject.getString(ITEM_DATA));
+                return getInfoWindowForItem(snipet.getString(ITEM_DATA));
             }
         } catch (JSONException e) {
             e.printStackTrace();

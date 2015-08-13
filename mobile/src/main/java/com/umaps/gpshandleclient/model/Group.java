@@ -51,14 +51,14 @@ public class Group {
 
     public Group(JSONObject itemGroup){
         try {
-            this.accountId      = itemGroup.has(ACCOUNT_ID) ? itemGroup.getString(ACCOUNT_ID) : "";
-            this.groupId        = itemGroup.has(GROUP_ID) ? itemGroup.getString(GROUP_ID) : "";
-            this.description    = itemGroup.has(DESCRIPTION) ? itemGroup.getString(DESCRIPTION) : "";
-            this.displayName    = itemGroup.has(DISPLAY_NAME) ? itemGroup.getString(DISPLAY_NAME) : "";
-            this.lastUpdateTime = itemGroup.has(LAST_UPDATE_TIME) ? itemGroup.getLong(LAST_UPDATE_TIME) : 0L;
-            this.creationTime   = itemGroup.has(CREATION_TIME) ? itemGroup.getLong(CREATION_TIME) : 0L;
-            this.deviceCount    = itemGroup.has(DEVICE_COUNT) ? itemGroup.getInt(DEVICE_COUNT) : 0;
-            this.notes          = itemGroup.has(NOTES) ? itemGroup.getString(NOTES) : "";
+            this.accountId      = itemGroup.has(ACCOUNT_ID)         ? itemGroup.getString(ACCOUNT_ID) : "";
+            this.groupId        = itemGroup.has(GROUP_ID)           ? itemGroup.getString(GROUP_ID) : "";
+            this.description    = itemGroup.has(DESCRIPTION)        ? itemGroup.getString(DESCRIPTION) : "";
+            this.displayName    = itemGroup.has(DISPLAY_NAME)       ? itemGroup.getString(DISPLAY_NAME) : "";
+            this.lastUpdateTime = itemGroup.has(LAST_UPDATE_TIME)   ? itemGroup.getLong(LAST_UPDATE_TIME) : 0L;
+            this.creationTime   = itemGroup.has(CREATION_TIME)      ? itemGroup.getLong(CREATION_TIME) : 0L;
+            this.deviceCount    = itemGroup.has(DEVICE_COUNT)       ? itemGroup.getInt(DEVICE_COUNT) : 0;
+            this.notes          = itemGroup.has(NOTES)              ? itemGroup.getString(NOTES) : "";
             if (itemGroup.has(DEVICE_LIST)){
                 deviceArrayList = new ArrayList<Device>();
                 JSONArray dA = itemGroup.getJSONArray(DEVICE_LIST);

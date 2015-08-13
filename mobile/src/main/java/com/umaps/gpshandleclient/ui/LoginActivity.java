@@ -24,6 +24,7 @@ import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.model.Account;
 import com.umaps.gpshandleclient.model.MyResponse;
+import com.umaps.gpshandleclient.model.ParseLoginEvent;
 import com.umaps.gpshandleclient.util.GpsOldRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
@@ -83,8 +84,8 @@ public class LoginActivity extends FragmentActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String accountID    = edtAccount.getText().toString();
-                String userID       = edtUser.getText().toString();
+                final String accountID    = edtAccount.getText().toString();
+                final String userID       = edtUser.getText().toString();
                 String password     = edtPassword.getText().toString();
                 if ((StringTools.isBlank(accountID)) ||
                   (StringTools.isBlank(userID)) ||
@@ -123,6 +124,14 @@ public class LoginActivity extends FragmentActivity {
                         showProgress(false);
                         Intent movingIntent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(movingIntent);
+
+                        ParseLoginEvent pEvent = new ParseLoginEvent();
+                        pEvent.setLoginAccount(accountID);
+                        pEvent.setLoginUser(userID);
+                        pEvent.setTimestamp(System.currentTimeMillis()/1000);
+                        pEvent.setStatus(true);
+                        pEvent.saveEventually();
+
                         finish();
                     }
                 });

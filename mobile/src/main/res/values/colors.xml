@@ -32,4 +32,5 @@
     <color name="green">#ff2dab00</color>
     <color name="warning">#ffff9600</color>
     <color name="orange">#fffac34c</color>
+    <color name="primaryColorLight">#CFD8DC</color>
 </resources>

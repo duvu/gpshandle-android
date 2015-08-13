@@ -40,6 +40,12 @@ public class Device {
     private static final String SMS_LIMIT       = "smsMonthlyLimited";
     private static final String CREATION_TIME   = "creationTime";
 
+    private static final String ICON            = "pushPin";
+    private static final String IS_LIVE         = "isLive";
+    private static final String LAST_EVENT_TIME = "lastEventTime";
+    private static final String LAST_BATTERY_LEVEL = "lastBatteryLevel";
+
+
     private Context context;
     private MyApplication myApplication;
 
@@ -66,9 +72,7 @@ public class Device {
     private boolean isActive;
     private boolean isLive = true;
     private long   lastEventTime;
-    private int satCount;
-    private double batteryLevel;
-    private double signalStrength;
+    private double lastBatteryLevel;
 
     public Device(JSONObject item) {
         if (item == null) return;
@@ -93,6 +97,12 @@ public class Device {
             this.smsLimit       = item.has(SMS_LIMIT) ? item.getInt(SMS_LIMIT) : 0;
             this.creationTime   = item.has(CREATION_TIME) ? item.getLong(CREATION_TIME) : 0L;
 
+            this.icon           = item.has(ICON) ? item.getString(ICON) : "";
+            this.lastEventTime   = item.has(LAST_EVENT_TIME) ? item.getLong(LAST_EVENT_TIME) : 0L;
+            long currTimestamp = Calendar.getInstance().getTimeInMillis() / 1000;
+            this.isLive         = (isActive && (currTimestamp - lastEventTime < 300));
+            this.lastBatteryLevel = item.has(LAST_BATTERY_LEVEL) ? item.getDouble(LAST_BATTERY_LEVEL) : 0D;
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -104,8 +114,8 @@ public class Device {
         myApplication = MyApplication.getInstance();
     }
 
-    public Device(String deviceID, String description){
-        this(deviceID, description, Calendar.getInstance().getTimeInMillis()/1000, null);
+    public Device(String deviceID, String description) {
+        this(deviceID, description, Calendar.getInstance().getTimeInMillis() / 1000, null);
     }
     public Device(String devID, String desc, long lastEventTime, String address){
         this(devID, desc, null, true, lastEventTime);
@@ -172,29 +182,14 @@ public class Device {
         this.isActive = active;
     }
 
-    public int getSatCount() {
-        return satCount;
+    public double getLastBatteryLevel() {
+        return lastBatteryLevel;
     }
 
-    public void setSatCount(int satCount) {
-        this.satCount = satCount;
+    public void setLastBatteryLevel(double batteryLevel) {
+        this.lastBatteryLevel = batteryLevel;
     }
 
-    public double getBatteryLevel() {
-        return batteryLevel;
-    }
-
-    public void setBatteryLevel(double batteryLevel) {
-        this.batteryLevel = batteryLevel;
-    }
-
-    public double getSignalStrength() {
-        return signalStrength;
-    }
-
-    public void setSignalStrength(double signalStrength) {
-        this.signalStrength = signalStrength;
-    }
 
     public String getAccountID() {
         return accountID;

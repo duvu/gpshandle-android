@@ -7,6 +7,12 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.parse.Parse;
+import com.parse.ParseCrashReporting;
+import com.parse.ParseInstallation;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.umaps.gpshandleclient.model.ParseLoginEvent;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONException;
@@ -72,6 +78,21 @@ public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
+        //-- register class
+        /*ParseObject.registerSubclass(Question.class);
+        ParseObject.registerSubclass(Answer.class);
+        ParseObject.registerSubclass(Category.class);
+        ParseObject.registerSubclass(Event.class);
+        ParseObject.registerSubclass(Inbox.class);*/
+        ParseObject.registerSubclass(ParseLoginEvent.class);
+        ParseCrashReporting.enable(this);
+        Parse.enableLocalDatastore(this);
+        ParseUser.enableAutomaticUser();
+        Parse.initialize(this);
+        ParseInstallation.getCurrentInstallation().saveInBackground();
+
         instance = this;
         mIconFont = Typeface.createFromAsset(this.getAssets(), "icomoon.ttf");
         mTextFont = Typeface.createFromAsset(this.getAssets(), "OpenSans-Regular.ttf");
@@ -85,6 +106,7 @@ public class MyApplication extends Application {
 
     @Override
     public void onTerminate() {
+        super.onTerminate();
         storeSettings();
     }
     public long timeInterval    = 20000;

@@ -41,6 +41,7 @@ import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.cluster.TrackClusterManager;
 import com.umaps.gpshandleclient.cluster.TrackInfoWindowAdapter;
 import com.umaps.gpshandleclient.cluster.TrackClusterRenderer;
+import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.model.Device;
 import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.MyApplication;
@@ -52,6 +53,7 @@ import com.umaps.gpshandleclient.util.GpsOldRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
 import com.umaps.gpshandleclient.util.DeviceGroupListAdapter;
+import com.umaps.gpshandleclient.view.GenericViewFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,17 +66,19 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by vu@umaps.vn on 30/01/2015.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback,
+public class MapFragment extends GenericViewFragment implements OnMapReadyCallback,
         TrackInfoWindowAdapter.TrackInfoWindowCallback  {
-    private static final String TAG    = "MapMonitoringFragment";
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private static final String TAG    = "MapFragment";
+    private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private ClusterManager<TrackItem> mClusterManager;
 
-    private static final String TAG_REQUEST = "TagRequest";
+    private static final String TAG_REQUEST = "MapFragment";
 
     TrackInfoWindowAdapter trackInfoWindowAdapter;
     TimerTask doAsynchronous = null;
@@ -245,6 +249,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onResponse(JSONObject response) {
                 Log.i(TAG, response.toString());
+
+                EventBus.getDefault().post(new UpdateEvent.OnLoading(false));
+
                 isRunning = false;
                 MyResponse mResponse = new MyResponse(response);
                 if (mResponse.isError()){
@@ -307,9 +314,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        EventBus.getDefault().post(new UpdateEvent.OnLoading(true));
                         if (!isRunning) {
                             mRequestRealtime.exec();
                             isRunning = true;
+
                         }
                     }
                 });
@@ -527,7 +536,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
                             //--Create new Device Object Model
                             Device device = new Device(deviceID, description, icon, isLive, lastEventTimestamp);
-                            device.setBatteryLevel(lastBatteryLevel);
+                            device.setLastBatteryLevel(lastBatteryLevel);
                             mArrayDevice.add(device);
                         }
                         Group group = new Group(

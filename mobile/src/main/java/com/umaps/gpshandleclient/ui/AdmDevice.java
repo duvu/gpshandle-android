@@ -69,12 +69,22 @@ public class AdmDevice extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_adm_device, container, false);
-
         //-- for progress-bar
         mBarProgress = view.findViewById(R.id.bar_progress);
         mProgress = view.findViewById(R.id.progress);
         mApplication = MyApplication.getInstance();
-        this.mTf = MyApplication.getIconFont();
+        mTf = MyApplication.getIconFont();
+
+        //-- init toolbar control button
+        addDevice = view.findViewById(R.id.add);
+        editDevice = view.findViewById(R.id.edit);
+        deleteDevice = view.findViewById(R.id.delete);
+
+
+        layoutAdd = view.findViewById(R.id.l_add_device);
+        layoutEdit = view.findViewById(R.id.l_edit_device);
+        layoutDelete = view.findViewById(R.id.l_delete_device);
+
         expListView = (ExpandableListView) view.findViewById(R.id.list_view_devices);
 
         expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
@@ -189,33 +199,25 @@ public class AdmDevice extends Fragment {
     }
 
     private void setBottomToolbar(){
-        TextView icAddDevice = (TextView) view.findViewById(R.id.ic_add_device);
+        TextView icAddDevice = (TextView) view.findViewById(R.id.ic_add);
         icAddDevice.setTypeface(mTf);
         icAddDevice.setText(String.valueOf((char) 0xe717));
-        TextView txtAddDevice = (TextView) view.findViewById(R.id.txt_add_device);
+        TextView txtAddDevice = (TextView) view.findViewById(R.id.txt_add);
         txtAddDevice.setText(R.string.add);
 
-        TextView icEditDevice = (TextView) view.findViewById(R.id.ic_edit_device);
+        TextView icEditDevice = (TextView) view.findViewById(R.id.ic_edit);
         icEditDevice.setTypeface(mTf);
         icEditDevice.setText(String.valueOf((char) 0xe714));
-        TextView txtEditDevice = (TextView) view.findViewById(R.id.txt_edit_device);
+        TextView txtEditDevice = (TextView) view.findViewById(R.id.txt_edit);
         txtEditDevice.setText(R.string.edit);
 
-        TextView icDeleteDevice = (TextView) view.findViewById(R.id.ic_delete_device);
+        TextView icDeleteDevice = (TextView) view.findViewById(R.id.ic_delete);
         icDeleteDevice.setTypeface(mTf);
         icDeleteDevice.setText(String.valueOf((char) 0xe608));
-        TextView txtDeleteDevice = (TextView) view.findViewById(R.id.txt_delete_device);
+        TextView txtDeleteDevice = (TextView) view.findViewById(R.id.txt_delete);
         txtDeleteDevice.setText(R.string.delete);
 
-        //-- init toolbar control button
-        addDevice = view.findViewById(R.id.add_device);
-        editDevice = view.findViewById(R.id.edit_device);
-        deleteDevice = view.findViewById(R.id.delete_device);
 
-
-        layoutAdd = view.findViewById(R.id.l_add_device);
-        layoutEdit = view.findViewById(R.id.l_edit_device);
-        layoutDelete = view.findViewById(R.id.l_delete_device);
 
 
         if (mApplication.getAclAdminDevice() > 2) {

@@ -76,6 +76,13 @@ public class AdmGroup extends Fragment {
         mProgress = view.findViewById(R.id.progress);
         mApplication = MyApplication.getInstance();
         mTf = MyApplication.getIconFont();
+        addGroup = view.findViewById(R.id.add);
+        editGroup = view.findViewById(R.id.edit);
+        deleteGroup = view.findViewById(R.id.delete);
+
+        layoutAdd = view.findViewById(R.id.l_add_group);
+        layoutEdit = view.findViewById(R.id.l_edit_group);
+        layoutDelete = view.findViewById(R.id.l_delete_group);
 
         expListView = (ExpandableListView) view.findViewById(R.id.list_view_device_groups);
         expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
@@ -155,31 +162,25 @@ public class AdmGroup extends Fragment {
     }
 
     private void setBottomToolbar(){
-        TextView icAddGroup = (TextView) view.findViewById(R.id.ic_add_group);
+        TextView icAddGroup = (TextView) view.findViewById(R.id.ic_add);
         icAddGroup.setTypeface(mTf);
         icAddGroup.setText(String.valueOf((char) 0xe717));
-        TextView txtAddGroup = (TextView) view.findViewById(R.id.txt_add_group);
+        TextView txtAddGroup = (TextView) view.findViewById(R.id.txt_add);
         txtAddGroup.setText(R.string.add);
 
-        TextView icEditGroup = (TextView) view.findViewById(R.id.ic_edit_group);
+        TextView icEditGroup = (TextView) view.findViewById(R.id.ic_edit);
         icEditGroup.setTypeface(mTf);
         icEditGroup.setText(String.valueOf((char) 0xe714));
-        TextView txtEditGroup = (TextView) view.findViewById(R.id.txt_edit_group);
+        TextView txtEditGroup = (TextView) view.findViewById(R.id.txt_edit);
         txtEditGroup.setText(R.string.edit);
 
-        TextView icDeleteGroup = (TextView) view.findViewById(R.id.ic_delete_group);
+        TextView icDeleteGroup = (TextView) view.findViewById(R.id.ic_delete);
         icDeleteGroup.setTypeface(mTf);
         icDeleteGroup.setText(String.valueOf((char) 0xe608));
-        TextView txtDeleteGroup = (TextView) view.findViewById(R.id.txt_delete_group);
+        TextView txtDeleteGroup = (TextView) view.findViewById(R.id.txt_delete);
         txtDeleteGroup.setText(R.string.delete);
 
-        addGroup = view.findViewById(R.id.add_group);
-        editGroup = view.findViewById(R.id.edit_group);
-        deleteGroup = view.findViewById(R.id.delete_group);
 
-        layoutAdd = view.findViewById(R.id.l_add_group);
-        layoutEdit = view.findViewById(R.id.l_edit_group);
-        layoutDelete = view.findViewById(R.id.l_delete_group);
 
         if (mApplication.getAclAdminGroup() > 2) {
             addGroup.setOnClickListener(new View.OnClickListener() {

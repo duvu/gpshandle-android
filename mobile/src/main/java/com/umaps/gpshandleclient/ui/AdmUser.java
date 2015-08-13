@@ -73,6 +73,14 @@ public class AdmUser extends Fragment {
         mApplication    = MyApplication.getInstance();
         mTf             = MyApplication.getIconFont();
 
+        addUser = view.findViewById(R.id.add);
+        editUser = view.findViewById(R.id.edit);
+        deleteUser = view.findViewById(R.id.delete);
+
+        layoutAdd = view.findViewById(R.id.l_add_user);
+        layoutEdit = view.findViewById(R.id.l_edit_user);
+        layoutDelete = view.findViewById(R.id.l_delete_user);
+
         expListView = (ExpandableListView)view.findViewById(R.id.exp_list);
         expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
 
@@ -162,15 +170,6 @@ public class AdmUser extends Fragment {
         icDelete.setText(String.valueOf((char) 0xe608));
         TextView txtDelete = (TextView) view.findViewById(R.id.txt_delete);
         txtDelete.setText(R.string.delete);
-
-
-        addUser = view.findViewById(R.id.add);
-        editUser = view.findViewById(R.id.edit);
-        deleteUser = view.findViewById(R.id.delete);
-
-        layoutAdd = view.findViewById(R.id.l_add_user);
-        layoutEdit = view.findViewById(R.id.l_edit_user);
-        layoutDelete = view.findViewById(R.id.l_delete_user);
 
         if (mApplication.getAclAdminUserManager() > 2) {
             addUser.setOnClickListener(new View.OnClickListener() {

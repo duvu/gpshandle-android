@@ -161,7 +161,7 @@ public class DeviceGroupListAdapter extends BaseExpandableListAdapter {
             icon = device.getIcon();
             isLive = device.isLive();
             lastEventTime = device.getLastEventTime();
-            batteryLevel = device.getBatteryLevel();
+            batteryLevel = device.getLastBatteryLevel();
         }
 
         View devState = dView.findViewById(R.id.ic_lv_device_status);
