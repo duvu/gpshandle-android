@@ -103,7 +103,7 @@ public class LoginActivity extends FragmentActivity {
                 mRequestAcc.setUserID(userID);
                 mRequestAcc.setPassword(password);
                 mRequestAcc.setCommand(GpsOldRequest.CMD_GET_ACCOUNT);
-                mRequestAcc.setMethod(Request.Method.POST);
+                mRequestAcc.setPost();
                 mRequestAcc.setUrl(GpsOldRequest.ADMIN_URL);
                 String[] lf = new String[] {"isAccountManager"};
                 JSONObject accParam = Account.createParam(lf);
@@ -247,12 +247,8 @@ public class LoginActivity extends FragmentActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     public void showProgress(final boolean show) {
         hideKeyboard();
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
             mLoginForm.setVisibility(show ? View.GONE : View.VISIBLE);
             mLoginForm.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
@@ -272,8 +268,6 @@ public class LoginActivity extends FragmentActivity {
                 }
             });
         } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
             mBarProgress.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginForm.setVisibility(show ? View.GONE : View.VISIBLE);
         }

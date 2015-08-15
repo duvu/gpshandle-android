@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WiMaps</string>
+    <string name="title_monitor">Mapa</string>
+    <string name="title_historical">Toque aqui para visualizar o histórico</string>
+    <string name="title_report">Relatório</string>
+    <string name="title_administration">Adm</string>
+    <string name="action_settings">Configurações</string>
+    <string name="action_logout">Sair</string>
+    <string name="select_a_group">Selecione um grupo</string>
+    <string name="user_name">Usuário</string>
+    <string name="account_name">Conta</string>
+    <string name="password">Senha</string>
+    <string name="copyright">COPYRIGHT © 2015 WIMAPS TECHNOLOGIES</string>
+    <string name="hint_account_name">Digite o nome da conta</string>
+    <string name="hint_user_name">Digite o nome do usuário</string>
+    <string name="hint_password">Digite a senha</string>
+    <string name="button_login">Login</string>
+    <string name="failure_login">Falhar ao logar</string>
+    <string name="network_failed">Falhar de rede!</string>
+    <!--Cluster Popup on map-->
+    <string name="deviceCountText">No. de dispositivos</string>
+    <string name="averageSpeedText">Média de velocidade</string>
+    <string name="deviceRunningCountText">Disp. Funcionando</string>
+
+
+    <string name="device_list">Lista de Dispositivos</string>
+    <string name="company_name">WIMAPS TECHNOLOGIES</string>
+    <string name="company_address">Rua Tibagi, votuporanga - sp</string>
+    <string name="company_tel">(17) 3421-1565</string>
+    <string name="getting_group_device_list">Obtendo informações do dispositivo</string>
+
+    <string name="partners">Parceiros internacionais</string>
+
+
+    <string name="historical_30m">30m</string>
+    <string name="historical_1h">1h</string>
+    <string name="historical_6h">6h</string>
+    <string name="historical_12h">12h</string>
+    <string name="device_description">Descrição</string>
+    <string name="device_position">Posição</string>
+    <string name="device_speedKph">Velocidade-KPH</string>
+    <string name="device_odometer">Odometro</string>
+    <string name="device_address">Endereço</string>
+
+    <string name="status_running">Funcionando</string>
+    <string name="status_idling">Dormindo</string>
+    <string name="status_stopped">Parado</string>
+    <string name="bar_events">Eventos</string>
+    <string name="bar_odo_meter">Odometro</string>
+    <string name="total_km">Km</string>
+    <string name="total_events">Eventos</string>
+    <string name="btn_settings">Configurações</string>
+
+    <string name="inline_preference">Inline Configurações</string>
+    <string name="title_checkbox_preference">Checkbox</string>
+    <string name="title_setting_interval">Setar intervalo</string>
+
+    <string name="summary_checkbox_preference">Resumo</string>
+    <string name="btn_refresh">Atualizar</string>
+    <string name="btn_history">Historico</string>
+    <string name="txt_account_id">ID da conta</string>
+    <string name="txt_desc">Descrição</string>
+    <string name="txt_display">Nome de visualização</string>
+    <string name="txt_account_contact_name">Nome do contato</string>
+    <string name="txt_account_contact_email">Email do contato</string>
+    <string name="txt_account_contact_phone">Tel do contato</string>
+    <string name="txt_account_device_count">Número de dispositivos</string>
+    <string name="txt_account_last_login">Hora do último login</string>
+    <string name="txt_created_on">Criado em</string>
+    <string name="rpt_event_count_desc">Gráfico Evento/Distancia</string>
+    <string name="txt_user_id">ID do usuário</string>
+
+    <string name="title_settings_about">Sobre</string>
+    <string name="no_history_events">Sem eventos de histórico</string>
+    <string name="add">Add</string>
+    <string name="edit">Editar</string>
+    <string name="delete">Remover</string>
+    <string name="managed_groups">Grupos gerenciáveis</string>
+    <string name="managed_group_none">Nenhum</string>
+    <string name="account_text">CONTA</string>
+    <string name="user_text">USUÁRIO</string>
+    <string name="group_text">GROUPO</string>
+    <string name="device_text">DISPOSITIVOS</string>
+    <string name="txt_group_id">ID do grupo</string>
+    <string name="txt_last_update">Hora do último update</string>
+    <string name="txt_group_device_list">Lista de dispositivos</string>
+    <string name="rpt_overview_text">Resumo</string>
+    <string name="rpt_event_count_text">Contagem de eventos</string>
+    <string name="txt_device_id">ID do dispositivo</string>
+    <string name="txt_is_active">Está ativo</string>
+    <string name="txt_serial_number">Numero serial</string>
+    <string name="txt_sms_sent">SMS enviado</string>
+    <string name="txt_sms_limited">Limite de SMS</string>
+    <string name="txt_notes">Notificações</string>
+    <string name="txt_group_all">Todos Grupos</string>
+    <string name="txt_save">Savar</string>
+    <string name="txt_cancel">Cancelar</string>
+    <string name="txt_device_unique_id">ID único</string>
+    <string name="hint_enter_unique_id">Ex: imei_12345678</string>
+    <string name="hint_enter_device_id">Digite ID do Dispositivo</string>
+    <string name="hint_enter_device_desc">Digite uma descrição dos dispositivos</string> 
+    <string name="hint_enter_display_name">Digite um nome para visualizar</string>
+    <string name="hint_enter_is_active">Está ativo</string>
+    <string name="hint_enter_serial_number">Digite o numero serial</string>
+    <string name="hint_enter_sim_number">Digite numero do chip</string>
+    <string name="hint_enter_sms_limited">Digite o limite de sms</string>
+    <string name="hint_enter_group_id">Digite ID do grupo</string>
+    <string name="hint_notes">Digite Notificação</string>
+    <string name="failure_create_device">Falhar ao criar dispositivo</string>
+    <string name="_must_input_unique_id">Você deve fornecer um ID único</string>
+    <string name="you_must_select_a_device">Você deve selecionar um dispositivo</string>
+    <string name="are_you_sure">Tem certeza que deseja remover?</string>
+    <string name="txt_delete">Remover</string>
+    <string name="you_dont_have_permission">Você não possui permissões</string>
+    <string name="hint_enter_group_desc">Digite a descrição do grupo</string>
+    <string name="_must_input_description">Você deve digitar uma descrição ou nome para visualizar</string>
+    <string name="failure_create_group">Falhar ao criar um grupo</string>
+    <string name="hint_enter_user_id">Digite o nome do usuário</string>
+    <string name="hint_enter_user_desc">Digite uma descrição do usuário</string>
+    <string name="txt_user_password">Senha*</string>
+    <string name="txt_user_contact_email">Email de contato*</string>
+    <string name="failure_delete">Falha ao apagar</string>
+    <string name="title_activity_settings">Configurações</string>
+    <string name="subtitle_group"></string>
+    <string name="action_list_groups"></string>
+</resources>

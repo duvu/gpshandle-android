@@ -89,8 +89,21 @@ public class GpsOldRequest {
         return method;
     }
 
-    public void setMethod(int method) {
+    public GpsOldRequest setMethod(int method) {
         this.method = method;
+        return this;
+    }
+    public GpsOldRequest setPost(){
+        return setMethod(Request.Method.POST);
+    }
+    public GpsOldRequest setGet() {
+        return setMethod(Request.Method.GET);
+    }
+    public GpsOldRequest setDel() {
+        return setMethod(Request.Method.DELETE);
+    }
+    public GpsOldRequest setPut() {
+        return setMethod(Request.Method.PUT);
     }
 
     public String getUrl() {

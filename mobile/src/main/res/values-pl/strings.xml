@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">mijnTrack</string>
+    <string name="title_monitor">Mapa</string>
+    <string name="title_historical">Historia</string>
+    <string name="title_report">Raport zbiorczy</string>
+    <string name="title_administration">Administracja</string>
+    <string name="action_settings">Ustawienia</string>
+
+    <string name="select_a_group">Wybierz grupę</string>
+
+    <string name="user_name">Nazwa użytkownika</string>
+    <string name="account_name">Konto</string>
+    <string name="password">Hasło</string>
+    <string name="copyright">COPYRIGHT © 2015 MIJNTRACK.be</string>
+    <string name="hint_account_name">Podaj nazwę konta</string>
+    <string name="hint_user_name">Podaj nazwę użytkownika</string>
+    <string name="hint_password">Podaj hasło</string>
+    <string name="failure_login">Nie udało się zalogować ...</string>
+    <string name="network_failed">Problem z siecią!</string>
+    <!--Item Popup on map-->
+    <!--Cluster Popup on map-->
+    <string name="deviceCountText">Lb. Urządzeń</string>
+    <string name="averageSpeedText">Średnia prędkość</string>
+    <string name="deviceRunningCountText">Lb. urz. w ruchu</string>
+
+
+    <string name="device_list">Lista urządzeń</string>
+    <string name="company_name">mijnTrack.be</string>
+    <string name="company_address">Bierna 92, 59-970 Zawidów, Polska</string>
+    <string name="company_tel">(+32) 505 801 01</string>
+    <string name="getting_group_device_list">Pobieranie info o urządz.</string>
+
+    <string name="partners">Międzynarodowi partnerzy</string>
+    <string name="action_logout">Wyloguj</string>
+
+    <string name="historical_30m">30m</string>
+    <string name="historical_1h">1h</string>
+    <string name="historical_6h">6h</string>
+    <string name="historical_12h">12h</string>
+    <string name="device_description">Opis</string>
+    <string name="device_position">Pozycja</string>
+    <string name="device_speedKph">Prędkość (km/h)</string>
+    <string name="device_odometer">Drogomierz</string>
+    <string name="device_address">Adres</string>
+    <string name="status_running">W ruchu</string>
+    <string name="status_idling">Uśpiony</string>
+    <string name="status_stopped">Zatrzymany</string>
+    <string name="bar_events">Wydarzenia</string>
+    <string name="bar_odo_meter">Drogomierz</string>
+    <string name="subtitle_group"></string>
+    <string name="action_list_groups"></string>
+
+</resources>

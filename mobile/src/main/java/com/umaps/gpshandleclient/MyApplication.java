@@ -114,6 +114,7 @@ public class MyApplication extends Application {
 
     private String accountID;
     private String userID;
+    private String email;
     private String password;
 
     private boolean isManager;
@@ -161,6 +162,14 @@ public class MyApplication extends Application {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
