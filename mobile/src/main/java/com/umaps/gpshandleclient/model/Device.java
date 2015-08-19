@@ -4,7 +4,8 @@ import android.content.Context;
 
 import com.android.volley.Request;
 import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.Session;
+import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
@@ -339,51 +340,51 @@ public class Device {
         return jsonParamsObject;
     }
 
-    public GpsOldRequest getRequestCreate(){
-        GpsOldRequest crtRequest = new GpsOldRequest(context);
+    public GpsRequest getRequestCreate(){
+        GpsRequest crtRequest = new GpsRequest(context);
         if (myApplication == null) {
             myApplication = MyApplication.getInstance();
         }
-        crtRequest.setAccountID(myApplication.getAccountID());
-        crtRequest.setUserID(myApplication.getUserID());
-        crtRequest.setPassword(myApplication.getPassword());
+        crtRequest.setAccountID(Session.getAccountId());
+        crtRequest.setUserID(Session.getUserId());
+        crtRequest.setPassword(Session.getUserPassword());
         crtRequest.setLocale(myApplication.getLocale());
-        crtRequest.setUrl(GpsOldRequest.ADMIN_URL);
+        crtRequest.setUrl(GpsRequest.ADMIN_URL);
         crtRequest.setMethod(Request.Method.POST);
-        crtRequest.setCommand(GpsOldRequest.CMD_CREATE_DEVICE);
+        crtRequest.setCommand(GpsRequest.CMD_CREATE_DEVICE);
         crtRequest.setParams(buildParams());
         return crtRequest;
     }
 
-    public GpsOldRequest getRequestEdit() {
-        GpsOldRequest edtRequest = new GpsOldRequest(context);
+    public GpsRequest getRequestEdit() {
+        GpsRequest edtRequest = new GpsRequest(context);
         if (myApplication == null) {
             myApplication = MyApplication.getInstance();
         }
-        edtRequest.setAccountID(myApplication.getAccountID());
-        edtRequest.setUserID(myApplication.getUserID());
-        edtRequest.setPassword(myApplication.getPassword());
+        edtRequest.setAccountID(Session.getAccountId());
+        edtRequest.setUserID(Session.getUserId());
+        edtRequest.setPassword(Session.getUserPassword());
         edtRequest.setLocale(myApplication.getLocale());
-        edtRequest.setUrl(GpsOldRequest.ADMIN_URL);
+        edtRequest.setUrl(GpsRequest.ADMIN_URL);
         edtRequest.setMethod(Request.Method.POST);
         edtRequest.setParams(buildParams());
-        edtRequest.setCommand(GpsOldRequest.CMD_UPDATE_DEVICE);
+        edtRequest.setCommand(GpsRequest.CMD_UPDATE_DEVICE);
         return edtRequest;
     }
 
-    public GpsOldRequest getRequestDelete() {
-        GpsOldRequest deleteRequest = new GpsOldRequest(context);
+    public GpsRequest getRequestDelete() {
+        GpsRequest deleteRequest = new GpsRequest(context);
         if (myApplication == null) {
             myApplication = MyApplication.getInstance();
         }
-        deleteRequest.setAccountID(myApplication.getAccountID());
-        deleteRequest.setUserID(myApplication.getUserID());
-        deleteRequest.setPassword(myApplication.getPassword());
+        deleteRequest.setAccountID(Session.getAccountId());
+        deleteRequest.setUserID(Session.getUserId());
+        deleteRequest.setPassword(Session.getUserPassword());
         deleteRequest.setLocale(myApplication.getLocale());
-        deleteRequest.setUrl(GpsOldRequest.ADMIN_URL);
+        deleteRequest.setUrl(GpsRequest.ADMIN_URL);
         deleteRequest.setMethod(Request.Method.POST);
         deleteRequest.setParams(buildParams());
-        deleteRequest.setCommand(GpsOldRequest.CMD_DELETE_DEVICE);
+        deleteRequest.setCommand(GpsRequest.CMD_DELETE_DEVICE);
         return deleteRequest;
     }
 

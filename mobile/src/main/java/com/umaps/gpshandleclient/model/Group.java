@@ -4,7 +4,8 @@ import android.content.Context;
 
 import com.android.volley.Request;
 import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.Session;
+import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
@@ -12,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -211,51 +211,51 @@ public class Group {
         return j;
     }
 
-    public GpsOldRequest getRequestCreate(){
+    public GpsRequest getRequestCreate(){
         if (this.context == null) return null;
-        GpsOldRequest r = new GpsOldRequest(context);
+        GpsRequest r = new GpsRequest(context);
         if (mApplication == null) {
             mApplication = MyApplication.getInstance();
         }
-        r.setAccountID(mApplication.getAccountID());
-        r.setUserID(mApplication.getUserID());
-        r.setPassword(mApplication.getPassword());
-        r.setCommand(GpsOldRequest.CMD_CREATE_GROUP);
+        r.setAccountID(Session.getAccountId());
+        r.setUserID(Session.getUserId());
+        r.setPassword(Session.getUserPassword());
+        r.setCommand(GpsRequest.CMD_CREATE_GROUP);
         r.setMethod(Request.Method.POST);
-        r.setUrl(GpsOldRequest.ADMIN_URL);
+        r.setUrl(GpsRequest.ADMIN_URL);
         r.setParams(buildParams());
         return r;
     }
 
-    public GpsOldRequest getRequestEdit() {
+    public GpsRequest getRequestEdit() {
         if (this.context == null) return null;
 
-        GpsOldRequest r = new GpsOldRequest(context);
+        GpsRequest r = new GpsRequest(context);
         if (mApplication == null) {
             mApplication = MyApplication.getInstance();
         }
-        r.setAccountID(mApplication.getAccountID());
-        r.setUserID(mApplication.getUserID());
-        r.setPassword(mApplication.getPassword());
-        r.setCommand(GpsOldRequest.CMD_UPDATE_GROUP);
+        r.setAccountID(Session.getAccountId());
+        r.setUserID(Session.getUserId());
+        r.setPassword(Session.getUserPassword());
+        r.setCommand(GpsRequest.CMD_UPDATE_GROUP);
         r.setMethod(Request.Method.POST);
-        r.setUrl(GpsOldRequest.ADMIN_URL);
+        r.setUrl(GpsRequest.ADMIN_URL);
         r.setParams(buildParams());
         return r;
     }
-    public GpsOldRequest getRequestDelete() {
+    public GpsRequest getRequestDelete() {
         if (this.context == null) return null;
 
-        GpsOldRequest r = new GpsOldRequest(context);
+        GpsRequest r = new GpsRequest(context);
         if (mApplication == null) {
             mApplication = MyApplication.getInstance();
         }
-        r.setAccountID(mApplication.getAccountID());
-        r.setUserID(mApplication.getUserID());
-        r.setPassword(mApplication.getPassword());
-        r.setCommand(GpsOldRequest.CMD_DELETE_GROUP);
+        r.setAccountID(Session.getAccountId());
+        r.setUserID(Session.getUserId());
+        r.setPassword(Session.getUserPassword());
+        r.setCommand(GpsRequest.CMD_DELETE_GROUP);
         r.setMethod(Request.Method.POST);
-        r.setUrl(GpsOldRequest.ADMIN_URL);
+        r.setUrl(GpsRequest.ADMIN_URL);
         r.setParams(buildParams());
         return r;
     }

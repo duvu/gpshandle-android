@@ -9,9 +9,12 @@ import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseCrashReporting;
+import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.umaps.gpshandleclient.model.ParseLoginEvent;
 import com.umaps.gpshandleclient.util.StringTools;
 
@@ -28,7 +31,20 @@ public class MyApplication extends Application {
     private static Typeface mIconFont = null;
     private static Typeface mTextFont = null;
 
-    private static final String GPS_HANDLE_CLIENT       = "GPS_HANDLE_CLIENT";
+    private static final String ACCOUNT_ID      = "accountID";
+    private static final String USER_ID         = "userID";
+    private static final String PASSWORD        = "password";
+    private static final String TOKEN           = "token";
+    private static final String EXPIRED_ON      = "expiredOn";
+    private static final String LOCALE          = "locale";
+    private static final String SEL_GROUP_DESC  = "selGroupDesc";
+    private static final String SEL_GROUP       = "selGroup";
+    private static final String SEL_DEVICE      = "selDevice";
+    private static final String SEL_DEVICE_DESC = "selDeviceDesc";
+    private static final String IS_FLEET        = "isFleet";
+    private static final String LOADED_GROUP    = "loadedGroupData";
+    private static final String LOADED_DEVICE   = "loadedDeviceData";
+    private static final String IS_SIGNED_IN    = "isSignedIn";
 
     public static final String ACL_ADMIN_ACCOUNT        = "acl.service.admin.account";
     public static final String ACL_ADMIN_DEVICE         = "acl.service.admin.device";
@@ -91,6 +107,18 @@ public class MyApplication extends Application {
         Parse.enableLocalDatastore(this);
         ParseUser.enableAutomaticUser();
         Parse.initialize(this);
+
+        ParsePush.subscribeInBackground("GPS", new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
+                } else {
+                    Log.e("com.parse.push", "failed to subscribe for push", e);
+                }
+            }
+        });
+
         ParseInstallation.getCurrentInstallation().saveInBackground();
 
         instance = this;
@@ -112,15 +140,11 @@ public class MyApplication extends Application {
     public long timeInterval    = 20000;
     private boolean isFleet     = true;
 
-    private String accountID;
-    private String userID;
     private String email;
-    private String password;
 
     private boolean isManager;
 
     private String locale = "en";
-    private String token; //--
     private long expireOn;
 
     private String selDevice;
@@ -148,22 +172,6 @@ public class MyApplication extends Application {
         this.isFleet = isFleet;
     }
 
-    public String getAccountID() {
-        return accountID;
-    }
-
-    public void setAccountID(String accountID) {
-        this.accountID = accountID;
-    }
-
-    public String getUserID() {
-        return userID;
-    }
-
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -172,13 +180,6 @@ public class MyApplication extends Application {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public boolean isAccountManger(){
         return this.isManager;
@@ -193,14 +194,6 @@ public class MyApplication extends Application {
 
     public void setLocale(String locale) {
         this.locale = locale;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public long getExpireOn() {
@@ -259,28 +252,14 @@ public class MyApplication extends Application {
         this.isSignedIn = isSignedIn;
     }
 
-    private static final String ACCOUNT_ID      = "accountID";
-    private static final String USER_ID         = "userID";
-    private static final String PASSWORD        = "password";
-    private static final String TOKEN           = "token";
-    private static final String EXPIRED_ON      = "expiredOn";
-    private static final String LOCALE          = "locale";
-    private static final String SEL_GROUP_DESC  = "selGroupDesc";
-    private static final String SEL_GROUP       = "selGroup";
-    private static final String SEL_DEVICE      = "selDevice";
-    private static final String SEL_DEVICE_DESC = "selDeviceDesc";
-    private static final String IS_FLEET        = "isFleet";
-    private static final String LOADED_GROUP    = "loadedGroupData";
-    private static final String LOADED_DEVICE   = "loadedDeviceData";
-    private static final String IS_SIGNED_IN    = "isSignedIn";
-
     public void populateSettings(){
         //SharedPreferences prefs = this.getSharedPreferences(GPS_HANDLE_CLIENT, Context.MODE_PRIVATE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        this.setAccountID(prefs.getString(ACCOUNT_ID, ""));
-        this.setUserID(prefs.getString(USER_ID, ""));
-        this.setPassword(prefs.getString(PASSWORD, ""));
-        this.setToken(prefs.getString(TOKEN, ""));
+        Session.setAccountId(prefs.getString(ACCOUNT_ID, ""));
+        Session.setUserId(prefs.getString(USER_ID, ""));
+        Session.setSessionToken(prefs.getString(TOKEN, ""));
+        Session.setUserPassword(prefs.getString(PASSWORD, ""));
+
         this.setExpireOn(prefs.getLong(EXPIRED_ON, 0));
         this.setLocale(prefs.getString(LOCALE, "en"));
         this.setSelDevice(prefs.getString(SEL_DEVICE, ""));
@@ -313,10 +292,11 @@ public class MyApplication extends Application {
         //SharedPreferences prefs = this.getSharedPreferences(GPS_HANDLE_CLIENT, Context.MODE_PRIVATE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(ACCOUNT_ID, this.getAccountID());
-        editor.putString(USER_ID, this.getUserID());
-        editor.putString(PASSWORD, this.getPassword());
-        editor.putString(TOKEN, this.getToken());
+        editor.putString(ACCOUNT_ID, Session.getAccountId());
+        editor.putString(USER_ID, Session.getUserId());
+        editor.putString(PASSWORD, Session.getUserPassword());
+        editor.putString(TOKEN, Session.getSessionToken());
+
         editor.putLong(EXPIRED_ON, this.getExpireOn());
         editor.putString(LOCALE, this.getLocale());
         editor.putString(SEL_DEVICE, this.getSelDevice());
@@ -344,19 +324,6 @@ public class MyApplication extends Application {
         editor.putInt(ACL_REPORT_PARKING, getAclReportParking());
         editor.putInt(ACL_REPORT_SUMMARY, getAclReportSummary());
         editor.commit();
-    }
-
-    public void cleanSettings() {
-        this.setAccountID(null);
-        this.setUserID(null);
-        this.setPassword(null);
-        this.setToken(null);
-        this.setLocale(null);
-        this.setSelDevice(null);
-        this.setSelGroup(null);
-        this.setIsFleet(true);
-        this.setGroupList(null);
-        this.setIsSignedIn(false);
     }
 
     public int getAclAdminAccount() {
@@ -503,9 +470,5 @@ public class MyApplication extends Application {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean isCurrentAdmin() {
-        return "admin".equalsIgnoreCase(this.userID);
     }
 }

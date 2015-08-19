@@ -5,10 +5,8 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.model.MyResponse;
+import com.umaps.gpshandleclient.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +14,7 @@ import org.json.JSONObject;
 /**
  * Created by beou on 03/06/2015.
  */
-public class GpsOldRequest {
+public class GpsRequest {
     private static final String TAG = "GpsOldRequest";
     public static final String BASE_URL                 = "https://secure.gpshandle.com:8443/ws";
     public static final String MAPPING_URL              = BASE_URL + "/monitor";
@@ -80,7 +78,7 @@ public class GpsOldRequest {
     private Response.Listener<JSONObject> responseHandler;
     private Response.ErrorListener errorHandler;
 
-    public GpsOldRequest(Context context) {
+    public GpsRequest(Context context) {
         this.context = context;
         mQueue = HttpQueue.getInstance(context);
     }
@@ -89,20 +87,20 @@ public class GpsOldRequest {
         return method;
     }
 
-    public GpsOldRequest setMethod(int method) {
+    public GpsRequest setMethod(int method) {
         this.method = method;
         return this;
     }
-    public GpsOldRequest setPost(){
+    public GpsRequest setPost(){
         return setMethod(Request.Method.POST);
     }
-    public GpsOldRequest setGet() {
+    public GpsRequest setGet() {
         return setMethod(Request.Method.GET);
     }
-    public GpsOldRequest setDel() {
+    public GpsRequest setDel() {
         return setMethod(Request.Method.DELETE);
     }
-    public GpsOldRequest setPut() {
+    public GpsRequest setPut() {
         return setMethod(Request.Method.PUT);
     }
 
@@ -243,5 +241,16 @@ public class GpsOldRequest {
         if (mQueue != null){
             mQueue.cancel(tag);
         }
+    }
+
+    public static GpsRequest getAccountRequest(Context context) {
+        GpsRequest r = new GpsRequest(context);
+        r.setAccountID(Session.getAccountId());
+        r.setUserID(Session.getUserId());
+        r.setPassword(Session.getUserPassword());
+        r.setCommand(CMD_GET_ACCOUNT);
+        r.setPost();
+        r.setUrl(ADMIN_URL);
+        return r;
     }
 }

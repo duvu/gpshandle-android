@@ -22,9 +22,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
+import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.model.Account;
 import com.umaps.gpshandleclient.model.MyResponse;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.GpsRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +39,7 @@ import java.util.Date;
 public class AdmAccount extends Fragment {
     private static final String TAG = "AdmAccount";
 
-    private GpsOldRequest mRequest;
+    private GpsRequest mRequest;
     private static final String TAG_REQUEST = "admAccount";
     private View mBarProgress;
     private View mProgress;
@@ -84,13 +85,13 @@ public class AdmAccount extends Fragment {
         });
         setBottomToolbar();
 
-        mRequest = new GpsOldRequest(getActivity());
-        mRequest.setAccountID(mApplication.getAccountID());
-        mRequest.setUserID(mApplication.getUserID());
-        mRequest.setPassword(mApplication.getPassword());
-        mRequest.setUrl(GpsOldRequest.ADMIN_URL);
+        mRequest = new GpsRequest(getActivity());
+        mRequest.setAccountID(Session.getAccountId());
+        mRequest.setUserID(Session.getUserId());
+        mRequest.setPassword(Session.getUserPassword());
+        mRequest.setUrl(GpsRequest.ADMIN_URL);
         mRequest.setMethod(Request.Method.POST);
-        mRequest.setCommand(GpsOldRequest.CMD_GET_AUTHORIZED_ACCOUNTS);
+        mRequest.setCommand(GpsRequest.CMD_GET_AUTHORIZED_ACCOUNTS);
 
         mRequest.setParams(Account.createParam());
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {

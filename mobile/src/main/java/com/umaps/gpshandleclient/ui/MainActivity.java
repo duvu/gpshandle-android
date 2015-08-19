@@ -32,6 +32,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
+import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.util.EBus;
 import com.umaps.gpshandleclient.util.StringTools;
@@ -76,7 +77,7 @@ public class MainActivity extends ActionBarActivity{
         }
         setToolbar();
 
-        IProfile profile = new ProfileDrawerItem().withName(mApplication.getAccountID()+"/"+mApplication.getUserID())
+        IProfile profile = new ProfileDrawerItem().withName(Session.getAccountId()+"/"+Session.getUserId())
                 .withEmail("hoaivubk@gmail.com")
                 .withIcon("https://avatars3.githubusercontent.com/u/1476232?v=3&s=460");
 
@@ -157,10 +158,10 @@ public class MainActivity extends ActionBarActivity{
     public boolean isUserSignedIn() {
         boolean hasUserData =
                 (
-                    (!StringTools.isBlank(mApplication.getAccountID())) &&
-                    (!StringTools.isBlank(mApplication.getUserID())) &&
-                    (!StringTools.isBlank(mApplication.getPassword()))
-                ) || (!StringTools.isBlank(mApplication.getToken()));
+                    (!StringTools.isBlank(Session.getAccountId())) &&
+                    (!StringTools.isBlank(Session.getUserId())) &&
+                    (!StringTools.isBlank(Session.getUserPassword()))
+                ) || (!StringTools.isBlank(Session.getSessionToken()));
         long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
         long expireOn = mApplication.getExpireOn();
 

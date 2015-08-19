@@ -22,10 +22,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
+import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.model.Account;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.model.ParseLoginEvent;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
@@ -43,9 +44,10 @@ public class LoginActivity extends FragmentActivity {
     private View mLoginForm;
     private View mBarProgress;
     private View mProgress;
-    private GpsOldRequest mRequestToken;
-    private GpsOldRequest mRequestAcl;
-    private GpsOldRequest mRequestAcc;
+    private GpsRequest mRequestToken;
+    private GpsRequest mRequestAcl;
+    private GpsRequest mRequestAcc;
+
     MyApplication mApplication;
 
     @Override
@@ -69,18 +71,18 @@ public class LoginActivity extends FragmentActivity {
 
         //-- save application setting
         final EditText edtAccount = (EditText) findViewById(R.id.edt_account);
-        edtAccount.setText(mApplication.getAccountID());
+        edtAccount.setText(Session.getAccountId());
 
         final EditText edtUser = (EditText) findViewById(R.id.edt_user);
-        edtUser.setText(mApplication.getUserID());
+        edtUser.setText(Session.getUserId());
 
         final EditText edtPassword = (EditText) findViewById(R.id.edt_password);
-        edtPassword.setText(mApplication.getPassword());
+        edtPassword.setText(Session.getUserPassword());
 
-        mRequestAcl = new GpsOldRequest(this);
-        mRequestAcc = new GpsOldRequest(this);
-        mRequestToken = new GpsOldRequest(this);
+        mRequestAcl = new GpsRequest(this);
+        mRequestToken = new GpsRequest(this);
         Button btnLogin = (Button) findViewById(R.id.btn_login);
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,17 +97,12 @@ public class LoginActivity extends FragmentActivity {
                 }
 
                 //-- save to SessionState
-                mApplication.setAccountID(accountID);
-                mApplication.setUserID(userID);
-                mApplication.setPassword(password);
+                Session.setAccountId(accountID);
+                Session.setUserId(userID);
+                Session.setUserPassword(password);
 
-                mRequestAcc.setAccountID(accountID);
-                mRequestAcc.setUserID(userID);
-                mRequestAcc.setPassword(password);
-                mRequestAcc.setCommand(GpsOldRequest.CMD_GET_ACCOUNT);
-                mRequestAcc.setPost();
-                mRequestAcc.setUrl(GpsOldRequest.ADMIN_URL);
-                String[] lf = new String[] {"isAccountManager"};
+                mRequestAcc = GpsRequest.getAccountRequest(LoginActivity.this); //new GpsRequest(this);
+                String[] lf = new String[] {"isAccountManager", "contactEmail"};
                 JSONObject accParam = Account.createParam(lf);
                 mRequestAcc.setParams(accParam);
                 mRequestAcc.setResponseHandler(new Response.Listener<JSONObject>() {
@@ -146,9 +143,9 @@ public class LoginActivity extends FragmentActivity {
                 mRequestAcl.setAccountID(accountID);
                 mRequestAcl.setUserID(userID);
                 mRequestAcl.setPassword(password);
-                mRequestAcl.setCommand(GpsOldRequest.CMD_GET_USER_ACL);
+                mRequestAcl.setCommand(GpsRequest.CMD_GET_USER_ACL);
                 mRequestAcl.setMethod(Request.Method.POST);
-                mRequestAcl.setUrl(GpsOldRequest.ADMIN_URL);
+                mRequestAcl.setUrl(GpsRequest.ADMIN_URL);
                 JSONObject jsonParams = new JSONObject();
                 mRequestAcl.setParams(jsonParams);
                 mRequestAcl.setResponseHandler(new Response.Listener<JSONObject>() {
@@ -187,15 +184,15 @@ public class LoginActivity extends FragmentActivity {
                 mRequestToken.setPassword(password);
                 JSONObject params = new JSONObject();
                 try {
-                    params.put(GpsOldRequest.KEY_ACCOUNT_ID, accountID);
-                    params.put(GpsOldRequest.KEY_USER_ID, userID);
-                    params.put(GpsOldRequest.KEY_PASSWORD, password);
-                    params.put(GpsOldRequest.KEY_LOCALE, Locale.getDefault().getLanguage());
+                    params.put(GpsRequest.KEY_ACCOUNT_ID, accountID);
+                    params.put(GpsRequest.KEY_USER_ID, userID);
+                    params.put(GpsRequest.KEY_PASSWORD, password);
+                    params.put(GpsRequest.KEY_LOCALE, Locale.getDefault().getLanguage());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 //mRequestToken.setParams(params);
-                mRequestToken.setUrl(GpsOldRequest.TOKEN_URL);
+                mRequestToken.setUrl(GpsRequest.TOKEN_URL);
                 mRequestToken.setMethod(Request.Method.POST);
                 Response.Listener<JSONObject> tokeHanler = new Response.Listener<JSONObject>() {
                     @Override
@@ -216,7 +213,7 @@ public class LoginActivity extends FragmentActivity {
                             e.printStackTrace();
                         }
                         mApplication.setIsSignedIn(true);
-                        mApplication.setToken(token);
+                        Session.setSessionToken(token);
                         mApplication.setExpireOn(expiredOn);
                         //mApplication.storeSettings();
                         mRequestAcl.exec();

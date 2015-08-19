@@ -16,7 +16,6 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,10 +24,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
+import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.model.Device;
 import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.model.MyResponse;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.HttpQueue;
 import com.umaps.gpshandleclient.util.StringTools;
 
@@ -105,13 +105,13 @@ public class AdmGroup extends Fragment {
         });
 
         setBottomToolbar();
-        GpsOldRequest mRequest = new GpsOldRequest(getActivity());
-        mRequest.setAccountID(mApplication.getAccountID());
-        mRequest.setUserID(mApplication.getUserID());
-        mRequest.setPassword(mApplication.getPassword());
+        GpsRequest mRequest = new GpsRequest(getActivity());
+        mRequest.setAccountID(Session.getAccountId());
+        mRequest.setUserID(Session.getUserId());
+        mRequest.setPassword(Session.getUserPassword());
         mRequest.setMethod(Request.Method.POST);
-        mRequest.setUrl(GpsOldRequest.ADMIN_URL);
-        mRequest.setCommand(GpsOldRequest.CMD_GET_GROUPS);
+        mRequest.setUrl(GpsRequest.ADMIN_URL);
+        mRequest.setCommand(GpsRequest.CMD_GET_GROUPS);
         JSONObject params = Group.createGetParams();
         mRequest.setParams(params);
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
@@ -313,7 +313,7 @@ public class AdmGroup extends Fragment {
                 g.setDisplayName(displayName);
                 g.setNotes(notes);
 
-                GpsOldRequest crtRequest = g.getRequestCreate();
+                GpsRequest crtRequest = g.getRequestCreate();
                 crtRequest.setRequestTag(TAG_REQUEST);
                 crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
@@ -385,7 +385,7 @@ public class AdmGroup extends Fragment {
                 g.setDisplayName(displayName);
                 g.setNotes(notes);
 
-                GpsOldRequest edtRequest = g.getRequestEdit();
+                GpsRequest edtRequest = g.getRequestEdit();
                 edtRequest.setRequestTag(TAG_REQUEST);
                 edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
@@ -444,7 +444,7 @@ public class AdmGroup extends Fragment {
             @Override
             public void onClick(View v) {
                 g.setContext(getActivity());
-                GpsOldRequest deleteRequest = g.getRequestDelete();
+                GpsRequest deleteRequest = g.getRequestDelete();
                 deleteRequest.setRequestTag(TAG_REQUEST);
                 deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override

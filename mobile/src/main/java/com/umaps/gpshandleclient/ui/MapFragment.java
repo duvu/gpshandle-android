@@ -10,7 +10,6 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +37,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterManager;
 import com.umaps.gpshandleclient.R;
+import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.cluster.TrackClusterManager;
 import com.umaps.gpshandleclient.cluster.TrackInfoWindowAdapter;
 import com.umaps.gpshandleclient.cluster.TrackClusterRenderer;
@@ -49,7 +49,7 @@ import com.umaps.gpshandleclient.model.MapData;
 import com.umaps.gpshandleclient.model.MapPoint;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.model.TrackItem;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
 import com.umaps.gpshandleclient.util.DeviceGroupListAdapter;
@@ -86,9 +86,9 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
     final Timer timer = new Timer();
 
     private MyApplication mApplication;
-    private GpsOldRequest mRequestRealtime;
-    private GpsOldRequest mRequestHistory;
-    private GpsOldRequest mRequestGetGroup;
+    private GpsRequest mRequestRealtime;
+    private GpsRequest mRequestHistory;
+    private GpsRequest mRequestGetGroup;
     private View view;
 
     private boolean isRunning = false;
@@ -237,13 +237,13 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mRequestRealtime = new GpsOldRequest(getActivity());
-        mRequestRealtime.setAccountID(mApplication.getAccountID());
-        mRequestRealtime.setUserID(mApplication.getUserID());
-        mRequestRealtime.setPassword(mApplication.getPassword());
-        mRequestRealtime.setCommand(GpsOldRequest.CMD_GET_MAP_FLEET);
+        mRequestRealtime = new GpsRequest(getActivity());
+        mRequestRealtime.setAccountID(Session.getAccountId());
+        mRequestRealtime.setUserID(Session.getUserId());
+        mRequestRealtime.setPassword(Session.getUserPassword());
+        mRequestRealtime.setCommand(GpsRequest.CMD_GET_MAP_FLEET);
         mRequestRealtime.setMethod(Request.Method.POST);
-        mRequestRealtime.setUrl(GpsOldRequest.MAPPING_URL);
+        mRequestRealtime.setUrl(GpsRequest.MAPPING_URL);
         mRequestRealtime.setParams(jsonParams);
         Response.Listener<JSONObject> responseHandler = new Response.Listener<JSONObject>() {
             @Override
@@ -358,13 +358,13 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mRequestHistory = new GpsOldRequest(getActivity());
-        mRequestHistory.setAccountID(mApplication.getAccountID());
-        mRequestHistory.setUserID(mApplication.getUserID());
-        mRequestHistory.setPassword(mApplication.getPassword());
-        mRequestHistory.setUrl(GpsOldRequest.MAPPING_URL);
+        mRequestHistory = new GpsRequest(getActivity());
+        mRequestHistory.setAccountID(Session.getAccountId());
+        mRequestHistory.setUserID(Session.getUserId());
+        mRequestHistory.setPassword(Session.getUserPassword());
+        mRequestHistory.setUrl(GpsRequest.MAPPING_URL);
         mRequestHistory.setParams(jsonParamsObject);
-        mRequestHistory.setCommand(GpsOldRequest.CMD_GET_MAP_DEVICE);
+        mRequestHistory.setCommand(GpsRequest.CMD_GET_MAP_DEVICE);
         mRequestHistory.setMethod(Request.Method.POST);
 
         mRequestHistory.setResponseHandler(new Response.Listener<JSONObject>() {
@@ -477,13 +477,13 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
         }
         Log.d(TAG, "toggleDeviceList: " + mApplication.getGroupList());
 
-        mRequestGetGroup = new GpsOldRequest(getActivity());
-        mRequestGetGroup.setAccountID(mApplication.getAccountID());
-        mRequestGetGroup.setUserID(mApplication.getUserID());
-        mRequestGetGroup.setPassword(mApplication.getPassword());
+        mRequestGetGroup = new GpsRequest(getActivity());
+        mRequestGetGroup.setAccountID(Session.getAccountId());
+        mRequestGetGroup.setUserID(Session.getUserId());
+        mRequestGetGroup.setPassword(Session.getUserPassword());
         mRequestGetGroup.setMethod(Request.Method.POST);
-        mRequestGetGroup.setUrl(GpsOldRequest.ADMIN_URL);
-        mRequestGetGroup.setCommand(GpsOldRequest.CMD_GET_GROUPS);
+        mRequestGetGroup.setUrl(GpsRequest.ADMIN_URL);
+        mRequestGetGroup.setCommand(GpsRequest.CMD_GET_GROUPS);
         JSONObject params = createParams();
         mRequestGetGroup.setParams(params);
         mRequestGetGroup.setResponseHandler(new Response.Listener<JSONObject>() {

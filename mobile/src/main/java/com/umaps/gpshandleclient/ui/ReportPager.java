@@ -23,9 +23,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
+import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.model.MyResponse;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.PagerAdapter;
 import com.umaps.gpshandleclient.util.ReportGroupListViewAdapter;
 import com.umaps.gpshandleclient.util.StringTools;
@@ -51,7 +52,7 @@ public class ReportPager extends Fragment {
     private View mBarProgress;
     private View mProgress;
 
-    private GpsOldRequest mRequestGetGroup;
+    private GpsRequest mRequestGetGroup;
     ArrayList<Group> groupsList;
     MyApplication mApplication;
     private Typeface mTf;
@@ -175,13 +176,13 @@ public class ReportPager extends Fragment {
         } else {
             layout.setVisibility(View.VISIBLE);
         }
-        mRequestGetGroup = new GpsOldRequest(getActivity());
-        mRequestGetGroup.setAccountID(mApplication.getAccountID());
-        mRequestGetGroup.setUserID(mApplication.getUserID());
-        mRequestGetGroup.setPassword(mApplication.getPassword());
+        mRequestGetGroup = new GpsRequest(getActivity());
+        mRequestGetGroup.setAccountID(Session.getAccountId());
+        mRequestGetGroup.setUserID(Session.getUserId());
+        mRequestGetGroup.setPassword(Session.getUserPassword());
         mRequestGetGroup.setMethod(Request.Method.POST);
-        mRequestGetGroup.setUrl(GpsOldRequest.ADMIN_URL);
-        mRequestGetGroup.setCommand(GpsOldRequest.CMD_GET_GROUPS);
+        mRequestGetGroup.setUrl(GpsRequest.ADMIN_URL);
+        mRequestGetGroup.setCommand(GpsRequest.CMD_GET_GROUPS);
         JSONObject params = createParams();
         mRequestGetGroup.setParams(params);
         mRequestGetGroup.setResponseHandler(new Response.Listener<JSONObject>() {

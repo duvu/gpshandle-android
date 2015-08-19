@@ -24,9 +24,10 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
+import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GPSColors;
-import com.umaps.gpshandleclient.util.GpsOldRequest;
+import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
 import org.json.JSONArray;
@@ -43,7 +44,7 @@ public class RptEventCount extends Fragment {
     private HorizontalBarChart mChart;
     private View mBarProgress;
     private View mProgress;
-    private GpsOldRequest mRequest;
+    private GpsRequest mRequest;
 
     private static final String TAG_REQUEST = "rptEventCount";
     public static RptEventCount newInstance(){
@@ -69,13 +70,13 @@ public class RptEventCount extends Fragment {
         MyApplication mApplication = MyApplication.getInstance();
         Utils.init(getResources());
         mChart = (HorizontalBarChart) view.findViewById(R.id.event_count_chart);
-        mRequest = new GpsOldRequest(getActivity());
-        mRequest.setAccountID(mApplication.getAccountID());
-        mRequest.setUserID(mApplication.getUserID());
-        mRequest.setPassword(mApplication.getPassword());
+        mRequest = new GpsRequest(getActivity());
+        mRequest.setAccountID(Session.getAccountId());
+        mRequest.setUserID(Session.getUserId());
+        mRequest.setPassword(Session.getUserPassword());
         mRequest.setMethod(Request.Method.GET);
-        String url = String.format(GpsOldRequest.CHART_SUMMARY_URL,
-                mApplication.getToken(), mApplication.getSelGroup());
+        String url = String.format(GpsRequest.CHART_SUMMARY_URL,
+                Session.getSessionToken(), mApplication.getSelGroup());
         mRequest.setUrl(url);
 
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
