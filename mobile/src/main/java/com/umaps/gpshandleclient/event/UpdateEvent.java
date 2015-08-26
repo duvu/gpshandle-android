@@ -20,4 +20,23 @@ public class UpdateEvent {
             this.isLoading = isLoading;
         }
     }
+
+    public static class OnLive {
+        private boolean isLive;
+        public OnLive(boolean live) {
+            this.isLive = live;
+        }
+
+        public boolean isLive() {
+            return isLive;
+        }
+
+        public void setIsLive(boolean isLive) {
+            this.isLive = isLive;
+        }
+    }
+
+    public static class GroupChanged {
+
+    }
 }

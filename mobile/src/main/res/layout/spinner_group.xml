@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingStart="16dp"
+    android:paddingLeft="16dp"
+    android:layout_width="220dp"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/spinner_group_name"
+        android:layout_centerVertical="true"
+        android:ellipsize="marquee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/spinner_group_size"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_group_size"/>
+</RelativeLayout>

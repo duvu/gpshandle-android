@@ -63,11 +63,14 @@ public class User {
             this.lastLoginTime  = jsonUser.has(LAST_LOGIN_TIME) ? jsonUser.getLong(LAST_LOGIN_TIME) : 0L;
             this.creationTime   = jsonUser.has(CREATION_TIME)   ? jsonUser.getLong(CREATION_TIME)   : 0L;
 
-            JSONArray lGrp = jsonUser.has(MANAGED_GROUPS) ? jsonUser.getJSONArray(MANAGED_GROUPS) : null;
-            if ((lGrp!=null) && (lGrp.length() > 0)) {
-                groupList = new ArrayList<>();
-                for (int i = 0; i < lGrp.length(); i++){
-                    groupList.add(new Group(lGrp.getJSONObject(i)));
+            Object jo = jsonUser.has(MANAGED_GROUPS) ? jsonUser.get(MANAGED_GROUPS) : null;
+            if (jo != null && jo instanceof JSONArray) {
+                JSONArray ja = (JSONArray) jo;
+                if (ja.length() > 0) {
+                    groupList = new ArrayList<>();
+                    for (int i = 0; i < ja.length(); i++){
+                        groupList.add(new Group(ja.getJSONObject(i)));
+                    }
                 }
             }
         } catch (JSONException e) {

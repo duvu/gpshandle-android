@@ -10,6 +10,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"/>
     <TextView
         android:id="@+id/txt_group_description"
@@ -18,7 +19,11 @@
         android:layout_marginStart="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:scrollHorizontally="true"
+        android:maxLength="30"
         android:layout_toRightOf="@+id/img_group"
+        android:layout_toEndOf="@+id/img_group"
         android:textColor="@color/text_color_dark"/>
     <TextView
         android:id="@+id/gps_group_size"
@@ -27,6 +32,7 @@
         android:layout_width="40dp"
         android:gravity="center"
         android:layout_toLeftOf="@+id/ic_indicator"
+        android:layout_toStartOf="@+id/ic_indicator"
         android:textColor="@color/text_color_dark"
         android:background="@drawable/bg_group_size"/>
     <TextView
@@ -37,5 +43,6 @@
         android:textSize="30sp"
         android:textColor="@color/text_color_dark"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"/>
 </RelativeLayout>

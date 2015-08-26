@@ -139,7 +139,6 @@ public class AdmUser extends Fragment {
                 showProgress(false);
             }
         });
-        mRequest.setRequestTag(TAG_REQUEST);
         mRequest.exec();
         showProgress(true);
         return view;
@@ -302,7 +301,6 @@ public class AdmUser extends Fragment {
                 u.setContactPhone(edtContactPhone.getText().toString());
                 GpsRequest crtRequest = u.getRequestCreate();
 
-                crtRequest.setRequestTag(TAG_REQUEST);
                 crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -382,7 +380,6 @@ public class AdmUser extends Fragment {
                 u.setContactEmail(edtContactEmail.getText().toString());
                 u.setContactPhone(edtContactPhone.getText().toString());
                 GpsRequest edtRequest = u.getRequestEdit();
-                edtRequest.setRequestTag(TAG_REQUEST);
 
                 edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
@@ -441,7 +438,6 @@ public class AdmUser extends Fragment {
             public void onClick(View v) {
                 u.setContext(getActivity());
                 GpsRequest deleteRequest = u.getRequestDelete();
-                deleteRequest.setRequestTag(TAG_REQUEST);
                 deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {

@@ -27,7 +27,7 @@
     <string name="device_list">Lista de Dispositivos</string>
     <string name="company_name">WIMAPS TECHNOLOGIES</string>
     <string name="company_address">Rua Tibagi, votuporanga - sp</string>
-    <string name="company_tel">(17) 3421-1565</string>
+    <string name="company_tel">(+17) 3421-1565</string>
     <string name="getting_group_device_list">Obtendo informações do dispositivo</string>
 
     <string name="partners">Parceiros internacionais</string>
@@ -122,6 +122,9 @@
     <string name="txt_user_contact_email">Email de contato*</string>
     <string name="failure_delete">Falha ao apagar</string>
     <string name="title_activity_settings">Configurações</string>
-    <string name="subtitle_group"></string>
-    <string name="action_list_groups"></string>
+    <string name="contact_info">Contact infomations</string>
+    <string name="faq_screen_title">Frequently asked questions</string>
+    <string name="send_us_a_message">Send us a message</string>
+    <string name="title_help_feedback"><![CDATA[Help & feedback]]></string>
+    <string name="title_logout">Logout</string>
 </resources>

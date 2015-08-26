@@ -5,8 +5,11 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.umaps.gpshandleclient.Session;
+import com.umaps.gpshandleclient.model.Group;
+import com.umaps.gpshandleclient.model.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +18,7 @@ import org.json.JSONObject;
  * Created by beou on 03/06/2015.
  */
 public class GpsRequest {
-    private static final String TAG = "GpsOldRequest";
+    private static final String TAG = "GpsRequest";
     public static final String BASE_URL                 = "https://secure.gpshandle.com:8443/ws";
     public static final String MAPPING_URL              = BASE_URL + "/monitor";
     public static final String REPORTING_URL            = BASE_URL + "/report";
@@ -61,12 +64,20 @@ public class GpsRequest {
     public static final String CMD_UPDATE_USER                  = "updateUser";
     public static final String CMD_DELETE_USER                  = "deleteUser";
 
+    private static GpsRequest instance = null;
+    public static GpsRequest getInstance(Context context) {
+        if (instance == null) {
+            instance = new GpsRequest(context);
+        }
+        return instance;
+    }
+
     private Context context;
     private HttpQueue mQueue;
 
     private int method;
     private String url;
-    private String requestTag;
+    private String tag;
 
     private String accountID;
     private String userID;
@@ -108,12 +119,12 @@ public class GpsRequest {
         return url;
     }
 
-    public String getRequestTag() {
-        return requestTag;
+    public String getTag() {
+        return tag;
     }
 
-    public void setRequestTag(String requestTag) {
-        this.requestTag = requestTag;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public void setUrl(String url) {
@@ -184,6 +195,16 @@ public class GpsRequest {
         this.errorHandler = errorHandler;
     }
 
+    public void setErrorHandler(){
+        this.errorHandler = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //noop
+                Log.e(TAG, error.getMessage());
+            }
+        };
+    }
+
     public JSONObject getAuthJson(){
         JSONObject authJson = new JSONObject();
         try {
@@ -230,8 +251,8 @@ public class GpsRequest {
     public void exec(JSONObject params){
         Log.i(TAG, url);
         JsonObjectRequest jObjReq = new JsonObjectRequest(method, url, params, responseHandler, errorHandler);
-        if (!StringTools.isBlank(requestTag)){
-            jObjReq.setTag(requestTag);
+        if (!StringTools.isBlank(tag)){
+            jObjReq.setTag(tag);
         }
         if (mQueue != null) {
             mQueue.addToRequestQueue(jObjReq);
@@ -243,14 +264,134 @@ public class GpsRequest {
         }
     }
 
-    public static GpsRequest getAccountRequest(Context context) {
+    private static JSONObject getFleetParams(String groupId) {
+        JSONObject p = new JSONObject();
+        try {
+            p.put(StringTools.FLD_status, null);
+            p.put(StringTools.FLD_inclZones, false);
+            p.put(StringTools.FLD_inclDebug, false);
+            p.put(StringTools.FLD_inclPOI, false);
+            p.put(StringTools.FLD_inclTime, false);
+            p.put(StringTools.FLD_groupID, groupId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return p;
+    }
+
+    private static JSONObject getMapDeviceParams(String deviceId, long from, long to) {
+        JSONObject p = new JSONObject();
+        try {
+            p.put(StringTools.FLD_deviceID, deviceId);
+            p.put(StringTools.FLD_status, null);
+            p.put(StringTools.FLD_timeFrom, from/*1421127296*/);
+            p.put(StringTools.FLD_timeTo, to/*1421137296*/);
+            p.put(StringTools.FLD_inclZones, false);
+            p.put(StringTools.FLD_inclDebug, false);
+            p.put(StringTools.FLD_inclPOI, false);
+            p.put(StringTools.FLD_inclTime, false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return p;
+    }
+
+    public void cancelAll() {
+        cancel("common");
+    }
+
+    private static GpsRequest getCommonRequest(Context context) {
         GpsRequest r = new GpsRequest(context);
         r.setAccountID(Session.getAccountId());
         r.setUserID(Session.getUserId());
         r.setPassword(Session.getUserPassword());
-        r.setCommand(CMD_GET_ACCOUNT);
+        r.setTag("common");
+        return r;
+    }
+
+    private static GpsRequest getAdminRequest(Context context) {
+        GpsRequest r = getCommonRequest(context);
         r.setPost();
         r.setUrl(ADMIN_URL);
+        return r;
+    }
+
+    private static GpsRequest getMapRequest(Context context) {
+        GpsRequest r = getCommonRequest(context);
+        r.setPost();
+        r.setUrl(MAPPING_URL);
+        return r;
+    }
+
+    public static GpsRequest getAccountRequest(Context context) {
+        GpsRequest r = getAdminRequest(context);
+        r.setCommand(CMD_GET_ACCOUNT);
+        r.setErrorHandler();
+        return r;
+    }
+    //-- get request for user
+    public static GpsRequest getUserRequest(Context context) {
+        GpsRequest r = getAdminRequest(context);
+        r.setCommand(CMD_GET_USERS);
+        r.setParams(User.createParams());
+        r.setErrorHandler();
+        return r;
+    }
+
+    /*public static JSONObject getGroupParams(){
+        JSONObject jsonParamsObject = new JSONObject();
+        List<String> fields = new ArrayList<>();
+        fields.add(ACCOUNT_ID);
+        fields.add(GROUP_ID);
+        fields.add(DESCRIPTION);
+        fields.add(PUSHPIN_ID);
+        fields.add(DISPLAY_NAME);
+        fields.add(DEVICE_COUNT);
+        fields.add(DEVICE_LIST);
+        fields.add(NOTES);
+        fields.add(LAST_UPDATE_TIME);
+        fields.add(CREATION_TIME);
+        try {
+            jsonParamsObject.put(StringTools.KEY_FIELDS, new JSONArray(fields));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonParamsObject;
+    }*/
+
+    public static GpsRequest getGroupRequest(Context context) {
+        GpsRequest r = getAdminRequest(context);
+        r.setCommand(CMD_GET_GROUPS);
+        r.setParams(Group.createGetParams());
+        r.setErrorHandler();
+        return r;
+    }
+    public static GpsRequest getAclRequest(Context context) {
+        GpsRequest r = getAdminRequest(context);
+        r.setCommand(CMD_GET_USER_ACL);
+        r.setErrorHandler();
+        return r;
+    }
+
+    public static GpsRequest getTokenRequest(Context context) {
+        GpsRequest r = getCommonRequest(context);
+        r.setCommand(TOKEN_URL);
+        r.setPost();
+        r.setErrorHandler();
+        return r;
+    }
+
+    public static GpsRequest getFleetRequest(Context context, String groupId) {
+        GpsRequest r = getMapRequest(context);
+        r.setCommand(CMD_GET_MAP_FLEET);
+        r.setParams(getFleetParams(groupId));
+        return r;
+    }
+    public static GpsRequest geMapsRequest(Context context, String deviceId, long from, long to) {
+        GpsRequest r = getMapRequest(context);
+        r.setCommand(CMD_GET_MAP_DEVICE);
+        r.setParams(getMapDeviceParams(deviceId, from, to));
+        r.setErrorHandler();
         return r;
     }
 }

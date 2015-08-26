@@ -100,9 +100,8 @@ public class RptOverview extends Fragment {
         mRequest.setPassword(Session.getUserPassword());
         mRequest.setMethod(Request.Method.GET);
 
-        String url = String.format(GpsRequest.CHART_STATE_URL, Session.getSessionToken(), mApplication.getSelGroup());
+        String url = String.format(GpsRequest.CHART_STATE_URL, Session.getSessionToken(), Session.getSelectedGroup());
         mRequest.setUrl(url);
-        mRequest.setRequestTag(TAG_REQUEST);
 
         //-- prepare piechart data
         PieData pieData = new PieData();

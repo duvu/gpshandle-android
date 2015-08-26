@@ -119,7 +119,6 @@ public class AdmAccount extends Fragment {
             }
         });
 
-        mRequest.setRequestTag(TAG_REQUEST);
         mRequest.exec();
         showProgress(true);
         return view;
@@ -127,7 +126,6 @@ public class AdmAccount extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        mRequest.cancel(TAG_REQUEST);
     }
 
     private void setBottomToolbar(){
@@ -149,7 +147,7 @@ public class AdmAccount extends Fragment {
         TextView txtDeleteAccount = (TextView) view.findViewById(R.id.txt_delete);
         txtDeleteAccount.setText(R.string.delete);
 
-        if (mApplication.isAccountManger()) {
+        if (Session.isAccountManager()) {
             View addAccount = view.findViewById(R.id.add);
             View deleteAccount = view.findViewById(R.id.delete);
             View editAccount = view.findViewById(R.id.edit);

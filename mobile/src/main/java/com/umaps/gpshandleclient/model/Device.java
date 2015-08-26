@@ -21,30 +21,30 @@ import java.util.List;
  */
 public class Device {
 
-    private static final String ACCOUNT_ID      = "accountID";
-    private static final String DEVICE_ID       = "deviceID";
-    private static final String DESCRIPTION     = "description";
-    private static final String DISPLAY_NAME    = "displayName";
-    private static final String UNIQUE_ID       = "uniqueID";
-    private static final String GROUP_ID        = "groupID";
-    private static final String DRIVER_ID       = "driverID";
-    private static final String DRIVER_STATUS   = "driverStatus";
-    private static final String PUSHPIN_ID      = "pushpinID";
-    private static final String NOTES           = "notes";
-    private static final String SERIAL_NUMBER   = "serialNumber";
-    private static final String SIM_NUMBER      = "simNumber";
-    private static final String LAST_LATITUDE   = "lastValidLatitude";
-    private static final String LAST_LONGITUDE  = "lastValidLongitude";
+    private static final String ACCOUNT_ID          = "accountID";
+    private static final String DEVICE_ID           = "deviceID";
+    private static final String DESCRIPTION         = "description";
+    private static final String DISPLAY_NAME        = "displayName";
+    private static final String UNIQUE_ID           = "uniqueID";
+    private static final String GROUP_ID            = "groupID";
+    private static final String DRIVER_ID           = "driverID";
+    private static final String DRIVER_STATUS       = "driverStatus";
+    private static final String PUSHPIN_ID          = "pushpinID";
+    private static final String NOTES               = "notes";
+    private static final String SERIAL_NUMBER       = "serialNumber";
+    private static final String SIM_NUMBER          = "simNumber";
+    private static final String LAST_LATITUDE       = "lastValidLatitude";
+    private static final String LAST_LONGITUDE      = "lastValidLongitude";
 
-    private static final String IS_ACTIVE       = "isActive";
-    private static final String SMS_COUNT       = "smsCount";
-    private static final String SMS_LIMIT       = "smsMonthlyLimited";
-    private static final String CREATION_TIME   = "creationTime";
+    private static final String IS_ACTIVE           = "isActive";
+    private static final String SMS_COUNT           = "smsCount";
+    private static final String SMS_LIMIT           = "smsMonthlyLimited";
+    private static final String CREATION_TIME       = "creationTime";
 
-    private static final String ICON            = "pushPin";
-    private static final String IS_LIVE         = "isLive";
-    private static final String LAST_EVENT_TIME = "lastEventTime";
-    private static final String LAST_BATTERY_LEVEL = "lastBatteryLevel";
+    private static final String ICON                = "pushPin";
+    private static final String IS_LIVE             = "isLive";
+    private static final String LAST_EVENT_TIME     = "lastEventTime";
+    private static final String LAST_BATTERY_LEVEL  = "lastBatteryLevel";
 
 
     private Context context;

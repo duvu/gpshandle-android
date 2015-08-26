@@ -141,7 +141,6 @@ public class AdmGroup extends Fragment {
                 }
             }
         });
-        mRequest.setRequestTag(TAG_REQUEST);
         mRequest.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -314,7 +313,6 @@ public class AdmGroup extends Fragment {
                 g.setNotes(notes);
 
                 GpsRequest crtRequest = g.getRequestCreate();
-                crtRequest.setRequestTag(TAG_REQUEST);
                 crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -386,7 +384,6 @@ public class AdmGroup extends Fragment {
                 g.setNotes(notes);
 
                 GpsRequest edtRequest = g.getRequestEdit();
-                edtRequest.setRequestTag(TAG_REQUEST);
                 edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -445,7 +442,6 @@ public class AdmGroup extends Fragment {
             public void onClick(View v) {
                 g.setContext(getActivity());
                 GpsRequest deleteRequest = g.getRequestDelete();
-                deleteRequest.setRequestTag(TAG_REQUEST);
                 deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {

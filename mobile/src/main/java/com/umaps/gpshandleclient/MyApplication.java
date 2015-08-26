@@ -5,16 +5,15 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseCrashReporting;
-import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
+import com.umaps.gpshandleclient.model.ParseDevice;
+import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.model.ParseLoginEvent;
 import com.umaps.gpshandleclient.util.StringTools;
 
@@ -31,20 +30,32 @@ public class MyApplication extends Application {
     private static Typeface mIconFont = null;
     private static Typeface mTextFont = null;
 
-    private static final String ACCOUNT_ID      = "accountID";
-    private static final String USER_ID         = "userID";
-    private static final String PASSWORD        = "password";
-    private static final String TOKEN           = "token";
-    private static final String EXPIRED_ON      = "expiredOn";
-    private static final String LOCALE          = "locale";
-    private static final String SEL_GROUP_DESC  = "selGroupDesc";
-    private static final String SEL_GROUP       = "selGroup";
-    private static final String SEL_DEVICE      = "selDevice";
-    private static final String SEL_DEVICE_DESC = "selDeviceDesc";
-    private static final String IS_FLEET        = "isFleet";
-    private static final String LOADED_GROUP    = "loadedGroupData";
-    private static final String LOADED_DEVICE   = "loadedDeviceData";
-    private static final String IS_SIGNED_IN    = "isSignedIn";
+    private static final String ACCOUNT_ID              = "accountID";
+    private static final String USER_ID                 = "userID";
+    private static final String PASSWORD                = "password";
+    private static final String TOKEN                   = "token";
+    private static final String EXPIRED_ON              = "expiredOn";
+
+    private static final String USER_DISPLAY_NAME       = "displayName";
+    private static final String USER_DESCRIPTION        = "desciption";
+    private static final String CONTACT_NAME            = "contactName";
+    private static final String CONTACT_EMAIL           = "contactEmail";
+    private static final String CONTACT_PHONE           = "contactPhone";
+    private static final String CREATION_TIME           = "creationTime";
+    private static final String LAST_LOGIN_TIME         = "lastLoginTime";
+
+    private static final String TOTAL_DEVICES           = "totalDevices";
+    private static final String SELECTED_GROUP          = "selGroup";
+    private static final String GROUP_POSITION          = "groupPosition";
+
+    private static final String LOCALE                  = "locale";
+    private static final String SEL_GROUP_DESC          = "selGroupDesc";
+    private static final String SEL_DEVICE              = "selDevice";
+    private static final String SEL_DEVICE_DESC         = "selDeviceDesc";
+    private static final String IS_FLEET                = "isFleet";
+    private static final String LOADED_GROUP            = "loadedGroupData";
+    private static final String LOADED_DEVICE           = "loadedDeviceData";
+    private static final String IS_SIGNED_IN            = "isSignedIn";
 
     public static final String ACL_ADMIN_ACCOUNT        = "acl.service.admin.account";
     public static final String ACL_ADMIN_DEVICE         = "acl.service.admin.device";
@@ -97,27 +108,15 @@ public class MyApplication extends Application {
         super.onCreate();
 
         //-- register class
-        /*ParseObject.registerSubclass(Question.class);
-        ParseObject.registerSubclass(Answer.class);
-        ParseObject.registerSubclass(Category.class);
-        ParseObject.registerSubclass(Event.class);
-        ParseObject.registerSubclass(Inbox.class);*/
         ParseObject.registerSubclass(ParseLoginEvent.class);
+        ParseObject.registerSubclass(ParseGroup.class);
+        ParseObject.registerSubclass(ParseDevice.class);
         ParseCrashReporting.enable(this);
         Parse.enableLocalDatastore(this);
         ParseUser.enableAutomaticUser();
         Parse.initialize(this);
 
-        ParsePush.subscribeInBackground("GPS", new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
-                } else {
-                    Log.e("com.parse.push", "failed to subscribe for push", e);
-                }
-            }
-        });
+        ParsePush.subscribeInBackground("GPS");
 
         ParseInstallation.getCurrentInstallation().saveInBackground();
 
@@ -137,19 +136,11 @@ public class MyApplication extends Application {
         super.onTerminate();
         storeSettings();
     }
+
     public long timeInterval    = 20000;
     private boolean isFleet     = true;
-
-    private String email;
-
-    private boolean isManager;
-
     private String locale = "en";
-    private long expireOn;
-
     private String selDevice;
-    private String selGroup;
-    private String selGroupDesc;
     private String selDeviceDesc;
 
     private String groupList;
@@ -172,22 +163,6 @@ public class MyApplication extends Application {
         this.isFleet = isFleet;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-
-    public boolean isAccountManger(){
-        return this.isManager;
-    }
-    public void  setManager(boolean isManager) {
-        this.isManager = isManager;
-    }
-
     public String getLocale() {
         return locale;
     }
@@ -196,36 +171,12 @@ public class MyApplication extends Application {
         this.locale = locale;
     }
 
-    public long getExpireOn() {
-        return expireOn;
-    }
-
-    public void setExpireOn(long expireOn) {
-        this.expireOn = expireOn;
-    }
-
     public String getSelDevice() {
         return selDevice;
     }
 
     public void setSelDevice(String selDevice) {
         this.selDevice = selDevice;
-    }
-
-    public String getSelGroup() {
-        return (StringTools.isBlank(selGroup)?"all":selGroup);
-    }
-
-    public void setSelGroup(String selGroup) {
-        this.selGroup = selGroup;
-    }
-
-    public String getSelGroupDesc() {
-        return (StringTools.isBlank(selGroup)||selGroup.equalsIgnoreCase("all"))? String.valueOf(getText(R.string.txt_group_all)):selGroupDesc;
-    }
-
-    public void setSelGroupDesc(String selGroupDesc) {
-        this.selGroupDesc = selGroupDesc;
     }
 
     public String getSelDeviceDesc() {
@@ -258,14 +209,22 @@ public class MyApplication extends Application {
         Session.setAccountId(prefs.getString(ACCOUNT_ID, ""));
         Session.setUserId(prefs.getString(USER_ID, ""));
         Session.setSessionToken(prefs.getString(TOKEN, ""));
+        Session.setTokenExpired(prefs.getLong(EXPIRED_ON, 0L));
         Session.setUserPassword(prefs.getString(PASSWORD, ""));
+        Session.setDisplayName(prefs.getString(USER_DISPLAY_NAME, ""));
+        Session.setDescription(prefs.getString(USER_DESCRIPTION, ""));
+        Session.setContactName(prefs.getString(CONTACT_NAME, ""));
+        Session.setContactPhone(prefs.getString(CONTACT_PHONE, ""));
+        Session.setContactEmail(prefs.getString(CONTACT_EMAIL, ""));
+        Session.setCreationTime(prefs.getLong(CREATION_TIME, 0L));
+        Session.setLastLoginTime(prefs.getLong(LAST_LOGIN_TIME, 0L));
+        Session.setTotalDevices(prefs.getInt(TOTAL_DEVICES, 0));
+        Session.setSelectedGroup(prefs.getString(SELECTED_GROUP, "all"));
+        Session.setGroupPosition(prefs.getInt(GROUP_POSITION, 0));
 
-        this.setExpireOn(prefs.getLong(EXPIRED_ON, 0));
         this.setLocale(prefs.getString(LOCALE, "en"));
         this.setSelDevice(prefs.getString(SEL_DEVICE, ""));
         this.setSelDeviceDesc(prefs.getString(SEL_DEVICE_DESC, ""));
-        this.setSelGroup(prefs.getString(SEL_GROUP, ""));
-        this.setSelGroupDesc(prefs.getString(SEL_GROUP_DESC, ""));
         this.setIsFleet(prefs.getBoolean(IS_FLEET, true));
         this.setGroupList(prefs.getString(LOADED_GROUP, ""));
         this.setIsSignedIn(prefs.getBoolean(IS_SIGNED_IN, false));
@@ -296,13 +255,23 @@ public class MyApplication extends Application {
         editor.putString(USER_ID, Session.getUserId());
         editor.putString(PASSWORD, Session.getUserPassword());
         editor.putString(TOKEN, Session.getSessionToken());
+        editor.putLong(EXPIRED_ON, Session.getTokenExpired());
 
-        editor.putLong(EXPIRED_ON, this.getExpireOn());
+        editor.putString(USER_DISPLAY_NAME, Session.getDisplayName());
+        editor.putString(USER_DESCRIPTION, Session.getDescription());
+        editor.putString(CONTACT_NAME, Session.getContactName());
+        editor.putString(CONTACT_PHONE, Session.getContactPhone());
+        editor.putString(CONTACT_EMAIL, Session.getContactEmail());
+        editor.putLong(CREATION_TIME, Session.getCreationTime());
+        editor.putLong(LAST_LOGIN_TIME, Session.getLastLoginTime());
+
+        editor.putInt(TOTAL_DEVICES, Session.getTotalDevices());
+        editor.putString(SELECTED_GROUP, Session.getSelectedGroup());
+        editor.putInt(GROUP_POSITION, Session.getGroupPosition());
+
         editor.putString(LOCALE, this.getLocale());
         editor.putString(SEL_DEVICE, this.getSelDevice());
         editor.putString(SEL_DEVICE_DESC, this.getSelDeviceDesc());
-        editor.putString(SEL_GROUP, this.getSelGroup());
-        editor.putString(SEL_GROUP_DESC, this.getSelGroupDesc());
         editor.putBoolean(IS_FLEET, this.isFleet());
         editor.putString(LOADED_GROUP, this.getGroupList());
         editor.putBoolean(IS_SIGNED_IN, this.isSignedIn());

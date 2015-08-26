@@ -24,12 +24,15 @@ import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.Session;
+import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.model.MyResponse;
+import com.umaps.gpshandleclient.util.EBus;
 import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.PagerAdapter;
 import com.umaps.gpshandleclient.util.ReportGroupListViewAdapter;
 import com.umaps.gpshandleclient.util.StringTools;
+import com.umaps.gpshandleclient.view.GenericViewFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,10 +42,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by beou on 04/06/2015.
  */
-public class ReportPager extends Fragment {
+public class ReportPager extends GenericViewFragment {
 
     private static final String TAG = "ReportPager";
     private static final String TAG_REQUEST = "ReportPager";
@@ -67,33 +72,17 @@ public class ReportPager extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_pager_report, container, false);
+        Session.setSessionId(1);
         mViewPager = (ViewPager)view.findViewById(R.id.view_pager_report);
+
+        EventBus.getDefault().post(new UpdateEvent.OnLive(false));
+
         mApplication = MyApplication.getInstance();
         mTf = mApplication.getIconFont();
         mBarProgress = view.findViewById(R.id.bar_progress);
         mProgress = view.findViewById(R.id.progress);
 
         updateAllFragment();
-
-        View lGroupAll =  view.findViewById(R.id.l_group_all);
-        lGroupAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mApplication.setSelGroup("all");
-                mApplication.setSelGroupDesc(String.valueOf(getText(R.string.txt_group_all)));
-                mApplication.storeSettings();
-                updateAllFragment();
-            }
-        });
-
-        View deviceGroup = view.findViewById(R.id.device_group);
-        deviceGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleDeviceList();
-            }
-        });
-
         return view;
     }
     private List<Fragment> getFragments() {
@@ -106,13 +95,6 @@ public class ReportPager extends Fragment {
     }
 
     public void updateAllFragment() {
-
-        TextView tvDeviceGroupSearch = (TextView) view.findViewById(R.id.ic_device_group_search);
-        TextView txtDeviceGroup = (TextView) view.findViewById(R.id.txt_device_group);
-        tvDeviceGroupSearch.setTypeface(mTf);
-        tvDeviceGroupSearch.setText(String.valueOf((char) 0xe629));
-        txtDeviceGroup.setText(mApplication.getSelGroupDesc());
-
         List<Fragment> fragments = getFragments();
         PagerAdapter mPageAdapter = new PagerAdapter(getChildFragmentManager(), fragments);
         mViewPager.setAdapter(mPageAdapter);
@@ -162,95 +144,11 @@ public class ReportPager extends Fragment {
         });
     }
 
-    /**
-     * function toggle device list
-     **/
-    private void toggleDeviceList(){
-        if (view == null){
-            return;
-        }
-        final View layout = view.findViewById(R.id.rpt_group_list_layout);
-        if (layout.getVisibility()==View.VISIBLE){
-            layout.setVisibility(View.GONE);
-            return;
-        } else {
-            layout.setVisibility(View.VISIBLE);
-        }
-        mRequestGetGroup = new GpsRequest(getActivity());
-        mRequestGetGroup.setAccountID(Session.getAccountId());
-        mRequestGetGroup.setUserID(Session.getUserId());
-        mRequestGetGroup.setPassword(Session.getUserPassword());
-        mRequestGetGroup.setMethod(Request.Method.POST);
-        mRequestGetGroup.setUrl(GpsRequest.ADMIN_URL);
-        mRequestGetGroup.setCommand(GpsRequest.CMD_GET_GROUPS);
-        JSONObject params = createParams();
-        mRequestGetGroup.setParams(params);
-        mRequestGetGroup.setResponseHandler(new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                showProgress(false);
-                MyResponse mRes = new MyResponse(response);
-                if (mRes.isError()) {
-                    return;
-                }
-                groupsList = new ArrayList<>();
-                //HashMap<String, ArrayList<Device>> devicesInGroup = new HashMap<>();
-                try {
-                    JSONArray mJSONArray = (JSONArray) mRes.getData();
-                    for (int i = 0; i < mJSONArray.length(); i++) {
-                        JSONObject itemGroup = mJSONArray.getJSONObject(i);
-                        String accountID = itemGroup.getString("accountID");
-                        String groupID = itemGroup.getString("groupID");
-                        String pushpinID = itemGroup.getString("pushpinID");
-                        String groupDescription = itemGroup.getString("description");
-                        String groupDisplay = itemGroup.getString("displayName");
-                        int deviceCount = itemGroup.getInt("deviceCount");
-
-                        long currTimestamp = Calendar.getInstance().getTimeInMillis() / 1000;
-                        Group group = new Group(
-                                accountID,
-                                groupID,
-                                (groupDisplay == null ? groupDescription : groupDisplay),
-                                (groupDisplay == null ? groupDescription : groupDisplay),
-                                pushpinID/*icon*/,
-                                0/*countLive*//*live*/,
-                                deviceCount);
-                        groupsList.add(group);
-                        //devicesInGroup.put(groupID, mArrayDevice);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                ListView groupListView = (ListView) view.findViewById(R.id.rpt_group_list);
-                groupListView.setClickable(true);
-
-                groupListView.setAdapter(new ReportGroupListViewAdapter(getActivity(),
-                        R.layout.list_view_report_group,
-                        groupsList));
-                groupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Log.i(TAG, "You'v just clicked on: " + groupsList.get(position).getDisplayName());
-                        mApplication.setSelGroup(groupsList.get(position).getGroupId());
-                        mApplication.setSelGroupDesc(groupsList.get(position).getDisplayName());
-                        mApplication.storeSettings();
-                        updateAllFragment();
-                        layout.setVisibility(View.GONE);
-                    }
-                });
-            }
-        });
-        mRequestGetGroup.setRequestTag(TAG_REQUEST);
-        mRequestGetGroup.setErrorHandler(new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                showProgress(false);
-                Toast.makeText(getActivity(), "Error", Toast.LENGTH_LONG).show();
-            }
-        });
-        mRequestGetGroup.exec();
-        showProgress(true);
+    @EBus
+    public void onEventMainThread(UpdateEvent.GroupChanged groupChanged) {
+        updateAllFragment();
     }
+
     /**
      * Shows the progress UI and hides the login form.
      */

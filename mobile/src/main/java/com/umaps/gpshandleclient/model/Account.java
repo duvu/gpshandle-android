@@ -22,6 +22,7 @@ public class Account {
     private static final String DEVICE_COUNT        = "deviceCount";
     private static final String LAST_LOGIN_TIME     = "lastLoginTime";
     private static final String CREATION_TIME       = "creationTime";
+    private static final String IS_MANAGER          = "isAccountManager";
 
     private String id;
     private String description;
@@ -32,18 +33,20 @@ public class Account {
     private int device_count;
     private long last_login_time;
     private long creation_time;
+    private boolean isManager;
 
     public Account(JSONObject account){
         try {
-            this.id = account.getString(ACCOUNT_ID);
-            this.description = account.getString(DESCRIPTION);
-            this.display_name = account.getString(DISPLAY_NAME);
-            this.contact_name = account.getString(CONTACT_NAME);
-            this.contact_email = account.getString(CONTACT_EMAIL);
-            this.contact_phone = account.getString(CONTACT_PHONE);
-            this.device_count = account.getInt(DEVICE_COUNT);
-            this.last_login_time = account.getLong(LAST_LOGIN_TIME);
-            this.creation_time = account.getLong(CREATION_TIME);
+            this.id                 = account.has(ACCOUNT_ID) ? account.getString(ACCOUNT_ID) : "";
+            this.description        = account.has(DESCRIPTION) ? account.getString(DESCRIPTION) : "";
+            this.display_name       = account.has(DISPLAY_NAME) ? account.getString(DISPLAY_NAME) : "";
+            this.contact_name       = account.has(CONTACT_NAME) ? account.getString(CONTACT_NAME) : "";
+            this.contact_email      = account.has(CONTACT_EMAIL) ? account.getString(CONTACT_EMAIL) : "";
+            this.contact_phone      = account.has(CONTACT_PHONE) ? account.getString(CONTACT_PHONE) : "";
+            this.device_count       = account.has(DEVICE_COUNT) ? account.getInt(DEVICE_COUNT) : 0;
+            this.last_login_time    = account.has(LAST_LOGIN_TIME) ? account.getLong(LAST_LOGIN_TIME) : 0L;
+            this.creation_time      = account.has(CREATION_TIME) ? account.getLong(CREATION_TIME) : 0L;
+            this.isManager          = account.has(IS_MANAGER) ? account.getBoolean(IS_MANAGER) : false;
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -169,5 +172,13 @@ public class Account {
 
     public void setCreation_time(long creation_time) {
         this.creation_time = creation_time;
+    }
+
+    public boolean isManager() {
+        return isManager;
+    }
+
+    public void setManager(boolean isManager) {
+        this.isManager = isManager;
     }
 }

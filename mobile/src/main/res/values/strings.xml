@@ -4,7 +4,7 @@
     <string name="title_monitor">Monitor</string>
     <string name="title_historical">Touch here to see historical</string>
     <string name="title_report">Report</string>
-    <string name="title_administration">Admin</string>
+    <string name="title_administration">Administration</string>
     <string name="action_settings">Settings</string>
     <string name="action_logout">Logout</string>
     <string name="select_a_group">Select A Group</string>
@@ -122,9 +122,9 @@
     <string name="txt_user_contact_email">Contact Email*</string>
     <string name="failure_delete">Failed to delete</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="subtitle_group"></string>
-    <string name="action_list_groups"></string>
     <string name="title_help_feedback"><![CDATA[Help & feedback]]></string>
     <string name="title_logout">Logout</string>
     <string name="faq_screen_title">Frequently asked questions</string>
+    <string name="send_us_a_message">Send us a message</string>
+    <string name="contact_info">Contact infomations</string>
 </resources>

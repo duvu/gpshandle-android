@@ -76,7 +76,7 @@ public class RptEventCount extends Fragment {
         mRequest.setPassword(Session.getUserPassword());
         mRequest.setMethod(Request.Method.GET);
         String url = String.format(GpsRequest.CHART_SUMMARY_URL,
-                Session.getSessionToken(), mApplication.getSelGroup());
+                Session.getSessionToken(), Session.getSelectedGroup());
         mRequest.setUrl(url);
 
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
@@ -160,7 +160,6 @@ public class RptEventCount extends Fragment {
                 Log.e(TAG, error.toString());
             }
         });
-        mRequest.setRequestTag(TAG_REQUEST);
         mRequest.exec();
         showProgress(true);
         return view;

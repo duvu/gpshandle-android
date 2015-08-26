@@ -4,7 +4,9 @@ package com.umaps.gpshandleclient.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,12 +14,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.mikepenz.iconics.typeface.FontAwesome;
@@ -30,14 +39,21 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.event.UpdateEvent;
+import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.util.EBus;
+import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
@@ -74,16 +90,100 @@ public class MainActivity extends ActionBarActivity{
         if (!isUserSignedIn()){
             startLoginActivity();
             finish();
+            return;
         }
         setToolbar();
+        setupView();
+    }
+    @Override
+    protected void onDestroy() {
+        UnregisterEventBus();
+        super.onDestroy();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    private void doLogout(){
+        mApplication.setIsSignedIn(false);
+        GpsRequest.getInstance(getApplicationContext()).cancelAll();
+        //clean token
+        //Session.clean();
+        startLoginActivity();
+    }
+
+    private void startLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
+    // retrieve access token from preferences
+    public boolean isUserSignedIn() {
+        boolean hasUserData =
+                (
+                    (!StringTools.isBlank(Session.getAccountId())) &&
+                    (!StringTools.isBlank(Session.getUserId())) &&
+                    (!StringTools.isBlank(Session.getUserPassword()))
+                ) || (!StringTools.isBlank(Session.getSessionToken()));
+        long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
+        long expireOn = Session.getTokenExpired();
+        boolean isExpired = (expireOn <= currentTime);
+        return !isExpired && hasUserData && mApplication.isSignedIn();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+    }
+
+    private void setToolbar(){
+        //-- set toolbar
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //add group to spinner
+        final Spinner sp = (Spinner) toolbar.findViewById(R.id.spinner_group);
+        sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String groupId = ((ParseGroup)(parent.getAdapter().getItem(position))).getGroupId();
+                Session.setGroupPosition(position);
+                Session.setSelectedGroup(groupId);
+                EventBus.getDefault().post(new UpdateEvent.GroupChanged());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //no op
+            }
+        });
+
+        ParseQuery<ParseGroup> query = ParseQuery.getQuery(ParseGroup.class);
+        query.fromLocalDatastore();
+        query.setLimit(100);
+        onUpdating(true);
+        query.findInBackground(new FindCallback<ParseGroup>() {
+            @Override
+            public void done(List<ParseGroup> objects, ParseException e) {
+                onUpdating(false);
+                ParseGroup all = ParseGroup.getGroupAll();
+                all.setDeviceCount(Session.getTotalDevices());
+                objects.add(all);
+                GroupSpinner adapter = new GroupSpinner(getApplicationContext(), R.layout.spinner_group, objects);
+                sp.setAdapter(adapter);
+                sp.setSelection(Session.getGroupPosition());
+            }
+        });
+    }
+
+    private void setupView() {
         IProfile profile = new ProfileDrawerItem().withName(Session.getAccountId()+"/"+Session.getUserId())
-                .withEmail("hoaivubk@gmail.com")
+                .withEmail(Session.getContactEmail())
                 .withIcon("https://avatars3.githubusercontent.com/u/1476232?v=3&s=460");
 
         headerResult = new AccountHeaderBuilder().withActivity(this)
                 .withHeaderBackground(R.drawable.header)
-                .withSavedInstance(savedInstanceState)
                 .addProfiles(profile)
                 .build();
 
@@ -96,10 +196,10 @@ public class MainActivity extends ActionBarActivity{
                         new PrimaryDrawerItem().withName(R.string.title_report).withIcon(FontAwesome.Icon.faw_bar_chart).withIdentifier(2),
                         new PrimaryDrawerItem().withName(R.string.title_administration).withIcon(FontAwesome.Icon.faw_cog).withIdentifier(3),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName(R.string.title_help_feedback).withIcon(FontAwesome.Icon.faw_support).withIdentifier(4),
+                        //new PrimaryDrawerItem().withName(R.string.title_help_feedback).withIcon(FontAwesome.Icon.faw_support).withIdentifier(4),
                         new PrimaryDrawerItem().withName(R.string.title_logout).withIcon(FontAwesome.Icon.faw_sign_out).withIdentifier(5)
 
-                ).withSavedInstance(savedInstanceState)
+                )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(AdapterView<?> adapterView, View view, int i, long l, IDrawerItem iDrawerItem) {
@@ -122,8 +222,11 @@ public class MainActivity extends ActionBarActivity{
                                             .replace(R.id.container, AdmDispatcher.newInstance())
                                             .commit();
                                     break;
-                                case 4:
-                                    break;
+                                /*case 4:
+                                    getSupportFragmentManager().beginTransaction()
+                                            .replace(R.id.container, HelpFeedback.newInstance())
+                                            .commit();
+                                    break;*/
                                 case 5:
                                     doLogout();
                                     break;
@@ -138,51 +241,15 @@ public class MainActivity extends ActionBarActivity{
                 .replace(R.id.container, MapFragment.newInstance())
                 .addToBackStack("realTime").commit();
     }
-    @Override
-    protected void onDestroy() {
-        UnregisterEventBus();
-        super.onDestroy();
 
+    private void SetBulbStatus(boolean started) {
+        ImageView bulb = (ImageView) findViewById(R.id.notification_bulb);
+        bulb.setImageResource(started ? R.drawable.circle_green : R.drawable.circle_none);
     }
 
-    private void doLogout(){
-        mApplication.setIsSignedIn(false);
-        startLoginActivity();
-    }
-
-    private void startLoginActivity() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-    }
-    // retrieve access token from preferences
-    public boolean isUserSignedIn() {
-        boolean hasUserData =
-                (
-                    (!StringTools.isBlank(Session.getAccountId())) &&
-                    (!StringTools.isBlank(Session.getUserId())) &&
-                    (!StringTools.isBlank(Session.getUserPassword()))
-                ) || (!StringTools.isBlank(Session.getSessionToken()));
-        long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
-        long expireOn = mApplication.getExpireOn();
-
-        Log.i(TAG, "Current Time: " + currentTime);
-        Log.i(TAG, "Expired On: " + expireOn);
-
-        boolean isExpired = (expireOn <= currentTime);
-
-        return !isExpired && hasUserData && mApplication.isSignedIn();
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-    }
-
-    private void setToolbar(){
-        //-- set toolbar
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    @EBus
+    public void onEventMainThread(UpdateEvent.OnLive onLive) {
+        SetBulbStatus(onLive.isLive());
     }
 
     @EBus
@@ -208,9 +275,6 @@ public class MainActivity extends ActionBarActivity{
         }
     }
 
-    public void showProgress(final boolean show) {
-
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
@@ -221,5 +285,51 @@ public class MainActivity extends ActionBarActivity{
         return super.onOptionsItemSelected(item);
     }
 
+    private class GroupSpinner extends BaseAdapter {
+        private LayoutInflater mInflater;
+        private int mResource;
+        private List<ParseGroup> items;
 
+        public GroupSpinner(Context context, int resource, List<ParseGroup> objects) {
+            mInflater = LayoutInflater.from(context);
+            mResource = resource;
+            items = objects;
+        }
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+            if (convertView == null) {
+                convertView = mInflater.inflate(mResource, parent, false);
+                holder = new ViewHolder();
+                holder.name = (TextView) convertView.findViewById(R.id.spinner_group_name);
+                holder.size = (TextView) convertView.findViewById(R.id.spinner_group_size);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder)convertView.getTag();
+            }
+            holder.name.setText(items.get(position).getName());
+            holder.size.setText(String.valueOf(items.get(position).getDeviceCount()));
+            return convertView;
+        }
+    }
+    private class ViewHolder {
+        TextView name;
+        TextView size;
+    }
 }
