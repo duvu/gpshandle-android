@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.util;
+package com.umaps.gpssdk;
 
 import android.content.Context;
 import android.graphics.Bitmap;

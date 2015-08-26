@@ -1,12 +1,11 @@
-package com.umaps.gpshandleclient.model;
+package com.umaps.gpssdk.model;
 
 import android.content.Context;
 
 import com.android.volley.Request;
-import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.Session;
-import com.umaps.gpshandleclient.util.GpsRequest;
-import com.umaps.gpshandleclient.util.StringTools;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.StringTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,7 +47,6 @@ public class Device {
 
 
     private Context context;
-    private MyApplication myApplication;
 
     private String accountID;
     private String deviceID;
@@ -112,7 +110,6 @@ public class Device {
     public Device(){}
     public Device(Context context){
         this.context = context;
-        myApplication = MyApplication.getInstance();
     }
 
     public Device(String deviceID, String description) {
@@ -342,13 +339,10 @@ public class Device {
 
     public GpsRequest getRequestCreate(){
         GpsRequest crtRequest = new GpsRequest(context);
-        if (myApplication == null) {
-            myApplication = MyApplication.getInstance();
-        }
-        crtRequest.setAccountID(Session.getAccountId());
-        crtRequest.setUserID(Session.getUserId());
-        crtRequest.setPassword(Session.getUserPassword());
-        crtRequest.setLocale(myApplication.getLocale());
+        crtRequest.setAccountID(GpsSdk.getAccountId());
+        crtRequest.setUserID(GpsSdk.getUserId());
+        crtRequest.setPassword(GpsSdk.getUserPassword());
+//        crtRequest.setLocale(myApplication.getLocale());
         crtRequest.setUrl(GpsRequest.ADMIN_URL);
         crtRequest.setMethod(Request.Method.POST);
         crtRequest.setCommand(GpsRequest.CMD_CREATE_DEVICE);
@@ -358,13 +352,10 @@ public class Device {
 
     public GpsRequest getRequestEdit() {
         GpsRequest edtRequest = new GpsRequest(context);
-        if (myApplication == null) {
-            myApplication = MyApplication.getInstance();
-        }
-        edtRequest.setAccountID(Session.getAccountId());
-        edtRequest.setUserID(Session.getUserId());
-        edtRequest.setPassword(Session.getUserPassword());
-        edtRequest.setLocale(myApplication.getLocale());
+        edtRequest.setAccountID(GpsSdk.getAccountId());
+        edtRequest.setUserID(GpsSdk.getUserId());
+        edtRequest.setPassword(GpsSdk.getUserPassword());
+//        edtRequest.setLocale(myApplication.getLocale());
         edtRequest.setUrl(GpsRequest.ADMIN_URL);
         edtRequest.setMethod(Request.Method.POST);
         edtRequest.setParams(buildParams());
@@ -374,13 +365,10 @@ public class Device {
 
     public GpsRequest getRequestDelete() {
         GpsRequest deleteRequest = new GpsRequest(context);
-        if (myApplication == null) {
-            myApplication = MyApplication.getInstance();
-        }
-        deleteRequest.setAccountID(Session.getAccountId());
-        deleteRequest.setUserID(Session.getUserId());
-        deleteRequest.setPassword(Session.getUserPassword());
-        deleteRequest.setLocale(myApplication.getLocale());
+        deleteRequest.setAccountID(GpsSdk.getAccountId());
+        deleteRequest.setUserID(GpsSdk.getUserId());
+        deleteRequest.setPassword(GpsSdk.getUserPassword());
+//        deleteRequest.setLocale(myApplication.getLocale());
         deleteRequest.setUrl(GpsRequest.ADMIN_URL);
         deleteRequest.setMethod(Request.Method.POST);
         deleteRequest.setParams(buildParams());

@@ -1,11 +1,11 @@
-package com.umaps.gpshandleclient;
+package com.umaps.gpssdk;
 
-import android.app.Application;
+import android.content.Context;
 
 /**
  * Created by beou on 16/08/2015.
  */
-public class Session extends Application {
+public class GpsSdk {
     //-- to store all session-variables here
     //--1 account-name
     //--2 account-email
@@ -42,7 +42,7 @@ public class Session extends Application {
     }
 
     public static void setAccountId(String accountId) {
-        Session.accountId = accountId;
+        GpsSdk.accountId = accountId;
     }
 
     public static boolean isAccountManager() {
@@ -50,7 +50,7 @@ public class Session extends Application {
     }
 
     public static void setAccountManager(boolean manager) {
-        Session.isAccountManager = manager;
+        GpsSdk.isAccountManager = manager;
     }
 
     public static String getUserId() {
@@ -58,7 +58,7 @@ public class Session extends Application {
     }
 
     public static void setUserId(String userId) {
-        Session.userId = userId;
+        GpsSdk.userId = userId;
     }
 
     public static String getDisplayName() {
@@ -66,7 +66,7 @@ public class Session extends Application {
     }
 
     public static void setDisplayName(String displayName) {
-        Session.displayName = displayName;
+        GpsSdk.displayName = displayName;
     }
 
     public static String getDescription() {
@@ -74,7 +74,7 @@ public class Session extends Application {
     }
 
     public static void setDescription(String description) {
-        Session.description = description;
+        GpsSdk.description = description;
     }
 
     public static String getContactName() {
@@ -82,7 +82,7 @@ public class Session extends Application {
     }
 
     public static void setContactName(String contactName) {
-        Session.contactName = contactName;
+        GpsSdk.contactName = contactName;
     }
 
     public static String getContactPhone() {
@@ -90,7 +90,7 @@ public class Session extends Application {
     }
 
     public static void setContactPhone(String contactPhone) {
-        Session.contactPhone = contactPhone;
+        GpsSdk.contactPhone = contactPhone;
     }
 
     public static String getContactEmail() {
@@ -98,7 +98,7 @@ public class Session extends Application {
     }
 
     public static void setContactEmail(String contactEmail) {
-        Session.contactEmail = contactEmail;
+        GpsSdk.contactEmail = contactEmail;
     }
 
     public static long getCreationTime() {
@@ -106,7 +106,7 @@ public class Session extends Application {
     }
 
     public static void setCreationTime(long creationTime) {
-        Session.creationTime = creationTime;
+        GpsSdk.creationTime = creationTime;
     }
 
     public static long getLastLoginTime() {
@@ -114,7 +114,7 @@ public class Session extends Application {
     }
 
     public static void setLastLoginTime(long lastLoginTime) {
-        Session.lastLoginTime = lastLoginTime;
+        GpsSdk.lastLoginTime = lastLoginTime;
     }
 
     public static String getUserProfileImage() {
@@ -122,7 +122,7 @@ public class Session extends Application {
     }
 
     public static void setUserProfileImage(String userProfileImage) {
-        Session.userProfileImage = userProfileImage;
+        GpsSdk.userProfileImage = userProfileImage;
     }
 
     public static String getSessionToken() {
@@ -130,7 +130,7 @@ public class Session extends Application {
     }
 
     public static void setSessionToken(String sessionToken) {
-        Session.sessionToken = sessionToken;
+        GpsSdk.sessionToken = sessionToken;
     }
 
     public static long getTokenExpired() {
@@ -138,7 +138,7 @@ public class Session extends Application {
     }
 
     public static void setTokenExpired(long tokenExpired) {
-        Session.tokenExpired = tokenExpired;
+        GpsSdk.tokenExpired = tokenExpired;
     }
 
     public static String getUserPassword() {
@@ -146,7 +146,7 @@ public class Session extends Application {
     }
 
     public static void setUserPassword(String userPassword) {
-        Session.userPassword = userPassword;
+        GpsSdk.userPassword = userPassword;
     }
 
     public static int getTotalDevices() {
@@ -154,7 +154,7 @@ public class Session extends Application {
     }
 
     public static void setTotalDevices(int totalDevices) {
-        Session.totalDevices = totalDevices;
+        GpsSdk.totalDevices = totalDevices;
     }
 
     public static String getSelectedGroup() {
@@ -162,7 +162,7 @@ public class Session extends Application {
     }
 
     public static void setSelectedGroup(String selectedGroup) {
-        Session.selectedGroup = selectedGroup;
+        GpsSdk.selectedGroup = selectedGroup;
     }
 
     public static int getGroupPosition() {
@@ -170,7 +170,7 @@ public class Session extends Application {
     }
 
     public static void setGroupPosition(int groupPosition) {
-        Session.groupPosition = groupPosition;
+        GpsSdk.groupPosition = groupPosition;
     }
 
     public static int getSessionId() {
@@ -178,7 +178,7 @@ public class Session extends Application {
     }
 
     public static void setSessionId(int sessionId) {
-        Session.sessionId = sessionId;
+        GpsSdk.sessionId = sessionId;
     }
 
     public static void clean() {
@@ -190,5 +190,9 @@ public class Session extends Application {
         sessionToken = null;
         tokenExpired = -1;
         userPassword = null;
+    }
+
+    public static final void initialize(Context context) {
+        // TODO: 26/08/2015 initialize gps-sdk
     }
 }

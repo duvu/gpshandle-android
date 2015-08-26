@@ -1,12 +1,11 @@
-package com.umaps.gpshandleclient.model;
+package com.umaps.gpssdk.model;
 
 import android.content.Context;
 
 import com.android.volley.Request;
-import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.Session;
-import com.umaps.gpshandleclient.util.GpsRequest;
-import com.umaps.gpshandleclient.util.StringTools;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.StringTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,8 +39,6 @@ public class Group {
     private String notes;
 
     Context context;
-    MyApplication mApplication;
-
 
     private String icon;
     private int live = 0;
@@ -74,7 +71,6 @@ public class Group {
 
     public Group(Context context) {
         this.context = context;
-        mApplication = MyApplication.getInstance();
     }
 
     public Group(String accountID, String groupId, String description,
@@ -214,12 +210,9 @@ public class Group {
     public GpsRequest getRequestCreate(){
         if (this.context == null) return null;
         GpsRequest r = new GpsRequest(context);
-        if (mApplication == null) {
-            mApplication = MyApplication.getInstance();
-        }
-        r.setAccountID(Session.getAccountId());
-        r.setUserID(Session.getUserId());
-        r.setPassword(Session.getUserPassword());
+        r.setAccountID(GpsSdk.getAccountId());
+        r.setUserID(GpsSdk.getUserId());
+        r.setPassword(GpsSdk.getUserPassword());
         r.setCommand(GpsRequest.CMD_CREATE_GROUP);
         r.setMethod(Request.Method.POST);
         r.setUrl(GpsRequest.ADMIN_URL);
@@ -231,12 +224,9 @@ public class Group {
         if (this.context == null) return null;
 
         GpsRequest r = new GpsRequest(context);
-        if (mApplication == null) {
-            mApplication = MyApplication.getInstance();
-        }
-        r.setAccountID(Session.getAccountId());
-        r.setUserID(Session.getUserId());
-        r.setPassword(Session.getUserPassword());
+        r.setAccountID(GpsSdk.getAccountId());
+        r.setUserID(GpsSdk.getUserId());
+        r.setPassword(GpsSdk.getUserPassword());
         r.setCommand(GpsRequest.CMD_UPDATE_GROUP);
         r.setMethod(Request.Method.POST);
         r.setUrl(GpsRequest.ADMIN_URL);
@@ -247,12 +237,9 @@ public class Group {
         if (this.context == null) return null;
 
         GpsRequest r = new GpsRequest(context);
-        if (mApplication == null) {
-            mApplication = MyApplication.getInstance();
-        }
-        r.setAccountID(Session.getAccountId());
-        r.setUserID(Session.getUserId());
-        r.setPassword(Session.getUserPassword());
+        r.setAccountID(GpsSdk.getAccountId());
+        r.setUserID(GpsSdk.getUserId());
+        r.setPassword(GpsSdk.getUserPassword());
         r.setCommand(GpsRequest.CMD_DELETE_GROUP);
         r.setMethod(Request.Method.POST);
         r.setUrl(GpsRequest.ADMIN_URL);

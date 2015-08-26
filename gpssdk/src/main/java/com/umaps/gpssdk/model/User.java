@@ -1,12 +1,11 @@
-package com.umaps.gpshandleclient.model;
+package com.umaps.gpssdk.model;
 
 import android.content.Context;
 
 import com.android.volley.Request;
-import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.Session;
-import com.umaps.gpshandleclient.util.GpsRequest;
-import com.umaps.gpshandleclient.util.StringTools;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.StringTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +46,6 @@ public class User {
     private ArrayList<Group> groupList;
 
     private Context context;
-    private MyApplication mApplication;
 
     public User(JSONObject jsonUser) {
         try {
@@ -80,7 +78,6 @@ public class User {
 
     public User(Context context) {
         this.context = context;
-        mApplication = MyApplication.getInstance();
     }
 
     public static JSONObject createParams(){
@@ -209,13 +206,10 @@ public class User {
 
     public GpsRequest getRequestCreate() {
         GpsRequest r = new GpsRequest(context);
-        if (mApplication == null) {
-            mApplication = MyApplication.getInstance();
-        }
-        r.setAccountID(Session.getAccountId());
-        r.setUserID(Session.getUserId());
-        r.setPassword(Session.getUserPassword());
-        r.setLocale(mApplication.getLocale());
+        r.setAccountID(GpsSdk.getAccountId());
+        r.setUserID(GpsSdk.getUserId());
+        r.setPassword(GpsSdk.getUserPassword());
+        //r.setLocale(mApplication.getLocale());
         r.setUrl(GpsRequest.ADMIN_URL);
         r.setMethod(Request.Method.POST);
         r.setCommand(GpsRequest.CMD_CREATE_USER);
@@ -224,13 +218,10 @@ public class User {
     }
     public GpsRequest getRequestEdit() {
         GpsRequest r = new GpsRequest(context);
-        if (mApplication == null) {
-            mApplication = MyApplication.getInstance();
-        }
-        r.setAccountID(Session.getAccountId());
-        r.setUserID(Session.getUserId());
-        r.setPassword(Session.getUserPassword());
-        r.setLocale(mApplication.getLocale());
+        r.setAccountID(GpsSdk.getAccountId());
+        r.setUserID(GpsSdk.getUserId());
+        r.setPassword(GpsSdk.getUserPassword());
+        //r.setLocale(mApplication.getLocale());
         r.setUrl(GpsRequest.ADMIN_URL);
         r.setMethod(Request.Method.POST);
         r.setCommand(GpsRequest.CMD_UPDATE_USER);
@@ -239,13 +230,10 @@ public class User {
     }
     public GpsRequest getRequestDelete() {
         GpsRequest r = new GpsRequest(context);
-        if (mApplication == null) {
-            mApplication = MyApplication.getInstance();
-        }
-        r.setAccountID(Session.getAccountId());
-        r.setUserID(Session.getUserId());
-        r.setPassword(Session.getUserPassword());
-        r.setLocale(mApplication.getLocale());
+        r.setAccountID(GpsSdk.getAccountId());
+        r.setUserID(GpsSdk.getUserId());
+        r.setPassword(GpsSdk.getUserPassword());
+        //r.setLocale(mApplication.getLocale());
         r.setUrl(GpsRequest.ADMIN_URL);
         r.setMethod(Request.Method.POST);
         r.setCommand(GpsRequest.CMD_DELETE_USER);
