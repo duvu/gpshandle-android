@@ -22,10 +22,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.Session;
-import com.umaps.gpshandleclient.model.Account;
 import com.umaps.gpshandleclient.model.MyResponse;
-import com.umaps.gpshandleclient.util.GpsRequest;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.model.Account;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -86,9 +86,9 @@ public class AdmAccount extends Fragment {
         setBottomToolbar();
 
         mRequest = new GpsRequest(getActivity());
-        mRequest.setAccountID(Session.getAccountId());
-        mRequest.setUserID(Session.getUserId());
-        mRequest.setPassword(Session.getUserPassword());
+        mRequest.setAccountID(GpsSdk.getAccountId());
+        mRequest.setUserID(GpsSdk.getUserId());
+        mRequest.setPassword(GpsSdk.getUserPassword());
         mRequest.setUrl(GpsRequest.ADMIN_URL);
         mRequest.setMethod(Request.Method.POST);
         mRequest.setCommand(GpsRequest.CMD_GET_AUTHORIZED_ACCOUNTS);
@@ -147,7 +147,7 @@ public class AdmAccount extends Fragment {
         TextView txtDeleteAccount = (TextView) view.findViewById(R.id.txt_delete);
         txtDeleteAccount.setText(R.string.delete);
 
-        if (Session.isAccountManager()) {
+        if (GpsSdk.isAccountManager()) {
             View addAccount = view.findViewById(R.id.add);
             View deleteAccount = view.findViewById(R.id.delete);
             View editAccount = view.findViewById(R.id.edit);

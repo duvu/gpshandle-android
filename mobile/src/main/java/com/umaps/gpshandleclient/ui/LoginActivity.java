@@ -9,7 +9,6 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -19,19 +18,17 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.SaveCallback;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.Session;
-import com.umaps.gpshandleclient.model.Account;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.model.ParseLoginEvent;
-import com.umaps.gpshandleclient.model.User;
-import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.model.Account;
+import com.umaps.gpssdk.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,13 +76,13 @@ public class LoginActivity extends FragmentActivity {
 
         //-- save application setting
         final EditText edtAccount = (EditText) findViewById(R.id.edt_account);
-        edtAccount.setText(Session.getAccountId());
+        edtAccount.setText(GpsSdk.getAccountId());
 
         final EditText edtUser = (EditText) findViewById(R.id.edt_user);
-        edtUser.setText(Session.getUserId());
+        edtUser.setText(GpsSdk.getUserId());
 
         final EditText edtPassword = (EditText) findViewById(R.id.edt_password);
-        edtPassword.setText(Session.getUserPassword());
+        edtPassword.setText(GpsSdk.getUserPassword());
 
         aclRequest = new GpsRequest(this);
         tokenRequest = new GpsRequest(this);
@@ -104,10 +101,10 @@ public class LoginActivity extends FragmentActivity {
                     return;
                 }
 
-                //-- save to SessionState
-                Session.setAccountId(accountID);
-                Session.setUserId(userID);
-                Session.setUserPassword(password);
+                //-- save to GpsSdkState
+                GpsSdk.setAccountId(accountID);
+                GpsSdk.setUserId(userID);
+                GpsSdk.setUserPassword(password);
 
                 //-- getting data and store
                 getData();
@@ -158,20 +155,20 @@ public class LoginActivity extends FragmentActivity {
 
                 //-- store: contactPhone, contactName, contactEmail, description, displayName, creationTime, lastLoginTime
                 User u = new User(result);
-                Session.setDisplayName(u.getDisplayName());
-                Session.setDescription(u.getDescription());
-                Session.setContactName(u.getContactName());
-                Session.setContactPhone(u.getContactPhone());
-                Session.setContactEmail(u.getContactEmail());
-                Session.setCreationTime(u.getCreationTime());
-                Session.setLastLoginTime(u.getLastLoginTime());
-                saveEventLogin(Session.getAccountId(), Session.getUserId());
+                GpsSdk.setDisplayName(u.getDisplayName());
+                GpsSdk.setDescription(u.getDescription());
+                GpsSdk.setContactName(u.getContactName());
+                GpsSdk.setContactPhone(u.getContactPhone());
+                GpsSdk.setContactEmail(u.getContactEmail());
+                GpsSdk.setCreationTime(u.getCreationTime());
+                GpsSdk.setLastLoginTime(u.getLastLoginTime());
+                saveEventLogin(GpsSdk.getAccountId(), GpsSdk.getUserId());
                 groupRequest.exec();
             }
         });
 
         //-- get account-info
-        accountRequest = GpsRequest.getAccountRequest(LoginActivity.this); //new GpsRequest(this);
+        accountRequest = GpsRequest.getAccountRequest(LoginActivity.this);
         String[] lf = new String[] {"isAccountManager", "deviceCount"};
         JSONObject accParam = Account.createParam(lf);
         accountRequest.setParams(accParam);
@@ -184,8 +181,8 @@ public class LoginActivity extends FragmentActivity {
                 Account account = new Account(result);
                 boolean isManager = account.isManager();
                 int count = account.getDevice_count();
-                Session.setAccountManager(isManager);
-                Session.setTotalDevices(count);
+                GpsSdk.setAccountManager(isManager);
+                GpsSdk.setTotalDevices(count);
                 userRequest.exec();
             }
         });
@@ -224,16 +221,16 @@ public class LoginActivity extends FragmentActivity {
         tokenRequest = GpsRequest.getTokenRequest(LoginActivity.this);
         JSONObject params = new JSONObject();
         try {
-            params.put(GpsRequest.KEY_ACCOUNT_ID, Session.getAccountId());
-            params.put(GpsRequest.KEY_USER_ID, Session.getUserId());
-            params.put(GpsRequest.KEY_PASSWORD, Session.getUserPassword());
+            params.put(GpsRequest.KEY_ACCOUNT_ID, GpsSdk.getAccountId());
+            params.put(GpsRequest.KEY_USER_ID, GpsSdk.getUserId());
+            params.put(GpsRequest.KEY_PASSWORD, GpsSdk.getUserPassword());
             params.put(GpsRequest.KEY_LOCALE, Locale.getDefault().getLanguage());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         //tokenRequest.setParams(params);
-        tokenRequest.setUrl(GpsRequest.TOKEN_URL);
-        tokenRequest.setMethod(Request.Method.POST);
+        //tokenRequest.setUrl(GpsRequest.TOKEN_URL);
+        //tokenRequest.setMethod(Request.Method.POST);
         Response.Listener<JSONObject> tokeHanler = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -253,13 +250,13 @@ public class LoginActivity extends FragmentActivity {
                     e.printStackTrace();
                 }
                 mApplication.setIsSignedIn(true);
-                Session.setSessionToken(token);
-                Session.setTokenExpired(expiredOn);
+                GpsSdk.setSessionToken(token);
+                GpsSdk.setTokenExpired(expiredOn);
                 aclRequest.exec();
             }
         };
         tokenRequest.setResponseHandler(tokeHanler);
-        tokenRequest.setErrorHandler();
+        //tokenRequest.setErrorHandler();
         tokenRequest.exec(params);
         showProgress(true);
     }

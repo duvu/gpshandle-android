@@ -15,11 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ExpandableListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.maps.CameraUpdate;
@@ -37,33 +34,24 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterManager;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.cluster.TrackClusterManager;
 import com.umaps.gpshandleclient.cluster.TrackInfoWindowAdapter;
 import com.umaps.gpshandleclient.cluster.TrackClusterRenderer;
 import com.umaps.gpshandleclient.event.UpdateEvent;
-import com.umaps.gpshandleclient.model.Device;
-import com.umaps.gpshandleclient.model.Group;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.model.MapData;
 import com.umaps.gpshandleclient.model.MapPoint;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.model.TrackItem;
 import com.umaps.gpshandleclient.util.EBus;
-import com.umaps.gpshandleclient.util.GpsRequest;
-import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
-import com.umaps.gpshandleclient.util.DeviceGroupListAdapter;
 import com.umaps.gpshandleclient.view.GenericViewFragment;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -109,7 +97,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_monitoring, container, false);
-        Session.setSessionId(0); //to track page
+        GpsSdk.setSessionId(0); //to track page
         mBarProgress = view.findViewById(R.id.bar_progress);
         mProgress = view.findViewById(R.id.progress);
         mView = view.findViewById(R.id.map);
@@ -189,7 +177,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
 
         EventBus.getDefault().post(new UpdateEvent.OnLive(true));
         isShowing = false;
-        String groupId = Session.getSelectedGroup(); //mApplication.getSelGroup();
+        String groupId = GpsSdk.getSelectedGroup(); //mApplication.getSelGroup();
 
         monitorRequest = GpsRequest.getFleetRequest(getActivity(), groupId);
         Response.Listener<JSONObject> responseHandler = new Response.Listener<JSONObject>() {
@@ -257,7 +245,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (Session.getSessionId() != 0) {
+                        if (GpsSdk.getSessionId() != 0) {
                             return;
                         }
                         EventBus.getDefault().post(new UpdateEvent.OnLoading(true));

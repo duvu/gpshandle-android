@@ -24,11 +24,11 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GPSColors;
-import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,12 +71,12 @@ public class RptEventCount extends Fragment {
         Utils.init(getResources());
         mChart = (HorizontalBarChart) view.findViewById(R.id.event_count_chart);
         mRequest = new GpsRequest(getActivity());
-        mRequest.setAccountID(Session.getAccountId());
-        mRequest.setUserID(Session.getUserId());
-        mRequest.setPassword(Session.getUserPassword());
+        mRequest.setAccountID(GpsSdk.getAccountId());
+        mRequest.setUserID(GpsSdk.getUserId());
+        mRequest.setPassword(GpsSdk.getUserPassword());
         mRequest.setMethod(Request.Method.GET);
         String url = String.format(GpsRequest.CHART_SUMMARY_URL,
-                Session.getSessionToken(), Session.getSelectedGroup());
+                GpsSdk.getSessionToken(), GpsSdk.getSelectedGroup());
         mRequest.setUrl(url);
 
         mRequest.setResponseHandler(new Response.Listener<JSONObject>() {

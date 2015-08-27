@@ -1,20 +1,35 @@
 package com.umaps.gpssdk;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
  * Created by beou on 16/08/2015.
  */
 public class GpsSdk {
-    //-- to store all session-variables here
-    //--1 account-name
-    //--2 account-email
-    //--3 account-profile-image
-    //--4 user-name
-    //--5 user-email
-    //--6 user-profile-image
-    //--7 session-token
-    //--8 password
+
+    private static final String ACCOUNT_ID              = "accountID";
+    private static final String USER_ID                 = "userID";
+    private static final String PASSWORD                = "password";
+    private static final String TOKEN                   = "token";
+    private static final String EXPIRED_ON              = "expiredOn";
+
+    private static final String USER_DISPLAY_NAME       = "displayName";
+    private static final String USER_DESCRIPTION        = "desciption";
+    private static final String CONTACT_NAME            = "contactName";
+    private static final String CONTACT_EMAIL           = "contactEmail";
+    private static final String CONTACT_PHONE           = "contactPhone";
+    private static final String CREATION_TIME           = "creationTime";
+    private static final String LAST_LOGIN_TIME         = "lastLoginTime";
+
+    private static final String TOTAL_DEVICES           = "totalDevices";
+    private static final String SELECTED_GROUP          = "selGroup";
+    private static final String GROUP_POSITION          = "groupPosition";
+
+    private static Context context;
+    private static boolean hasError;
+
     private static String accountId;
     private static boolean isAccountManager;
     private static String userId;
@@ -36,6 +51,14 @@ public class GpsSdk {
     private static int groupPosition;
 
     private static int sessionId;
+
+    public static boolean hasError() {
+        return hasError;
+    }
+
+    public static void setError(boolean hasError) {
+        GpsSdk.hasError = hasError;
+    }
 
     public static String getAccountId() {
         return accountId;
@@ -193,6 +216,53 @@ public class GpsSdk {
     }
 
     public static final void initialize(Context context) {
-        // TODO: 26/08/2015 initialize gps-sdk
+        if (context == null) {
+            //-- setError
+            setError(true);
+            return;
+        }
+        GpsSdk.context = context;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsSdk.context);
+        GpsSdk.setAccountId     (prefs.getString    (ACCOUNT_ID         , ""));
+        GpsSdk.setUserId        (prefs.getString    (USER_ID            , ""));
+        GpsSdk.setSessionToken  (prefs.getString    (TOKEN              , ""));
+        GpsSdk.setTokenExpired  (prefs.getLong      (EXPIRED_ON         , 0L));
+        GpsSdk.setUserPassword  (prefs.getString    (PASSWORD           , ""));
+        GpsSdk.setDisplayName   (prefs.getString    (USER_DISPLAY_NAME  , ""));
+        GpsSdk.setDescription   (prefs.getString    (USER_DESCRIPTION   , ""));
+        GpsSdk.setContactName   (prefs.getString    (CONTACT_NAME       , ""));
+        GpsSdk.setContactPhone  (prefs.getString    (CONTACT_PHONE      , ""));
+        GpsSdk.setContactEmail  (prefs.getString    (CONTACT_EMAIL      , ""));
+        GpsSdk.setCreationTime  (prefs.getLong      (CREATION_TIME      , 0L));
+        GpsSdk.setLastLoginTime (prefs.getLong      (LAST_LOGIN_TIME    , 0L));
+        GpsSdk.setTotalDevices  (prefs.getInt       (TOTAL_DEVICES      , 0));
+        GpsSdk.setSelectedGroup (prefs.getString    (SELECTED_GROUP     , "all"));
+        GpsSdk.setGroupPosition (prefs.getInt       (GROUP_POSITION     , 0));
+    }
+    public static final void saveInstanceState(){
+        if (context == null) {
+            //-- SDK has not been initialized yet
+            setError(true);
+            return;
+        }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsSdk.context);
+        SharedPreferences.Editor e = prefs.edit();
+        e.putString (ACCOUNT_ID,        GpsSdk.getAccountId());
+        e.putString (USER_ID,           GpsSdk.getUserId());
+        e.putString (PASSWORD,          GpsSdk.getUserPassword());
+        e.putString (TOKEN,             GpsSdk.getSessionToken());
+        e.putLong   (EXPIRED_ON,        GpsSdk.getTokenExpired());
+
+        e.putString (USER_DISPLAY_NAME, GpsSdk.getDisplayName());
+        e.putString (USER_DESCRIPTION,  GpsSdk.getDescription());
+        e.putString (CONTACT_NAME,      GpsSdk.getContactName());
+        e.putString (CONTACT_PHONE,     GpsSdk.getContactPhone());
+        e.putString (CONTACT_EMAIL,     GpsSdk.getContactEmail());
+        e.putLong   (CREATION_TIME,     GpsSdk.getCreationTime());
+        e.putLong   (LAST_LOGIN_TIME,   GpsSdk.getLastLoginTime());
+
+        e.putInt    (TOTAL_DEVICES,     GpsSdk.getTotalDevices());
+        e.putString (SELECTED_GROUP,    GpsSdk.getSelectedGroup());
+        e.putInt    (GROUP_POSITION,    GpsSdk.getGroupPosition());
     }
 }

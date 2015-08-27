@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.util.PagerAdapter;
 import com.umaps.gpshandleclient.view.GenericViewFragment;
+import com.umaps.gpssdk.GpsSdk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class AdmDispatcher extends GenericViewFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_pager_admin, container, false);
-        Session.setSessionId(2);
+        GpsSdk.setSessionId(2);
         EventBus.getDefault().post(new UpdateEvent.OnLive(false));
         mViewPager = (ViewPager) view.findViewById(R.id.view_pager_admin);
         mApplication = MyApplication.getInstance();

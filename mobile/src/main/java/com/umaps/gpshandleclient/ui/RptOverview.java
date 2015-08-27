@@ -27,10 +27,10 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GPSColors;
-import com.umaps.gpshandleclient.util.GpsRequest;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -95,12 +95,12 @@ public class RptOverview extends Fragment {
 
         mRequest = new GpsRequest(getActivity());
 
-        mRequest.setAccountID(Session.getAccountId());
-        mRequest.setUserID(Session.getUserId());
-        mRequest.setPassword(Session.getUserPassword());
+        mRequest.setAccountID(GpsSdk.getAccountId());
+        mRequest.setUserID(GpsSdk.getUserId());
+        mRequest.setPassword(GpsSdk.getUserPassword());
         mRequest.setMethod(Request.Method.GET);
 
-        String url = String.format(GpsRequest.CHART_STATE_URL, Session.getSessionToken(), Session.getSelectedGroup());
+        String url = String.format(GpsRequest.CHART_STATE_URL, GpsSdk.getSessionToken(), GpsSdk.getSelectedGroup());
         mRequest.setUrl(url);
 
         //-- prepare piechart data

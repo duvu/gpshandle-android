@@ -6,27 +6,21 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.mikepenz.iconics.typeface.FontAwesome;
@@ -44,14 +38,13 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.util.EBus;
-import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.StringTools;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -122,12 +115,12 @@ public class MainActivity extends ActionBarActivity{
     public boolean isUserSignedIn() {
         boolean hasUserData =
                 (
-                    (!StringTools.isBlank(Session.getAccountId())) &&
-                    (!StringTools.isBlank(Session.getUserId())) &&
-                    (!StringTools.isBlank(Session.getUserPassword()))
-                ) || (!StringTools.isBlank(Session.getSessionToken()));
+                    (!StringTools.isBlank(GpsSdk.getAccountId())) &&
+                    (!StringTools.isBlank(GpsSdk.getUserId())) &&
+                    (!StringTools.isBlank(GpsSdk.getUserPassword()))
+                ) || (!StringTools.isBlank(GpsSdk.getSessionToken()));
         long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
-        long expireOn = Session.getTokenExpired();
+        long expireOn = GpsSdk.getTokenExpired();
         boolean isExpired = (expireOn <= currentTime);
         return !isExpired && hasUserData && mApplication.isSignedIn();
     }
@@ -148,8 +141,8 @@ public class MainActivity extends ActionBarActivity{
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String groupId = ((ParseGroup)(parent.getAdapter().getItem(position))).getGroupId();
-                Session.setGroupPosition(position);
-                Session.setSelectedGroup(groupId);
+                GpsSdk.setGroupPosition(position);
+                GpsSdk.setSelectedGroup(groupId);
                 EventBus.getDefault().post(new UpdateEvent.GroupChanged());
             }
 
@@ -168,18 +161,18 @@ public class MainActivity extends ActionBarActivity{
             public void done(List<ParseGroup> objects, ParseException e) {
                 onUpdating(false);
                 ParseGroup all = ParseGroup.getGroupAll();
-                all.setDeviceCount(Session.getTotalDevices());
+                all.setDeviceCount(GpsSdk.getTotalDevices());
                 objects.add(all);
                 GroupSpinner adapter = new GroupSpinner(getApplicationContext(), R.layout.spinner_group, objects);
                 sp.setAdapter(adapter);
-                sp.setSelection(Session.getGroupPosition());
+                sp.setSelection(GpsSdk.getGroupPosition());
             }
         });
     }
 
     private void setupView() {
-        IProfile profile = new ProfileDrawerItem().withName(Session.getAccountId()+"/"+Session.getUserId())
-                .withEmail(Session.getContactEmail())
+        IProfile profile = new ProfileDrawerItem().withName(GpsSdk.getAccountId()+"/"+GpsSdk.getUserId())
+                .withEmail(GpsSdk.getContactEmail())
                 .withIcon("https://avatars3.githubusercontent.com/u/1476232?v=3&s=460");
 
         headerResult = new AccountHeaderBuilder().withActivity(this)

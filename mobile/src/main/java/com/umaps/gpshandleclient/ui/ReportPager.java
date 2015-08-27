@@ -9,37 +9,26 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.Session;
 import com.umaps.gpshandleclient.event.UpdateEvent;
-import com.umaps.gpshandleclient.model.Group;
-import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.EBus;
-import com.umaps.gpshandleclient.util.GpsRequest;
 import com.umaps.gpshandleclient.util.PagerAdapter;
-import com.umaps.gpshandleclient.util.ReportGroupListViewAdapter;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.view.GenericViewFragment;
+import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.model.Group;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -72,7 +61,7 @@ public class ReportPager extends GenericViewFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_pager_report, container, false);
-        Session.setSessionId(1);
+        GpsSdk.setSessionId(1);
         mViewPager = (ViewPager)view.findViewById(R.id.view_pager_report);
 
         EventBus.getDefault().post(new UpdateEvent.OnLive(false));

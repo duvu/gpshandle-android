@@ -13,6 +13,8 @@ import com.umaps.gpssdk.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Locale;
+
 /**
  * Created by beou on 03/06/2015.
  */
@@ -377,6 +379,17 @@ public class GpsRequest {
         r.setCommand(TOKEN_URL);
         r.setPost();
         r.setErrorHandler();
+
+        JSONObject params = new JSONObject();
+        try {
+            params.put(GpsRequest.KEY_ACCOUNT_ID, GpsSdk.getAccountId());
+            params.put(GpsRequest.KEY_USER_ID, GpsSdk.getUserId());
+            params.put(GpsRequest.KEY_PASSWORD, GpsSdk.getUserPassword());
+            params.put(GpsRequest.KEY_LOCALE, Locale.getDefault().getLanguage());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         return r;
     }
 
