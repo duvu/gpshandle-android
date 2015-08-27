@@ -8,8 +8,8 @@ android {
         applicationId "com.umaps.gpshandleclient"
         minSdkVersion 11
         targetSdkVersion 22
-        versionCode 10
-        versionName "1.9.1"
+        versionCode 11
+        versionName "11"
 
     }
     buildTypes {
@@ -29,7 +29,6 @@ dependencies {
     compile "com.android.support:appcompat-v7:22.2.1"
     compile 'com.google.maps.android:android-maps-utils:0.3.4'
     compile 'com.google.android.gms:play-services:7.5.0'
-    //compile 'com.mcxiaoke.volley:library:1.0.10'
     compile 'com.github.PhilJay:MPAndroidChart:v2.0.7'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.parse.bolts:bolts-android:1.2.0'
