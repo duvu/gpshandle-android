@@ -376,7 +376,7 @@ public class GpsRequest {
 
     public static GpsRequest getTokenRequest(Context context) {
         GpsRequest r = getCommonRequest(context);
-        r.setCommand(TOKEN_URL);
+        r.setUrl(TOKEN_URL);
         r.setPost();
         r.setErrorHandler();
 

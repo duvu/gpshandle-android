@@ -228,9 +228,6 @@ public class LoginActivity extends FragmentActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        //tokenRequest.setParams(params);
-        //tokenRequest.setUrl(GpsRequest.TOKEN_URL);
-        //tokenRequest.setMethod(Request.Method.POST);
         Response.Listener<JSONObject> tokeHanler = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -256,7 +253,6 @@ public class LoginActivity extends FragmentActivity {
             }
         };
         tokenRequest.setResponseHandler(tokeHanler);
-        //tokenRequest.setErrorHandler();
         tokenRequest.exec(params);
         showProgress(true);
     }
