@@ -125,8 +125,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
     @Override
     public void onDetach(){
         super.onDetach();
-        mBarProgress = null;
-        mProgress = null;
+        GpsRequest.getInstance().cancelAll();
     }
     @Override
     public void onResume(){

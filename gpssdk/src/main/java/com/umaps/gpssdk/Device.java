@@ -1,4 +1,4 @@
-package com.umaps.gpssdk.model;
+package com.umaps.gpssdk;
 
 import android.content.Context;
 

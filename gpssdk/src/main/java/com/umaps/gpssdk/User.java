@@ -1,10 +1,11 @@
-package com.umaps.gpssdk.model;
+package com.umaps.gpssdk;
 
 import android.content.Context;
 
 import com.android.volley.Request;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.Group;
 import com.umaps.gpssdk.StringTools;
 
 import org.json.JSONArray;

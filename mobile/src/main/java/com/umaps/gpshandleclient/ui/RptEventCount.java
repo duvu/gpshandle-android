@@ -167,10 +167,7 @@ public class RptEventCount extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        //mChart = null;
-        //mBarProgress = null;
-        //mProgress = null;
-        mRequest.cancel(TAG_REQUEST);
+        GpsRequest.getInstance().cancelAll();
     }
     /**
      * Shows the progress UI and hides the login form.

@@ -28,8 +28,8 @@ import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.model.Device;
-import com.umaps.gpssdk.model.Group;
+import com.umaps.gpssdk.Device;
+import com.umaps.gpssdk.Group;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -155,9 +155,8 @@ public class AdmGroup extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        showProgress(false);
+        GpsRequest.getInstance().cancelAll();
     }
-
     private void setBottomToolbar(){
         TextView icAddGroup = (TextView) view.findViewById(R.id.ic_add);
         icAddGroup.setTypeface(mTf);

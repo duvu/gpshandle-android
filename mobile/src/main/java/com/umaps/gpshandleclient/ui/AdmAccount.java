@@ -25,7 +25,7 @@ import com.umaps.gpshandleclient.R;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.model.Account;
+import com.umaps.gpssdk.Account;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -126,6 +126,7 @@ public class AdmAccount extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
+        GpsRequest.getInstance().cancelAll();
     }
 
     private void setBottomToolbar(){

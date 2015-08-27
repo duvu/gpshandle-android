@@ -184,6 +184,4 @@ public class MyApplication extends Application {
         editor.commit();
         GpsSdk.saveInstanceState();
     }
-
-
 }

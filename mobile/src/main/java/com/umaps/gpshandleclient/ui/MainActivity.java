@@ -140,10 +140,13 @@ public class MainActivity extends ActionBarActivity{
         sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String groupId = ((ParseGroup)(parent.getAdapter().getItem(position))).getGroupId();
-                GpsSdk.setGroupPosition(position);
-                GpsSdk.setSelectedGroup(groupId);
-                EventBus.getDefault().post(new UpdateEvent.GroupChanged());
+                ParseGroup pg = (ParseGroup)(parent.getAdapter().getItem(position));
+                if (pg!=null){
+                    String groupId = pg.getGroupId();
+                    GpsSdk.setGroupPosition(position);
+                    GpsSdk.setSelectedGroup(groupId);
+                    EventBus.getDefault().post(new UpdateEvent.GroupChanged());
+                }
             }
 
             @Override
@@ -296,7 +299,7 @@ public class MainActivity extends ActionBarActivity{
 
         @Override
         public Object getItem(int position) {
-            return items.get(position);
+            return (items!=null && items.size()>position) ? items.get(position) : null;
         }
 
         @Override
@@ -316,8 +319,10 @@ public class MainActivity extends ActionBarActivity{
             } else {
                 holder = (ViewHolder)convertView.getTag();
             }
-            holder.name.setText(items.get(position).getName());
-            holder.size.setText(String.valueOf(items.get(position).getDeviceCount()));
+            if ((items !=null) && (items.size() > position)) {
+                holder.name.setText(items.get(position).getName());
+                holder.size.setText(String.valueOf(items.get(position).getDeviceCount()));
+            }
             return convertView;
         }
     }

@@ -29,7 +29,7 @@ import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.model.Device;
+import com.umaps.gpssdk.Device;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -156,9 +156,8 @@ public class AdmDevice extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        showProgress(false);
+        GpsRequest.getInstance().cancelAll();
     }
-
     /**
      * Shows the progress UI and hides the login form.
     */

@@ -16,8 +16,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Response;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.SaveCallback;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.model.ParseGroup;
@@ -27,8 +28,6 @@ import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.Listener;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.model.Account;
-import com.umaps.gpssdk.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,9 +45,6 @@ public class LoginActivity extends FragmentActivity {
     private View mLoginForm;
     private View mBarProgress;
     private View mProgress;
-    private GpsRequest aclRequest;
-    private GpsRequest accountRequest;
-    private GpsRequest userRequest;
     private GpsRequest groupRequest;
 
     MyApplication mApplication;
@@ -82,9 +78,7 @@ public class LoginActivity extends FragmentActivity {
         final EditText edtPassword = (EditText) findViewById(R.id.edt_password);
         edtPassword.setText(GpsSdk.getUserPassword());
 
-        aclRequest = new GpsRequest();
         Button btnLogin = (Button) findViewById(R.id.btn_login);
-
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,77 +108,6 @@ public class LoginActivity extends FragmentActivity {
 
     //-- tokenRequest --> aclRequest --> accountRequest --> userRequest --> groupRequest
     private void getData() {
-        //-- get groups and store in local database
-        groupRequest = GpsRequest.getGroupRequest();
-        groupRequest.setResponseHandler(new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                MyResponse mRes = new MyResponse(response);
-                if (mRes.isError()) return;
-                JSONArray j = (JSONArray) mRes.getData();
-                List<ParseGroup> list = new ArrayList<ParseGroup>();
-                for (int i = 0; i < j.length(); i++) {
-                    try {
-                        JSONObject jo = j.getJSONObject(i);
-                        ParseGroup p = ParseGroup.parseGroup(jo);
-                        list.add(p);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                ParseObject.pinAllInBackground("pinned", list);
-                //store
-                showProgress(false);
-                mApplication.storeSettings();
-                Intent movingIntent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(movingIntent);
-                finish();
-            }
-        });
-        //-- get user-info
-        userRequest = GpsRequest.getUserRequest();
-        userRequest.setResponseHandler(new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                MyResponse mRes = new MyResponse(response);
-                if (mRes.isError()) return;
-                JSONObject result = (JSONObject) mRes.getData();
-
-                //-- store: contactPhone, contactName, contactEmail, description, displayName, creationTime, lastLoginTime
-                User u = new User(result);
-                GpsSdk.setDisplayName(u.getDisplayName());
-                GpsSdk.setDescription(u.getDescription());
-                GpsSdk.setContactName(u.getContactName());
-                GpsSdk.setContactPhone(u.getContactPhone());
-                GpsSdk.setContactEmail(u.getContactEmail());
-                GpsSdk.setCreationTime(u.getCreationTime());
-                GpsSdk.setLastLoginTime(u.getLastLoginTime());
-                saveEventLogin(GpsSdk.getAccountId(), GpsSdk.getUserId());
-                groupRequest.exec();
-            }
-        });
-
-        //-- get account-info
-        accountRequest = GpsRequest.getAccountRequest();
-        String[] lf = new String[] {"isAccountManager", "deviceCount"};
-        JSONObject accParam = Account.createParam(lf);
-        accountRequest.setParams(accParam);
-        accountRequest.setResponseHandler(new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                MyResponse mRes = new MyResponse(response);
-                if (mRes.isError()) return;
-                JSONObject result = (JSONObject) mRes.getData();
-                Account account = new Account(result);
-                boolean isManager = account.isManager();
-                int count = account.getDevice_count();
-                GpsSdk.setAccountManager(isManager);
-                GpsSdk.setTotalDevices(count);
-                userRequest.exec();
-            }
-        });
-        accountRequest.setErrorHandler();
-
         //-- getToken
         GpsRequest.getToken(new Listener<MyResponse>() {
             @Override
@@ -195,7 +118,32 @@ public class LoginActivity extends FragmentActivity {
                     return;
                 } else {
                     mApplication.setIsSignedIn(true);
-                    accountRequest.exec();
+                    saveEventLogin(GpsSdk.getAccountId(), GpsSdk.getUserId());
+
+                    if (response.isError()) return;
+                    JSONArray j = (JSONArray) response.getData();
+                    List<ParseGroup> list = new ArrayList<ParseGroup>();
+                    for (int i = 0; i < j.length(); i++) {
+                        try {
+                            JSONObject jo = j.getJSONObject(i);
+                            ParseGroup p = ParseGroup.parseGroup(jo);
+                            list.add(p);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    ParseObject.pinAllInBackground("pinned", list, new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            //store
+                            showProgress(false);
+                            mApplication.storeSettings();
+                            Intent movingIntent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(movingIntent);
+                            finish();
+                        }
+                    });
+
                 }
             }
         });

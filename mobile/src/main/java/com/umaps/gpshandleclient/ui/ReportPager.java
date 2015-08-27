@@ -22,7 +22,7 @@ import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.view.GenericViewFragment;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
-import com.umaps.gpssdk.model.Group;
+import com.umaps.gpssdk.Group;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -82,7 +82,11 @@ public class ReportPager extends GenericViewFragment {
         frags.add(rptEventCount);
         return frags;
     }
-
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        GpsRequest.getInstance().cancelAll();
+    }
     public void updateAllFragment() {
         List<Fragment> fragments = getFragments();
         PagerAdapter mPageAdapter = new PagerAdapter(getChildFragmentManager(), fragments);

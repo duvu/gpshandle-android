@@ -2,14 +2,11 @@ package com.umaps.gpssdk;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.umaps.gpssdk.model.Group;
-import com.umaps.gpssdk.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -321,6 +318,7 @@ public class GpsRequest {
         GpsRequest r = getCommonRequest();
         r.setPost();
         r.setUrl(MAPPING_URL);
+        r.setErrorHandler();
         return r;
     }
 
@@ -345,6 +343,69 @@ public class GpsRequest {
         r.setParams(Group.createGetParams());
         r.setErrorHandler();
         return r;
+    }
+
+    public static void getGroup(final Listener<MyResponse> listener) {
+        GpsRequest r = getGroupRequest();
+        r.setResponseHandler(new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                MyResponse mRes = new MyResponse(response);
+                if (mRes.isError()) return;
+                listener.onResponse(mRes);
+            }
+        });
+        r.exec();
+    }
+    public static void getUser(final Listener<MyResponse> listener) {
+        GpsRequest r = getAdminRequest();
+        r.setCommand(CMD_GET_USERS);
+        r.setParams(User.createParams());
+        r.setErrorHandler();
+        r.setResponseHandler(new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                MyResponse mRes = new MyResponse(response);
+                if (mRes.isError()) return;
+                JSONObject result = (JSONObject) mRes.getData();
+                //-- store: contactPhone, contactName, contactEmail, description, displayName, creationTime, lastLoginTime
+                User u = new User(result);
+                GpsSdk.setDisplayName(u.getDisplayName());
+                GpsSdk.setDescription(u.getDescription());
+                GpsSdk.setContactName(u.getContactName());
+                GpsSdk.setContactPhone(u.getContactPhone());
+                GpsSdk.setContactEmail(u.getContactEmail());
+                GpsSdk.setCreationTime(u.getCreationTime());
+                GpsSdk.setLastLoginTime(u.getLastLoginTime());
+                getGroup(listener);
+            }
+        });
+        r.exec();
+    }
+
+    public static void getAccount(final Listener<MyResponse> listener) {
+        GpsRequest r = getAdminRequest();
+        r.setCommand(CMD_GET_ACCOUNT);
+        r.setErrorHandler();
+
+        String[] lf = new String[] {"isAccountManager", "deviceCount"};
+        JSONObject accParam = Account.createParam(lf);
+        r.setParams(accParam);
+        r.setResponseHandler(new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                MyResponse mRes = new MyResponse(response);
+                if (mRes.isError()) return;
+                JSONObject result = (JSONObject) mRes.getData();
+                Account account = new Account(result);
+                boolean isManager = account.isManager();
+                int count = account.getDevice_count();
+                GpsSdk.setAccountManager(isManager);
+                GpsSdk.setTotalDevices(count);
+                getUser(listener);
+            }
+        });
+        r.exec();
     }
     public static void getAcls(final Listener<MyResponse> listener) {
         GpsRequest r = getAdminRequest();
@@ -371,7 +432,7 @@ public class GpsRequest {
                     }
                     GpsSdk.storeAcls(acl);
                 }
-                listener.onResponse(mResponse);
+                getAccount(listener);
             }
         });
         r.exec();

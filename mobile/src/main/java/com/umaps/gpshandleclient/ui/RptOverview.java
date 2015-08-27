@@ -66,6 +66,7 @@ public class RptOverview extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -199,10 +200,7 @@ public class RptOverview extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        //mChart = null;
-        //mBarProgress = null;
-        //mProgress = null;
-        mRequest.cancel(TAG_REQUEST);
+        GpsRequest.getInstance().cancelAll();
     }
 
 

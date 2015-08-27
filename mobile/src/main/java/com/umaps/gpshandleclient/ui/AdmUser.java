@@ -28,8 +28,8 @@ import com.umaps.gpshandleclient.R;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.model.Group;
-import com.umaps.gpssdk.model.User;
+import com.umaps.gpssdk.Group;
+import com.umaps.gpssdk.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -145,7 +145,7 @@ public class AdmUser extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        showProgress(false);
+        GpsRequest.getInstance().cancelAll();
     }
 
     private void setBottomToolbar(){
