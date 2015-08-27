@@ -1,0 +1,1 @@
+GPSLogger [![Build Status](https://travis-ci.org/duvu/gpshandle-android.svg?branch=master)](https://travis-ci.org/duvu/gpshandle-android)
