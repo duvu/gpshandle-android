@@ -22,9 +22,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.MyResponse;
 import com.umaps.gpssdk.model.Account;
 
 import org.json.JSONArray;
@@ -85,7 +85,7 @@ public class AdmAccount extends Fragment {
         });
         setBottomToolbar();
 
-        mRequest = new GpsRequest(getActivity());
+        mRequest = new GpsRequest();
         mRequest.setAccountID(GpsSdk.getAccountId());
         mRequest.setUserID(GpsSdk.getUserId());
         mRequest.setPassword(GpsSdk.getUserPassword());

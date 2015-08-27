@@ -205,7 +205,7 @@ public class User {
     }
 
     public GpsRequest getRequestCreate() {
-        GpsRequest r = new GpsRequest(context);
+        GpsRequest r = new GpsRequest();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());
@@ -217,7 +217,7 @@ public class User {
         return r;
     }
     public GpsRequest getRequestEdit() {
-        GpsRequest r = new GpsRequest(context);
+        GpsRequest r = new GpsRequest();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());
@@ -229,7 +229,7 @@ public class User {
         return r;
     }
     public GpsRequest getRequestDelete() {
-        GpsRequest r = new GpsRequest(context);
+        GpsRequest r = new GpsRequest();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());

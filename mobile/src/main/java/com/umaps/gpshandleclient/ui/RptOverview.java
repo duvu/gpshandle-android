@@ -27,10 +27,10 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GPSColors;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.MyResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,7 +93,7 @@ public class RptOverview extends Fragment {
         mChart.setRotationEnabled(false);
 
 
-        mRequest = new GpsRequest(getActivity());
+        mRequest = new GpsRequest();
 
         mRequest.setAccountID(GpsSdk.getAccountId());
         mRequest.setUserID(GpsSdk.getUserId());

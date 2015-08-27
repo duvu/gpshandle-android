@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by beou on 16/08/2015.
  */
@@ -27,6 +30,23 @@ public class GpsSdk {
     private static final String SELECTED_GROUP          = "selGroup";
     private static final String GROUP_POSITION          = "groupPosition";
 
+    public static final String ACL_ADMIN_ACCOUNT        = "acl.service.admin.account";
+    public static final String ACL_ADMIN_DEVICE         = "acl.service.admin.device";
+    public static final String ACL_ADMIN_DRIVER         = "acl.service.admin.driver";
+    public static final String ACL_ADMIN_GEOZONE        = "acl.service.admin.geozone";
+    public static final String ACL_ADMIN_GROUP          = "acl.service.admin.group";
+    public static final String ACL_ADMIN_ROLE           = "acl.service.admin.role";
+    public static final String ACL_ADMIN_RULE           = "acl.service.admin.rule";
+    public static final String ACL_ADMIN_USER           = "acl.service.admin.user";
+    public static final String ACL_ADMIN_USER_MANAGER   = "acl.service.admin.user.manager";
+    public static final String ACL_MAP_HISTORY          = "acl.service.map.history";
+    public static final String ACL_MAP_MONITOR          = "acl.service.map.monitor";
+    public static final String ACL_REPORT_DETAIL        = "acl.service.report.detail";
+    public static final String ACL_REPORT_GEOZONE       = "acl.service.report.geozone";
+    public static final String ACL_REPORT_PARKING       = "acl.service.report.parking";
+    public static final String ACL_REPORT_SUMMARY       = "acl.service.report.summary";
+
+
     private static Context context;
     private static boolean hasError;
 
@@ -49,8 +69,31 @@ public class GpsSdk {
     private static int totalDevices;
     private static String selectedGroup;
     private static int groupPosition;
-
     private static int sessionId;
+
+    private static int aclAdminAccount;
+    private static int aclAdminDevice;
+    private static int aclAdminDriver;
+    private static int aclAdminGeozone;
+    private static int aclAdminGroup;
+    private static int aclAdminRole;
+    private static int aclAdminRule;
+    private static int aclAdminUser;
+    private static int aclAdminUserManager;
+    private static int aclMapHistory;
+    private static int aclMapMonitor;
+    private static int aclReportSummary;
+    private static int aclReportParking;
+    private static int aclReportGeozone;
+    private static int aclReportDetail;
+
+    public static Context getContext() {
+        return context;
+    }
+
+    public static void setContext(Context context) {
+        GpsSdk.context = context;
+    }
 
     public static boolean hasError() {
         return hasError;
@@ -204,6 +247,130 @@ public class GpsSdk {
         GpsSdk.sessionId = sessionId;
     }
 
+
+    //-- Acls
+
+
+    public static int getAclAdminAccount() {
+        return aclAdminAccount;
+    }
+
+    public static void setAclAdminAccount(int aclAdminAccount) {
+        GpsSdk.aclAdminAccount = aclAdminAccount;
+    }
+
+    public static int getAclAdminDevice() {
+        return aclAdminDevice;
+    }
+
+    public static void setAclAdminDevice(int aclAdminDevice) {
+        GpsSdk.aclAdminDevice = aclAdminDevice;
+    }
+
+    public static int getAclAdminDriver() {
+        return aclAdminDriver;
+    }
+
+    public static void setAclAdminDriver(int aclAdminDriver) {
+        GpsSdk.aclAdminDriver = aclAdminDriver;
+    }
+
+    public static int getAclAdminGeozone() {
+        return aclAdminGeozone;
+    }
+
+    public static void setAclAdminGeozone(int aclAdminGeozone) {
+        GpsSdk.aclAdminGeozone = aclAdminGeozone;
+    }
+
+    public static int getAclAdminGroup() {
+        return aclAdminGroup;
+    }
+
+    public static void setAclAdminGroup(int aclAdminGroup) {
+        GpsSdk.aclAdminGroup = aclAdminGroup;
+    }
+
+    public static int getAclAdminRole() {
+        return aclAdminRole;
+    }
+
+    public static void setAclAdminRole(int aclAdminRole) {
+        GpsSdk.aclAdminRole = aclAdminRole;
+    }
+
+    public static int getAclAdminRule() {
+        return aclAdminRule;
+    }
+
+    public static void setAclAdminRule(int aclAdminRule) {
+        GpsSdk.aclAdminRule = aclAdminRule;
+    }
+
+    public static int getAclAdminUser() {
+        return aclAdminUser;
+    }
+
+    public static void setAclAdminUser(int aclAdminUser) {
+        GpsSdk.aclAdminUser = aclAdminUser;
+    }
+
+    public static int getAclAdminUserManager() {
+        return aclAdminUserManager;
+    }
+
+    public static void setAclAdminUserManager(int aclAdminUserManager) {
+        GpsSdk.aclAdminUserManager = aclAdminUserManager;
+    }
+
+    public static int getAclMapHistory() {
+        return aclMapHistory;
+    }
+
+    public static void setAclMapHistory(int aclMapHistory) {
+        GpsSdk.aclMapHistory = aclMapHistory;
+    }
+
+    public static int getAclMapMonitor() {
+        return aclMapMonitor;
+    }
+
+    public static void setAclMapMonitor(int aclMapMonitor) {
+        GpsSdk.aclMapMonitor = aclMapMonitor;
+    }
+
+    public static int getAclReportSummary() {
+        return aclReportSummary;
+    }
+
+    public static void setAclReportSummary(int aclReportSummary) {
+        GpsSdk.aclReportSummary = aclReportSummary;
+    }
+
+    public static int getAclReportParking() {
+        return aclReportParking;
+    }
+
+    public static void setAclReportParking(int aclReportParking) {
+        GpsSdk.aclReportParking = aclReportParking;
+    }
+
+    public static int getAclReportGeozone() {
+        return aclReportGeozone;
+    }
+
+    public static void setAclReportGeozone(int aclReportGeozone) {
+        GpsSdk.aclReportGeozone = aclReportGeozone;
+    }
+
+    public static int getAclReportDetail() {
+        return aclReportDetail;
+    }
+
+    public static void setAclReportDetail(int aclReportDetail) {
+        GpsSdk.aclReportDetail = aclReportDetail;
+    }
+
     public static void clean() {
         accountId = null;
         isAccountManager = false;
@@ -238,6 +405,23 @@ public class GpsSdk {
         GpsSdk.setTotalDevices  (prefs.getInt       (TOTAL_DEVICES      , 0));
         GpsSdk.setSelectedGroup (prefs.getString    (SELECTED_GROUP     , "all"));
         GpsSdk.setGroupPosition (prefs.getInt       (GROUP_POSITION     , 0));
+
+        //-- Acl
+        GpsSdk.setAclAdminAccount       (prefs.getInt(ACL_ADMIN_ACCOUNT     , 0));
+        GpsSdk.setAclAdminDevice        (prefs.getInt(ACL_ADMIN_DEVICE      , 0));
+        GpsSdk.setAclAdminDriver        (prefs.getInt(ACL_ADMIN_DRIVER      , 0));
+        GpsSdk.setAclAdminGeozone       (prefs.getInt(ACL_ADMIN_GEOZONE     , 0));
+        GpsSdk.setAclAdminGroup         (prefs.getInt(ACL_ADMIN_GROUP       , 0));
+        GpsSdk.setAclAdminRole          (prefs.getInt(ACL_ADMIN_ROLE        , 0));
+        GpsSdk.setAclAdminRule          (prefs.getInt(ACL_ADMIN_RULE        , 0));
+        GpsSdk.setAclAdminUser          (prefs.getInt(ACL_ADMIN_USER        , 0));
+        GpsSdk.setAclAdminUserManager   (prefs.getInt(ACL_ADMIN_USER_MANAGER, 0));
+        GpsSdk.setAclMapHistory         (prefs.getInt(ACL_MAP_HISTORY       , 0));
+        GpsSdk.setAclMapMonitor         (prefs.getInt(ACL_MAP_MONITOR       , 0));
+        GpsSdk.setAclReportDetail       (prefs.getInt(ACL_REPORT_DETAIL     , 0));
+        GpsSdk.setAclReportGeozone      (prefs.getInt(ACL_REPORT_GEOZONE    , 0));
+        GpsSdk.setAclReportParking      (prefs.getInt(ACL_REPORT_PARKING    , 0));
+        GpsSdk.setAclReportSummary      (prefs.getInt(ACL_REPORT_SUMMARY    , 0));
     }
     public static final void saveInstanceState(){
         if (context == null) {
@@ -252,7 +436,6 @@ public class GpsSdk {
         e.putString (PASSWORD,          GpsSdk.getUserPassword());
         e.putString (TOKEN,             GpsSdk.getSessionToken());
         e.putLong   (EXPIRED_ON,        GpsSdk.getTokenExpired());
-
         e.putString (USER_DISPLAY_NAME, GpsSdk.getDisplayName());
         e.putString (USER_DESCRIPTION,  GpsSdk.getDescription());
         e.putString (CONTACT_NAME,      GpsSdk.getContactName());
@@ -260,9 +443,53 @@ public class GpsSdk {
         e.putString (CONTACT_EMAIL,     GpsSdk.getContactEmail());
         e.putLong   (CREATION_TIME,     GpsSdk.getCreationTime());
         e.putLong   (LAST_LOGIN_TIME,   GpsSdk.getLastLoginTime());
-
         e.putInt    (TOTAL_DEVICES,     GpsSdk.getTotalDevices());
         e.putString (SELECTED_GROUP,    GpsSdk.getSelectedGroup());
         e.putInt    (GROUP_POSITION,    GpsSdk.getGroupPosition());
+
+        //-- Acl
+        e.putInt(ACL_ADMIN_ACCOUNT, getAclAdminAccount());
+        e.putInt(ACL_ADMIN_DEVICE, getAclAdminDevice());
+        e.putInt(ACL_ADMIN_DRIVER, getAclAdminDriver());
+        e.putInt(ACL_ADMIN_GEOZONE, getAclAdminGeozone());
+        e.putInt(ACL_ADMIN_GROUP, getAclAdminGroup());
+        e.putInt(ACL_ADMIN_ROLE, getAclAdminRole());
+        e.putInt(ACL_ADMIN_RULE, getAclAdminRule());
+        e.putInt(ACL_ADMIN_USER, getAclAdminUser());
+        e.putInt(ACL_ADMIN_USER_MANAGER, getAclAdminUserManager());
+        e.putInt(ACL_MAP_HISTORY, getAclMapHistory());
+        e.putInt(ACL_MAP_MONITOR, getAclMapMonitor());
+        e.putInt(ACL_REPORT_DETAIL, getAclReportDetail());
+        e.putInt(ACL_REPORT_GEOZONE, getAclReportGeozone());
+        e.putInt(ACL_REPORT_PARKING, getAclReportParking());
+        e.putInt(ACL_REPORT_SUMMARY, getAclReportSummary());
+        //-- save
+        e.commit();
+    }
+
+    public static void storeAcls(JSONObject acl) {
+        //Log.i(TAG, acl.toString());
+        try {
+            String name = acl.getString("name");
+            int value = acl.getInt("value");
+            String description = acl.getString("description");
+            if (name.equalsIgnoreCase(ACL_ADMIN_ACCOUNT))      { setAclAdminAccount(value); }
+            else if (name.equalsIgnoreCase(ACL_ADMIN_DEVICE))       { setAclAdminDevice(value);}
+            else if (name.equalsIgnoreCase(ACL_ADMIN_DRIVER))       { setAclAdminDriver(value);}
+            else if (name.equalsIgnoreCase(ACL_ADMIN_GEOZONE))      { setAclAdminGeozone(value);}
+            else if (name.equalsIgnoreCase(ACL_ADMIN_GROUP))        { setAclAdminGroup(value);}
+            else if (name.equalsIgnoreCase(ACL_ADMIN_ROLE))         { setAclAdminRole(value);}
+            else if (name.equalsIgnoreCase(ACL_ADMIN_RULE))         { setAclAdminRule(value);}
+            else if (name.equalsIgnoreCase(ACL_ADMIN_USER))         { setAclAdminUser(value);}
+            else if (name.equalsIgnoreCase(ACL_ADMIN_USER_MANAGER)) { setAclAdminUserManager(value);}
+            else if (name.equalsIgnoreCase(ACL_MAP_HISTORY))        { setAclMapHistory(value);}
+            else if (name.equalsIgnoreCase(ACL_MAP_MONITOR))        { setAclMapMonitor(value);}
+            else if (name.equalsIgnoreCase(ACL_REPORT_DETAIL))      { setAclReportDetail(value);}
+            else if (name.equalsIgnoreCase(ACL_REPORT_GEOZONE))     { setAclReportGeozone(value);}
+            else if (name.equalsIgnoreCase(ACL_REPORT_PARKING))     { setAclReportParking(value);}
+            else if (name.equalsIgnoreCase(ACL_REPORT_SUMMARY))     { setAclReportSummary(value);}
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

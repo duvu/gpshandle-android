@@ -41,13 +41,13 @@ import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.model.MapData;
 import com.umaps.gpshandleclient.model.MapPoint;
-import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.model.TrackItem;
 import com.umaps.gpshandleclient.util.EBus;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
 import com.umaps.gpshandleclient.view.GenericViewFragment;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.MyResponse;
 
 import org.json.JSONObject;
 

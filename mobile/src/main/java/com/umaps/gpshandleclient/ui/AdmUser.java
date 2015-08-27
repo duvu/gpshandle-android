@@ -25,9 +25,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.MyResponse;
 import com.umaps.gpssdk.model.Group;
 import com.umaps.gpssdk.model.User;
 
@@ -100,7 +100,7 @@ public class AdmUser extends Fragment {
         });
         setBottomToolbar();
 
-        GpsRequest mRequest = new GpsRequest(getActivity());
+        GpsRequest mRequest = new GpsRequest();
         mRequest.setAccountID(GpsSdk.getAccountId());
         mRequest.setUserID(GpsSdk.getUserId());
         mRequest.setPassword(GpsSdk.getUserPassword());
@@ -167,7 +167,7 @@ public class AdmUser extends Fragment {
         TextView txtDelete = (TextView) view.findViewById(R.id.txt_delete);
         txtDelete.setText(R.string.delete);
 
-        if (mApplication.getAclAdminUserManager() > 2) {
+        if (GpsSdk.getAclAdminUserManager() > 2) {
             addUser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -231,11 +231,11 @@ public class AdmUser extends Fragment {
             });
         }
 
-        if (mApplication.getAclAdminGroup() > 1) {
+        if (GpsSdk.getAclAdminGroup() > 1) {
             editUser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mApplication.getAclAdminDevice() < 2) {
+                    if (GpsSdk.getAclAdminDevice() < 2) {
                         Toast.makeText(getActivity(), getResources().getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
                         return;
                     }

@@ -16,17 +16,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.parse.ParseObject;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
-import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.model.ParseLoginEvent;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.Listener;
+import com.umaps.gpssdk.MyResponse;
 import com.umaps.gpssdk.model.Account;
 import com.umaps.gpssdk.model.User;
 
@@ -36,7 +36,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by vu@umaps.vn on 01/02/2015.
@@ -47,7 +46,6 @@ public class LoginActivity extends FragmentActivity {
     private View mLoginForm;
     private View mBarProgress;
     private View mProgress;
-    private GpsRequest tokenRequest;
     private GpsRequest aclRequest;
     private GpsRequest accountRequest;
     private GpsRequest userRequest;
@@ -84,8 +82,7 @@ public class LoginActivity extends FragmentActivity {
         final EditText edtPassword = (EditText) findViewById(R.id.edt_password);
         edtPassword.setText(GpsSdk.getUserPassword());
 
-        aclRequest = new GpsRequest(this);
-        tokenRequest = new GpsRequest(this);
+        aclRequest = new GpsRequest();
         Button btnLogin = (Button) findViewById(R.id.btn_login);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +115,7 @@ public class LoginActivity extends FragmentActivity {
     //-- tokenRequest --> aclRequest --> accountRequest --> userRequest --> groupRequest
     private void getData() {
         //-- get groups and store in local database
-        groupRequest = GpsRequest.getGroupRequest(LoginActivity.this);
+        groupRequest = GpsRequest.getGroupRequest();
         groupRequest.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -145,7 +142,7 @@ public class LoginActivity extends FragmentActivity {
             }
         });
         //-- get user-info
-        userRequest = GpsRequest.getUserRequest(LoginActivity.this);
+        userRequest = GpsRequest.getUserRequest();
         userRequest.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -168,7 +165,7 @@ public class LoginActivity extends FragmentActivity {
         });
 
         //-- get account-info
-        accountRequest = GpsRequest.getAccountRequest(LoginActivity.this);
+        accountRequest = GpsRequest.getAccountRequest();
         String[] lf = new String[] {"isAccountManager", "deviceCount"};
         JSONObject accParam = Account.createParam(lf);
         accountRequest.setParams(accParam);
@@ -188,72 +185,20 @@ public class LoginActivity extends FragmentActivity {
         });
         accountRequest.setErrorHandler();
 
-        aclRequest = GpsRequest.getAclRequest(LoginActivity.this);
-        JSONObject jsonParams = new JSONObject();
-        aclRequest.setParams(jsonParams);
-        aclRequest.setResponseHandler(new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                MyResponse mResponse = new MyResponse(response);
-                if (mResponse.isError()) {
-                    Toast.makeText(LoginActivity.this, mResponse.getMessage(), Toast.LENGTH_LONG).show();
-                    return;
-                }
-                JSONArray aclList = (JSONArray) mResponse.getData();
-                if (aclList == null) return;
-                for (int i = 0; i < aclList.length(); i++) {
-                    JSONObject acl = null;
-                    try {
-                        acl = aclList.getJSONObject(i);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        continue;
-                    }
-                    mApplication.storeAcls(acl);
-                }
-                accountRequest.exec();
-
-            }
-        });
-        aclRequest.setErrorHandler();
-
         //-- getToken
-        tokenRequest = GpsRequest.getTokenRequest(LoginActivity.this);
-        JSONObject params = new JSONObject();
-        try {
-            params.put(GpsRequest.KEY_ACCOUNT_ID, GpsSdk.getAccountId());
-            params.put(GpsRequest.KEY_USER_ID, GpsSdk.getUserId());
-            params.put(GpsRequest.KEY_PASSWORD, GpsSdk.getUserPassword());
-            params.put(GpsRequest.KEY_LOCALE, Locale.getDefault().getLanguage());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Response.Listener<JSONObject> tokeHanler = new Response.Listener<JSONObject>() {
+        GpsRequest.getToken(new Listener<MyResponse>() {
             @Override
-            public void onResponse(JSONObject response) {
-                //Log.d(TAG, response.toString());
-                MyResponse mRes = new MyResponse(response);
-                if (mRes.isError()){
+            public void onResponse(MyResponse response) {
+                if (response.isError()) {
                     showProgress(false);
                     Toast.makeText(getApplicationContext(), getText(R.string.failure_login), Toast.LENGTH_LONG).show();
                     return;
+                } else {
+                    mApplication.setIsSignedIn(true);
+                    accountRequest.exec();
                 }
-                String token = null;
-                long expiredOn = 0;
-                try {
-                    token = ((JSONObject)mRes.getData()).getString("token");
-                    expiredOn = ((JSONObject)mRes.getData()).getLong("expireOn");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                mApplication.setIsSignedIn(true);
-                GpsSdk.setSessionToken(token);
-                GpsSdk.setTokenExpired(expiredOn);
-                aclRequest.exec();
             }
-        };
-        tokenRequest.setResponseHandler(tokeHanler);
-        tokenRequest.exec(params);
+        });
         showProgress(true);
     }
     /**

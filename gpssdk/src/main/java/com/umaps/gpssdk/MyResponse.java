@@ -1,8 +1,4 @@
-package com.umaps.gpshandleclient.model;
-
-import android.util.Log;
-
-import com.umaps.gpshandleclient.util.StringTools;
+package com.umaps.gpssdk;
 
 import org.json.JSONException;
 import org.json.JSONObject;

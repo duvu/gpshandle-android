@@ -338,7 +338,7 @@ public class Device {
     }
 
     public GpsRequest getRequestCreate(){
-        GpsRequest crtRequest = new GpsRequest(context);
+        GpsRequest crtRequest = new GpsRequest();
         crtRequest.setAccountID(GpsSdk.getAccountId());
         crtRequest.setUserID(GpsSdk.getUserId());
         crtRequest.setPassword(GpsSdk.getUserPassword());
@@ -351,7 +351,7 @@ public class Device {
     }
 
     public GpsRequest getRequestEdit() {
-        GpsRequest edtRequest = new GpsRequest(context);
+        GpsRequest edtRequest = new GpsRequest();
         edtRequest.setAccountID(GpsSdk.getAccountId());
         edtRequest.setUserID(GpsSdk.getUserId());
         edtRequest.setPassword(GpsSdk.getUserPassword());
@@ -364,7 +364,7 @@ public class Device {
     }
 
     public GpsRequest getRequestDelete() {
-        GpsRequest deleteRequest = new GpsRequest(context);
+        GpsRequest deleteRequest = new GpsRequest();
         deleteRequest.setAccountID(GpsSdk.getAccountId());
         deleteRequest.setUserID(GpsSdk.getUserId());
         deleteRequest.setPassword(GpsSdk.getUserPassword());

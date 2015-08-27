@@ -25,10 +25,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.MyResponse;
 import com.umaps.gpssdk.model.Device;
 
 import org.json.JSONArray;
@@ -106,7 +106,7 @@ public class AdmDevice extends Fragment {
         });
         setBottomToolbar();
 
-        GpsRequest mRequest = new GpsRequest(getActivity());
+        GpsRequest mRequest = new GpsRequest();
         mRequest.setAccountID(GpsSdk.getAccountId());
         mRequest.setUserID(GpsSdk.getUserId());
         mRequest.setPassword(GpsSdk.getUserPassword());
@@ -218,7 +218,7 @@ public class AdmDevice extends Fragment {
 
 
 
-        if (mApplication.getAclAdminDevice() > 2) {
+        if (GpsSdk.getAclAdminDevice() > 2) {
             addDevice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -283,11 +283,11 @@ public class AdmDevice extends Fragment {
                 }
             });
         }
-        if (mApplication.getAclAdminDevice() > 1) {
+        if (GpsSdk.getAclAdminDevice() > 1) {
             editDevice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mApplication.getAclAdminDevice() < 2) {
+                    if (GpsSdk.getAclAdminDevice() < 2) {
                         Toast.makeText(getActivity(), getResources().getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -782,7 +782,7 @@ public class AdmDevice extends Fragment {
         }
 
         private void toggleDeviceState(int groupPosition){
-            if (mApplication.getAclAdminDevice() < 2) {
+            if (GpsSdk.getAclAdminDevice() < 2) {
                 Toast.makeText(getActivity(), getText(R.string.you_dont_have_permission), Toast.LENGTH_LONG).show();
                 return;
             }

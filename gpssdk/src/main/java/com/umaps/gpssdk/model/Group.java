@@ -209,7 +209,7 @@ public class Group {
 
     public GpsRequest getRequestCreate(){
         if (this.context == null) return null;
-        GpsRequest r = new GpsRequest(context);
+        GpsRequest r = new GpsRequest();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());
@@ -223,7 +223,7 @@ public class Group {
     public GpsRequest getRequestEdit() {
         if (this.context == null) return null;
 
-        GpsRequest r = new GpsRequest(context);
+        GpsRequest r = new GpsRequest();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());
@@ -236,7 +236,7 @@ public class Group {
     public GpsRequest getRequestDelete() {
         if (this.context == null) return null;
 
-        GpsRequest r = new GpsRequest(context);
+        GpsRequest r = new GpsRequest();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());

@@ -101,7 +101,7 @@ public class MainActivity extends ActionBarActivity{
 
     private void doLogout(){
         mApplication.setIsSignedIn(false);
-        GpsRequest.getInstance(getApplicationContext()).cancelAll();
+        GpsRequest.getInstance().cancelAll();
         //clean token
         //Session.clean();
         startLoginActivity();

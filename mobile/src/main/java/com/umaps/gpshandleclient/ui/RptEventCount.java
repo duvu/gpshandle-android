@@ -24,11 +24,11 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpshandleclient.model.MyResponse;
 import com.umaps.gpshandleclient.util.GPSColors;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
+import com.umaps.gpssdk.MyResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,7 +70,7 @@ public class RptEventCount extends Fragment {
         MyApplication mApplication = MyApplication.getInstance();
         Utils.init(getResources());
         mChart = (HorizontalBarChart) view.findViewById(R.id.event_count_chart);
-        mRequest = new GpsRequest(getActivity());
+        mRequest = new GpsRequest();
         mRequest.setAccountID(GpsSdk.getAccountId());
         mRequest.setUserID(GpsSdk.getUserId());
         mRequest.setPassword(GpsSdk.getUserPassword());
