@@ -90,11 +90,6 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_monitoring, container, false);
         GpsSdk.setSessionId(0); //to track page

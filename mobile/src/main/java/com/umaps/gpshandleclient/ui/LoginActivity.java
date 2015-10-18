@@ -45,7 +45,14 @@ public class LoginActivity extends FragmentActivity {
     private View mLoginForm;
     private View mBarProgress;
     private View mProgress;
-    private GpsRequest groupRequest;
+
+    private EditText edtAccountId;
+    private EditText edtUserId;
+    private EditText edtPassword;
+
+    private String accountId;
+    private String userId;
+    private String password;
 
     MyApplication mApplication;
 
@@ -58,44 +65,45 @@ public class LoginActivity extends FragmentActivity {
         setContentView(R.layout.activity_login);
 
         //-- save application setting
-        TextView icAccount = (TextView) findViewById(R.id.ic_account);
+        TextView icAccount  = (TextView) findViewById(R.id.ic_account);
+        TextView icUser     = (TextView) findViewById(R.id.ic_user);
+        TextView icKey      = (TextView) findViewById(R.id.ic_password);
+
         icAccount.setTypeface(mTf);
-        icAccount.setText(String.valueOf((char) 0xe624));
-        TextView icUser = (TextView) findViewById(R.id.ic_user);
         icUser.setTypeface(mTf);
-        icUser.setText(String.valueOf((char) 0xe704));
-        TextView icKey = (TextView) findViewById(R.id.ic_password);
         icKey.setTypeface(mTf);
+
+        icAccount.setText(String.valueOf((char) 0xe624));
+        icUser.setText(String.valueOf((char) 0xe704));
         icKey.setText(String.valueOf((char) 0xe64c));
 
         //-- save application setting
-        final EditText edtAccount = (EditText) findViewById(R.id.edt_account);
-        edtAccount.setText(GpsSdk.getAccountId());
+        edtAccountId = (EditText) findViewById(R.id.edt_account);
+        edtUserId = (EditText) findViewById(R.id.edt_user);
+        edtPassword = (EditText) findViewById(R.id.edt_password);
 
-        final EditText edtUser = (EditText) findViewById(R.id.edt_user);
-        edtUser.setText(GpsSdk.getUserId());
-
-        final EditText edtPassword = (EditText) findViewById(R.id.edt_password);
+        edtAccountId.setText(GpsSdk.getAccountId());
+        edtUserId.setText(GpsSdk.getUserId());
         edtPassword.setText(GpsSdk.getUserPassword());
 
         Button btnLogin = (Button) findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String accountID    = edtAccount.getText().toString();
-                final String userID       = edtUser.getText().toString();
-                String password     = edtPassword.getText().toString();
-                if ((StringTools.isBlank(accountID)) ||
-                  (StringTools.isBlank(userID)) ||
+                accountId    = edtAccountId.getText().toString();
+                userId       = edtUserId.getText().toString();
+                password     = edtPassword.getText().toString();
+                if ((StringTools.isBlank(accountId)) ||
+                  (StringTools.isBlank(userId)) ||
                   (StringTools.isBlank(password))) {
                     Toast.makeText(getApplicationContext(), R.string.failure_login, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                //-- save to GpsSdkState
-                GpsSdk.setAccountId(accountID);
-                GpsSdk.setUserId(userID);
-                GpsSdk.setUserPassword(password);
+                //-- save to GpsSdk
+                GpsSdk.updateAccountId(accountId);
+                GpsSdk.updateUserId(userId);
+                GpsSdk.updatePassword(password);
 
                 //-- getting data and store
                 getData();

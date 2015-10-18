@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
 
     defaultConfig {
         applicationId "com.umaps.gpshandleclient"
         minSdkVersion 11
-        targetSdkVersion 22
-        versionCode 11
-        versionName "11"
+        targetSdkVersion 23
+        versionCode 12
+        versionName "12"
 
     }
     buildTypes {
@@ -25,10 +25,10 @@ repositories {
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-v4:22.2.1'
-    compile "com.android.support:appcompat-v7:22.2.1"
+    compile 'com.android.support:support-v4:23.0.0'
+    compile "com.android.support:appcompat-v7:23.0.0"
     compile 'com.google.maps.android:android-maps-utils:0.3.4'
-    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.google.android.gms:play-services:7.8.0'
     compile 'com.github.PhilJay:MPAndroidChart:v2.0.7'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.parse.bolts:bolts-android:1.2.0'

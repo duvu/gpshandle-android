@@ -14,12 +14,14 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by beou on 03/06/2015.
  */
 public class GpsRequest {
     private static final String TAG = "GpsRequest";
-    public static final String BASE_URL                 = "https://secure.gpshandle.com:8443/ws";
+    public static final String BASE_URL                 = "https://apis.gpshandle.com:8443/ws";
     public static final String MAPPING_URL              = BASE_URL + "/monitor";
     public static final String REPORTING_URL            = BASE_URL + "/report";
     public static final String CHART_URL                = BASE_URL + "/chart";
@@ -198,7 +200,8 @@ public class GpsRequest {
             @Override
             public void onErrorResponse(VolleyError error) {
                 //noop
-                Log.e(TAG, error.getMessage());
+                //EventBus.getDefault().post();
+                Log.e(TAG, "" + error.getMessage());
             }
         };
     }

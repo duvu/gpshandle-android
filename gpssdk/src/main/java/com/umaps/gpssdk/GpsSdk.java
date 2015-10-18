@@ -127,6 +127,8 @@ public class GpsSdk {
         GpsSdk.userId = userId;
     }
 
+
+
     public static String getDisplayName() {
         return displayName;
     }
@@ -214,6 +216,32 @@ public class GpsSdk {
     public static void setUserPassword(String userPassword) {
         GpsSdk.userPassword = userPassword;
     }
+
+
+    public static void updateAccountId (String updateAcc) {
+        if (StringTools.isBlank(accountId)) {
+            setAccountId(updateAcc);
+        } else if (!accountId.equalsIgnoreCase(updateAcc)) {
+            setAccountId(updateAcc);
+        }
+    }
+
+    public static void updateUserId(String updateUser) {
+        if (StringTools.isBlank(userId)) {
+            setUserId(updateUser);
+        } else if (!userId.equalsIgnoreCase(updateUser)) {
+            setUserId(updateUser);
+        }
+    }
+
+    public static void updatePassword(String updatePassword) {
+        if (StringTools.isBlank(userPassword)) {
+            setUserPassword(updatePassword);
+        } else if (!userPassword.equalsIgnoreCase(updatePassword)) {
+            setUserPassword(updatePassword);
+        }
+    }
+
 
     public static int getTotalDevices() {
         return totalDevices;
