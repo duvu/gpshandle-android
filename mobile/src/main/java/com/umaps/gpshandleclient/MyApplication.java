@@ -17,9 +17,6 @@ import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.model.ParseLoginEvent;
 import com.umaps.gpssdk.GpsSdk;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Created by vu@umaps.vn on 30/01/2015.
  */
@@ -101,7 +98,7 @@ public class MyApplication extends Application {
 
     private String groupList;
 
-    private boolean isSignedIn;
+    private static boolean isSignedIn;
 
     public long getTimeInterval() {
         return timeInterval;
@@ -151,12 +148,12 @@ public class MyApplication extends Application {
         this.groupList = groupList;
     }
 
-    public boolean isSignedIn() {
+    public static boolean isSignedIn() {
         return isSignedIn;
     }
 
-    public void setIsSignedIn(boolean isSignedIn) {
-        this.isSignedIn = isSignedIn;
+    public static void setIsSignedIn(boolean isSignedIn) {
+        MyApplication.isSignedIn = isSignedIn;
     }
 
     public void populateSettings(){

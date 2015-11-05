@@ -36,16 +36,14 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
+import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.util.EBus;
-import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 
-import java.util.Calendar;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -80,11 +78,7 @@ public class MainActivity extends ActionBarActivity{
         mApplication = MyApplication.getInstance();
         mTf = MyApplication.getIconFont();
 
-        if (!isUserSignedIn()){
-            startLoginActivity();
-            finish();
-            return;
-        }
+
         setToolbar();
         setupView();
     }
@@ -112,18 +106,7 @@ public class MainActivity extends ActionBarActivity{
         startActivity(intent);
     }
     // retrieve access token from preferences
-    public boolean isUserSignedIn() {
-        boolean hasUserData =
-                (
-                    (!StringTools.isBlank(GpsSdk.getAccountId())) &&
-                    (!StringTools.isBlank(GpsSdk.getUserId())) &&
-                    (!StringTools.isBlank(GpsSdk.getUserPassword()))
-                ) || (!StringTools.isBlank(GpsSdk.getSessionToken()));
-        long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
-        long expireOn = GpsSdk.getTokenExpired();
-        boolean isExpired = (expireOn <= currentTime);
-        return !isExpired && hasUserData && mApplication.isSignedIn();
-    }
+
 
     @Override
     protected void onResume(){

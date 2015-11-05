@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GPSHandle</string>
+    <string name="app_name">GpsHandle</string>
     <string name="title_monitor">Monitor</string>
     <string name="title_historical">Touch here to see historical</string>
     <string name="title_report">Report</string>
@@ -127,4 +127,8 @@
     <string name="faq_screen_title">Frequently asked questions</string>
     <string name="send_us_a_message">Send us a message</string>
     <string name="contact_info">Contact infomations</string>
+
+    <string name="title_activity_dispatcher">DispatcherActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
