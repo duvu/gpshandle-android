@@ -8,6 +8,11 @@
 0% — 00
 -->
 <resources>
+
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
     <color name="base_color">#ffc95506</color>
     <color name="base_color_dark">#ff753206</color>
     <color name="base_color_light">#b4b2b2ff</color>

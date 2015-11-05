@@ -9,7 +9,13 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,16 +29,6 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.mikepenz.iconics.typeface.FontAwesome;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
-import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -48,14 +44,12 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class MainActivity extends ActionBarActivity{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private static final String TAG = "MainActivity";
     private Typeface mTf = null;
     private MyApplication mApplication;
     private Toolbar toolbar;
 
-    private Drawer result = null;
-    private AccountHeader headerResult = null;
 
     private void RegisterEventBus() {
         EventBus.getDefault().register(this);
@@ -78,14 +72,42 @@ public class MainActivity extends ActionBarActivity{
         mApplication = MyApplication.getInstance();
         mTf = MyApplication.getIconFont();
 
-
         setToolbar();
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         setupView();
     }
     @Override
     protected void onDestroy() {
         UnregisterEventBus();
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -115,9 +137,9 @@ public class MainActivity extends ActionBarActivity{
 
     private void setToolbar(){
         //-- set toolbar
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //getSupportActionBar().setDisplayShowTitleEnabled(false);
         //add group to spinner
         final Spinner sp = (Spinner) toolbar.findViewById(R.id.spinner_group);
         sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -157,7 +179,7 @@ public class MainActivity extends ActionBarActivity{
     }
 
     private void setupView() {
-        IProfile profile = new ProfileDrawerItem().withName(GpsSdk.getAccountId()+"/"+GpsSdk.getUserId())
+        /*IProfile profile = new ProfileDrawerItem().withName(GpsSdk.getAccountId()+"/"+GpsSdk.getUserId())
                 .withEmail(GpsSdk.getContactEmail())
                 .withIcon("https://avatars3.githubusercontent.com/u/1476232?v=3&s=460");
 
@@ -201,11 +223,11 @@ public class MainActivity extends ActionBarActivity{
                                             .replace(R.id.container, AdmDispatcher.newInstance())
                                             .commit();
                                     break;
-                                /*case 4:
+                                *//*case 4:
                                     getSupportFragmentManager().beginTransaction()
                                             .replace(R.id.container, HelpFeedback.newInstance())
                                             .commit();
-                                    break;*/
+                                    break;*//*
                                 case 5:
                                     doLogout();
                                     break;
@@ -214,7 +236,7 @@ public class MainActivity extends ActionBarActivity{
                         return false;
                     }
                 })
-                .build();
+                .build();*/
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, MapFragment.newInstance())
@@ -262,6 +284,30 @@ public class MainActivity extends ActionBarActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        /// Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camara) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     private class GroupSpinner extends BaseAdapter {
