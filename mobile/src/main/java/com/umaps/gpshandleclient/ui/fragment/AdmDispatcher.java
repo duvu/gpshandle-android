@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.ui;
+package com.umaps.gpshandleclient.ui.fragment;
 
 
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.util.PagerAdapter;
-import com.umaps.gpshandleclient.view.GenericViewFragment;
 import com.umaps.gpssdk.GpsSdk;
 
 import java.util.ArrayList;

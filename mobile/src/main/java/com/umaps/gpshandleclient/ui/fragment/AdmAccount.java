@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.ui;
+package com.umaps.gpshandleclient.ui.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

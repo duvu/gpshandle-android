@@ -8,8 +8,8 @@ android {
         applicationId "com.umaps.gpshandleclient"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 12
-        versionName "12"
+        versionCode 13
+        versionName "Zen"
 
     }
     buildTypes {
@@ -32,7 +32,7 @@ dependencies {
     compile 'com.android.support:design:23.1.0'
 
     compile 'com.google.maps.android:android-maps-utils:0.3.4'
-    compile 'com.google.android.gms:play-services:8.1.0'
+    compile 'com.google.android.gms:play-services:8.3.0'
 
     compile 'com.github.PhilJay:MPAndroidChart:v2.0.7'
     compile 'de.greenrobot:eventbus:2.4.0'

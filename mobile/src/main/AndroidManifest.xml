@@ -38,12 +38,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.activity.LoginActivity"
             android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.activity.MonitorActivity"
+            android:label="@string/app_name"
+            android:noHistory="true"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".ui.activity.ReportActivity"
+            android:label="@string/app_name"
+            android:noHistory="true"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".ui.activity.AdminActivity"
             android:label="@string/app_name"
             android:noHistory="true"
             android:screenOrientation="portrait">

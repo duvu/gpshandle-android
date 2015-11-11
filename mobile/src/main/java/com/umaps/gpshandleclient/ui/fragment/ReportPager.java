@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.ui;
+package com.umaps.gpshandleclient.ui.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -19,7 +19,6 @@ import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.util.EBus;
 import com.umaps.gpshandleclient.util.PagerAdapter;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpshandleclient.view.GenericViewFragment;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.Group;

@@ -15,17 +15,16 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay">
             <RelativeLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
-
                 <Spinner
                     android:id="@+id/spinner_group"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"></Spinner>
+                    android:layout_height="wrap_content"/>
 
                 <ImageView
                     android:layout_width="30dp"
@@ -49,7 +48,6 @@
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
-
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />

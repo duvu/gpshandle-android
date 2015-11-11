@@ -1,9 +1,8 @@
-package com.umaps.gpshandleclient.ui;
+package com.umaps.gpshandleclient.ui.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -44,7 +43,6 @@ import com.umaps.gpshandleclient.model.MapPoint;
 import com.umaps.gpshandleclient.model.TrackItem;
 import com.umaps.gpshandleclient.util.EBus;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
-import com.umaps.gpshandleclient.view.GenericViewFragment;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
@@ -121,6 +119,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
     public void onDetach(){
         super.onDetach();
         GpsRequest.getInstance().cancelAll();
+        getActivity().onBackPressed();
     }
     @Override
     public void onResume(){

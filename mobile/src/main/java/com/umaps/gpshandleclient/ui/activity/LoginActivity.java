@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.ui;
+package com.umaps.gpshandleclient.ui.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -146,7 +146,7 @@ public class LoginActivity extends FragmentActivity {
                             //store
                             showProgress(false);
                             mApplication.storeSettings();
-                            Intent movingIntent = new Intent(getApplicationContext(), MainActivity.class);
+                            Intent movingIntent = new Intent(getApplicationContext(), MonitorActivity.class);
                             startActivity(movingIntent);
                             finish();
                         }

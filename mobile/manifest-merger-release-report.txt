@@ -201,7 +201,7 @@ category#android.intent.category.LAUNCHER
 ADDED from AndroidManifest.xml:33:17
 	android:name
 		ADDED from AndroidManifest.xml:33:27
-activity#com.umaps.gpshandleclient.ui.LoginActivity
+activity#com.umaps.gpshandleclient.ui.activity.LoginActivity
 ADDED from AndroidManifest.xml:36:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:36:19

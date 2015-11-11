@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.ui;
+package com.umaps.gpshandleclient.ui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,7 +8,6 @@ import android.widget.Button;
 
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.event.UpdateEvent;
-import com.umaps.gpshandleclient.view.GenericViewFragment;
 
 import de.greenrobot.event.EventBus;
 

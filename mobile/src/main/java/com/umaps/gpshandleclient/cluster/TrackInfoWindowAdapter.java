@@ -14,8 +14,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.model.MapPoint;
-import com.umaps.gpshandleclient.ui.MainActivity;
-import com.umaps.gpshandleclient.ui.MapFragment;
+import com.umaps.gpshandleclient.ui.fragment.MapFragment;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
 
@@ -178,8 +177,8 @@ public class TrackInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Clus
         txtLink.setOnTouchListener(
             new OnInfoWindowElemTouchListener(
                 vHistory,
-                context.getResources().getDrawable(R.drawable.common_signin_btn_icon_normal_light),
-                context.getResources().getDrawable(R.drawable.common_signin_btn_icon_pressed_light)
+                context.getResources().getDrawable(R.drawable.common_google_signin_btn_icon_dark),
+                context.getResources().getDrawable(R.drawable.common_google_signin_btn_icon_light)
         ) {
             @Override
             protected void onClickConfirm(View view, Marker marker) {

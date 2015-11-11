@@ -8,8 +8,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.umaps.gpshandleclient.ui.LoginActivity;
-import com.umaps.gpshandleclient.ui.MainActivity;
+import com.umaps.gpshandleclient.ui.activity.LoginActivity;
+import com.umaps.gpshandleclient.ui.activity.MonitorActivity;
 import com.umaps.gpshandleclient.util.StringTools;
 import com.umaps.gpssdk.GpsSdk;
 
@@ -30,12 +30,12 @@ public class DispatcherActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dispatcher);
         mContentView = findViewById(R.id.fullscreen_content);
 
-        if (!isUserSignedIn()){
+        if (!isUserSignedIn()) {
             dispatch(LoginActivity.class);
             finish();
             return;
         } else {
-            dispatch(MainActivity.class);
+            dispatch(MonitorActivity.class);
         }
     }
 
@@ -74,6 +74,7 @@ public class DispatcherActivity extends AppCompatActivity {
             hide();
         }
     };
+
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
@@ -87,7 +88,7 @@ public class DispatcherActivity extends AppCompatActivity {
                                 (!StringTools.isBlank(GpsSdk.getUserId())) &&
                                 (!StringTools.isBlank(GpsSdk.getUserPassword()))
                 ) || (!StringTools.isBlank(GpsSdk.getSessionToken()));
-        long currentTime = Calendar.getInstance().getTimeInMillis()/1000;
+        long currentTime = Calendar.getInstance().getTimeInMillis() / 1000;
         long expireOn = GpsSdk.getTokenExpired();
         boolean isExpired = (expireOn <= currentTime);
         return !isExpired && hasUserData && MyApplication.isSignedIn();
@@ -95,6 +96,9 @@ public class DispatcherActivity extends AppCompatActivity {
 
     private void dispatch(Class cls) {
         Intent intent = new Intent(this, cls);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
     }
 }

@@ -1,11 +1,10 @@
-package com.umaps.gpshandleclient.ui;
+package com.umaps.gpshandleclient.ui.activity;
 
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,15 +34,15 @@ import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.model.ParseGroup;
+import com.umaps.gpshandleclient.ui.fragment.ReportPager;
 import com.umaps.gpshandleclient.util.EBus;
-import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
 
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class ReportActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
     private Typeface mTf = null;
     private MyApplication mApplication;
@@ -92,7 +90,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setupView();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, ReportPager.newInstance())
+                .commit();
     }
     @Override
     protected void onDestroy() {
@@ -114,21 +114,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onPause() {
         super.onPause();
     }
-
-    private void doLogout(){
-        mApplication.setIsSignedIn(false);
-        GpsRequest.getInstance().cancelAll();
-        //clean token
-        //Session.clean();
-        startLoginActivity();
-    }
-
-    private void startLoginActivity() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-    }
-    // retrieve access token from preferences
-
 
     @Override
     protected void onResume(){
@@ -178,71 +163,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void setupView() {
-        /*IProfile profile = new ProfileDrawerItem().withName(GpsSdk.getAccountId()+"/"+GpsSdk.getUserId())
-                .withEmail(GpsSdk.getContactEmail())
-                .withIcon("https://avatars3.githubusercontent.com/u/1476232?v=3&s=460");
-
-        headerResult = new AccountHeaderBuilder().withActivity(this)
-                .withHeaderBackground(R.drawable.header)
-                .addProfiles(profile)
-                .build();
-
-        result = new DrawerBuilder()
-                .withActivity(this)
-                .withToolbar(toolbar)
-                .withAccountHeader(headerResult)
-                .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.title_monitor).withIcon(FontAwesome.Icon.faw_globe).withIdentifier(1),
-                        new PrimaryDrawerItem().withName(R.string.title_report).withIcon(FontAwesome.Icon.faw_bar_chart).withIdentifier(2),
-                        new PrimaryDrawerItem().withName(R.string.title_administration).withIcon(FontAwesome.Icon.faw_cog).withIdentifier(3),
-                        new DividerDrawerItem(),
-                        //new PrimaryDrawerItem().withName(R.string.title_help_feedback).withIcon(FontAwesome.Icon.faw_support).withIdentifier(4),
-                        new PrimaryDrawerItem().withName(R.string.title_logout).withIcon(FontAwesome.Icon.faw_sign_out).withIdentifier(5)
-
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(AdapterView<?> adapterView, View view, int i, long l, IDrawerItem iDrawerItem) {
-
-                        if (iDrawerItem != null) {
-                            int iden = iDrawerItem.getIdentifier();
-                            switch (iden) {
-                                case 1:
-                                    getSupportFragmentManager().beginTransaction()
-                                            .replace(R.id.container, MapFragment.newInstance())
-                                            .addToBackStack("realTime").commit();
-                                    break;
-                                case 2:
-                                    getSupportFragmentManager().beginTransaction()
-                                            .replace(R.id.container, ReportPager.newInstance())
-                                            .commit();
-                                    break;
-                                case 3:
-                                    getSupportFragmentManager().beginTransaction()
-                                            .replace(R.id.container, AdmDispatcher.newInstance())
-                                            .commit();
-                                    break;
-                                *//*case 4:
-                                    getSupportFragmentManager().beginTransaction()
-                                            .replace(R.id.container, HelpFeedback.newInstance())
-                                            .commit();
-                                    break;*//*
-                                case 5:
-                                    doLogout();
-                                    break;
-                            }
-                        }
-                        return false;
-                    }
-                })
-                .build();*/
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, MapFragment.newInstance())
-                .addToBackStack("realTime").commit();
-    }
-
     private void SetBulbStatus(boolean started) {
         ImageView bulb = (ImageView) findViewById(R.id.notification_bulb);
         bulb.setImageResource(started ? R.drawable.circle_green : R.drawable.circle_none);
@@ -284,30 +204,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        /// Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     private class GroupSpinner extends BaseAdapter {

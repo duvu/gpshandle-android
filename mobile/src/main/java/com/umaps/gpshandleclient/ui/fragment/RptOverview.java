@@ -1,4 +1,4 @@
-package com.umaps.gpshandleclient.ui;
+package com.umaps.gpshandleclient.ui.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -27,6 +27,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Utils;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
+import com.umaps.gpshandleclient.ui.activity.LoginActivity;
 import com.umaps.gpshandleclient.util.GPSColors;
 import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;

@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <group android:checkableBehavior="single">
-        <item android:id="@+id/nav_camara" android:icon="@android:drawable/ic_menu_camera"
-            android:title="Import" />
-        <item android:id="@+id/nav_gallery" android:icon="@android:drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item android:id="@+id/nav_slideshow" android:icon="@android:drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"
-            android:title="Tools" />
+        <item android:id="@+id/nav_map_monitor"
+            android:icon="@drawable/ic_map_white_48dp"
+            android:title="@string/title_monitor" />
+        <item android:id="@+id/nav_report"
+            android:icon="@drawable/ic_equalizer_white_48dp"
+            android:title="@string/title_report" />
+        <item android:id="@+id/nav_administration"
+            android:icon="@drawable/ic_edit_white_48dp"
+            android:title="@string/title_administration" />
+        <item android:id="@+id/nav_tools"
+            android:icon="@drawable/ic_build_white_48dp"
+            android:title="@string/tools" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="@string/configuration">
         <menu>
-            <item android:id="@+id/nav_share" android:icon="@android:drawable/ic_menu_share"
-                android:title="Share" />
-            <item android:id="@+id/nav_send" android:icon="@android:drawable/ic_menu_send"
-                android:title="Send" />
+            <item android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_setting_dark"
+                android:title="@string/action_settings" />
+            <item android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_exit_to_app_white_48dp"
+                android:title="@string/action_logout" />
         </menu>
     </item>
-
 </menu>

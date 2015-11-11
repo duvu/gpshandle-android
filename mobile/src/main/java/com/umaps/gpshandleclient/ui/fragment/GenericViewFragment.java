@@ -15,7 +15,7 @@
  * along with GPSLogger for Android.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package com.umaps.gpshandleclient.view;
+package com.umaps.gpshandleclient.ui.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
