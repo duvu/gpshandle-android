@@ -1,4 +1,6 @@
-package com.umaps.gpssdk;
+package com.umaps.gpssdk.model;
+
+import com.umaps.gpssdk.StringTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;

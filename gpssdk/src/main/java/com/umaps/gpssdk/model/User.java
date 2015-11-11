@@ -1,11 +1,9 @@
-package com.umaps.gpssdk;
+package com.umaps.gpssdk.model;
 
 import android.content.Context;
 
-import com.android.volley.Request;
-import com.umaps.gpssdk.GpsRequest;
 import com.umaps.gpssdk.GpsSdk;
-import com.umaps.gpssdk.Group;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.StringTools;
 
 import org.json.JSONArray;
@@ -68,7 +66,7 @@ public class User {
                 if (ja.length() > 0) {
                     groupList = new ArrayList<>();
                     for (int i = 0; i < ja.length(); i++){
-                        groupList.add(new Group(ja.getJSONObject(i)));
+                        groupList.add((Group) ja.getJSONObject(i));
                     }
                 }
             }
@@ -205,39 +203,39 @@ public class User {
         this.context = context;
     }
 
-    public GpsRequest getRequestCreate() {
-        GpsRequest r = new GpsRequest();
+    public Query getRequestCreate() {
+        Query r = new Query();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());
         //r.setLocale(mApplication.getLocale());
-        r.setUrl(GpsRequest.ADMIN_URL);
-        r.setMethod(Request.Method.POST);
-        r.setCommand(GpsRequest.CMD_CREATE_USER);
+        r.setUrl(Query.ADMIN_URL);
+        r.setMethod(com.android.volley.Request.Method.POST);
+        r.setCommand(Query.CMD_CREATE_USER);
         r.setParams(buildParams());
         return r;
     }
-    public GpsRequest getRequestEdit() {
-        GpsRequest r = new GpsRequest();
+    public Query getRequestEdit() {
+        Query r = new Query();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());
         //r.setLocale(mApplication.getLocale());
-        r.setUrl(GpsRequest.ADMIN_URL);
-        r.setMethod(Request.Method.POST);
-        r.setCommand(GpsRequest.CMD_UPDATE_USER);
+        r.setUrl(Query.ADMIN_URL);
+        r.setMethod(com.android.volley.Request.Method.POST);
+        r.setCommand(Query.CMD_UPDATE_USER);
         r.setParams(buildParams());
         return r;
     }
-    public GpsRequest getRequestDelete() {
-        GpsRequest r = new GpsRequest();
+    public Query getRequestDelete() {
+        Query r = new Query();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());
         //r.setLocale(mApplication.getLocale());
-        r.setUrl(GpsRequest.ADMIN_URL);
-        r.setMethod(Request.Method.POST);
-        r.setCommand(GpsRequest.CMD_DELETE_USER);
+        r.setUrl(Query.ADMIN_URL);
+        r.setMethod(com.android.volley.Request.Method.POST);
+        r.setCommand(Query.CMD_DELETE_USER);
         r.setParams(buildParams());
         return r;
     }

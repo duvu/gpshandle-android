@@ -20,16 +20,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.Group;
-import com.umaps.gpssdk.User;
+import com.umaps.gpssdk.model.Group;
+import com.umaps.gpssdk.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -100,16 +99,16 @@ public class AdmUser extends Fragment {
         });
         setBottomToolbar();
 
-        GpsRequest mRequest = new GpsRequest();
-        mRequest.setAccountID(GpsSdk.getAccountId());
-        mRequest.setUserID(GpsSdk.getUserId());
-        mRequest.setPassword(GpsSdk.getUserPassword());
-        mRequest.setUrl(GpsRequest.ADMIN_URL);
-        mRequest.setMethod(Request.Method.POST);
-        mRequest.setCommand(GpsRequest.CMD_GET_AUTHORIZED_USERS);
-        mRequest.setParams(User.createParams());
+        Query mQuery = new Query();
+        mQuery.setAccountID(GpsSdk.getAccountId());
+        mQuery.setUserID(GpsSdk.getUserId());
+        mQuery.setPassword(GpsSdk.getUserPassword());
+        mQuery.setUrl(Query.ADMIN_URL);
+        mQuery.setMethod(com.android.volley.Request.Method.POST);
+        mQuery.setCommand(Query.CMD_GET_AUTHORIZED_USERS);
+        mQuery.setParams(User.createParams());
 
-        mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+        mQuery.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 showProgress(false);
@@ -132,20 +131,20 @@ public class AdmUser extends Fragment {
                 expListView.setAdapter(expListAdapter);
             }
         });
-        mRequest.setErrorHandler(new Response.ErrorListener() {
+        mQuery.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 showProgress(false);
             }
         });
-        mRequest.exec();
+        mQuery.exec();
         showProgress(true);
         return view;
     }
     @Override
     public void onDetach(){
         super.onDetach();
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
     }
 
     private void setBottomToolbar(){
@@ -297,9 +296,9 @@ public class AdmUser extends Fragment {
                 u.setContactName(edtContactName.getText().toString());
                 u.setContactEmail(edtContactEmail.getText().toString());
                 u.setContactPhone(edtContactPhone.getText().toString());
-                GpsRequest crtRequest = u.getRequestCreate();
+                Query crtQuery = u.getRequestCreate();
 
-                crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                crtQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -319,13 +318,13 @@ public class AdmUser extends Fragment {
                         Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
-                crtRequest.setErrorHandler(new Response.ErrorListener() {
+                crtQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                     }
                 });
-                crtRequest.exec();
+                crtQuery.exec();
                 showProgress(true);
             }
         });
@@ -377,9 +376,9 @@ public class AdmUser extends Fragment {
                 u.setContactName(edtContactName.getText().toString());
                 u.setContactEmail(edtContactEmail.getText().toString());
                 u.setContactPhone(edtContactPhone.getText().toString());
-                GpsRequest edtRequest = u.getRequestEdit();
+                Query edtQuery = u.getRequestEdit();
 
-                edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                edtQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -399,13 +398,13 @@ public class AdmUser extends Fragment {
                         Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
-                edtRequest.setErrorHandler(new Response.ErrorListener() {
+                edtQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                     }
                 });
-                edtRequest.exec();
+                edtQuery.exec();
                 showProgress(true);
             }
         });
@@ -435,8 +434,8 @@ public class AdmUser extends Fragment {
             @Override
             public void onClick(View v) {
                 u.setContext(getActivity());
-                GpsRequest deleteRequest = u.getRequestDelete();
-                deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                Query deleteQuery = u.getRequestDelete();
+                deleteQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -455,14 +454,14 @@ public class AdmUser extends Fragment {
                         Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
-                deleteRequest.setErrorHandler(new Response.ErrorListener() {
+                deleteQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                         Toast.makeText(getActivity(), getText(R.string.failure_delete), Toast.LENGTH_LONG).show();
                     }
                 });
-                deleteRequest.exec();
+                deleteQuery.exec();
                 showProgress(true);
             }
         });

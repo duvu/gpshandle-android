@@ -25,7 +25,7 @@ public class MyApplication extends Application {
 
     private static MyApplication instance = null;
     private static Typeface mIconFont = null;
-    private static Typeface mTextFont = null;
+    //private static Typeface mTextFont = null;
 
 
 
@@ -44,9 +44,9 @@ public class MyApplication extends Application {
     public static Typeface getIconFont(){
         return mIconFont;
     }
-    public static Typeface getTextFont(){
-        return mTextFont;
-    }
+    //public static Typeface getTextFont(){
+    //    return mTextFont;
+    //}
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -71,7 +71,7 @@ public class MyApplication extends Application {
 
         instance = this;
         mIconFont = Typeface.createFromAsset(this.getAssets(), "icomoon.ttf");
-        mTextFont = Typeface.createFromAsset(this.getAssets(), "OpenSans-Regular.ttf");
+        //mTextFont = Typeface.createFromAsset(this.getAssets(), "OpenSans-Regular.ttf");
 
         GpsSdk.initialize(this);
         populateSettings();

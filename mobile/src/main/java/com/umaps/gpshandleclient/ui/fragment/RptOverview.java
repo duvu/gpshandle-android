@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.github.mikephil.charting.charts.PieChart;
@@ -29,7 +28,7 @@ import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.ui.activity.LoginActivity;
 import com.umaps.gpshandleclient.util.GPSColors;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
 
@@ -48,7 +47,7 @@ public class RptOverview extends Fragment {
     private View mBarProgress;
     private View mProgress;
 
-    private GpsRequest mRequest;
+    private Query mQuery;
     private static final String TAG_REQUEST = "tptOverview";
 
     private View view;
@@ -95,20 +94,20 @@ public class RptOverview extends Fragment {
         mChart.setRotationEnabled(false);
 
 
-        mRequest = new GpsRequest();
+        mQuery = new Query();
 
-        mRequest.setAccountID(GpsSdk.getAccountId());
-        mRequest.setUserID(GpsSdk.getUserId());
-        mRequest.setPassword(GpsSdk.getUserPassword());
-        mRequest.setMethod(Request.Method.GET);
+        mQuery.setAccountID(GpsSdk.getAccountId());
+        mQuery.setUserID(GpsSdk.getUserId());
+        mQuery.setPassword(GpsSdk.getUserPassword());
+        mQuery.setMethod(com.android.volley.Request.Method.GET);
 
-        String url = String.format(GpsRequest.CHART_STATE_URL, GpsSdk.getSessionToken(), GpsSdk.getSelectedGroup());
-        mRequest.setUrl(url);
+        String url = String.format(Query.CHART_STATE_URL, GpsSdk.getSessionToken(), GpsSdk.getSelectedGroup());
+        mQuery.setUrl(url);
 
         //-- prepare piechart data
         PieData pieData = new PieData();
 
-        mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+        mQuery.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.i(TAG, response.toString());
@@ -188,20 +187,20 @@ public class RptOverview extends Fragment {
 
             }
         });
-        mRequest.setErrorHandler(new Response.ErrorListener() {
+        mQuery.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 //TODO
             }
         });
-        mRequest.exec();
+        mQuery.exec();
         showProgress(true);
     }
 
     @Override
     public void onDetach(){
         super.onDetach();
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
     }
 
 

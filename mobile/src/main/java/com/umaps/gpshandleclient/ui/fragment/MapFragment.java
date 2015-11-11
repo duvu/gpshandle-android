@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,18 +31,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterManager;
+import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.cluster.TrackClusterManager;
-import com.umaps.gpshandleclient.cluster.TrackInfoWindowAdapter;
 import com.umaps.gpshandleclient.cluster.TrackClusterRenderer;
+import com.umaps.gpshandleclient.cluster.TrackInfoWindowAdapter;
 import com.umaps.gpshandleclient.event.UpdateEvent;
-import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.model.MapData;
 import com.umaps.gpshandleclient.model.MapPoint;
 import com.umaps.gpshandleclient.model.TrackItem;
 import com.umaps.gpshandleclient.util.EBus;
 import com.umaps.gpshandleclient.view.CustomMapLayout;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
 
@@ -71,8 +70,8 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
 
     private MyApplication mApplication;
 
-    private GpsRequest monitorRequest;
-    private GpsRequest historyRequest;
+    private Query monitorQuery;
+    private Query historyQuery;
     //private GpsRequest groupRequest;
 
     private View view;
@@ -96,7 +95,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
         mView = view.findViewById(R.id.map);
 
         mApplication = MyApplication.getInstance();
-        Typeface mTf = MyApplication.getIconFont();
+        //Typeface mTf = MyApplication.getIconFont();
         mHistoryOptions = view.findViewById(R.id.options_history);
         mApplication.setIsFleet(true);
         if (mapFragment == null) {
@@ -118,7 +117,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
     @Override
     public void onDetach(){
         super.onDetach();
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
         getActivity().onBackPressed();
     }
     @Override
@@ -134,8 +133,8 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
         if(doAsynchronous!=null){
             doAsynchronous.cancel();
         }
-        if (monitorRequest != null) {
-            monitorRequest.cancelAll();
+        if (monitorQuery != null) {
+            monitorQuery.cancelAll();
         }
     }
 
@@ -172,7 +171,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
         isShowing = false;
         String groupId = GpsSdk.getSelectedGroup(); //mApplication.getSelGroup();
 
-        monitorRequest = GpsRequest.getFleetRequest(getActivity(), groupId);
+        monitorQuery = Query.getFleetRequest(getActivity(), groupId);
         Response.Listener<JSONObject> responseHandler = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -224,8 +223,8 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
             }
         };
 
-        monitorRequest.setResponseHandler(responseHandler);
-        monitorRequest.setErrorHandler(errorHandler);
+        monitorQuery.setResponseHandler(responseHandler);
+        monitorQuery.setErrorHandler(errorHandler);
 
         //Clear old task
         if (doAsynchronous != null) {
@@ -243,7 +242,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
                         }
                         EventBus.getDefault().post(new UpdateEvent.OnLoading(true));
                         if (!isRunning) {
-                            monitorRequest.exec();
+                            monitorQuery.exec();
                             isRunning = true;
 
                         }
@@ -272,8 +271,8 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
             doAsynchronous.cancel();
             doAsynchronous = null;
         }
-        historyRequest = GpsRequest.geMapsRequest(getActivity(), deviceId, from, to);
-        historyRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+        historyQuery = Query.geMapsRequest(getActivity(), deviceId, from, to);
+        historyQuery.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 MyResponse myResponse = new MyResponse(response);
@@ -347,7 +346,7 @@ public class MapFragment extends GenericViewFragment implements OnMapReadyCallba
 
             }
         });
-        historyRequest.exec();
+        historyQuery.exec();
         mMap.clear();
         historicalData = new PolylineOptions().width(3).color(Color.RED);
         //mMap.addPolyline(historicalData);

@@ -19,17 +19,16 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.Device;
-import com.umaps.gpssdk.Group;
+import com.umaps.gpssdk.model.Device;
+import com.umaps.gpssdk.model.Group;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -104,16 +103,16 @@ public class AdmGroup extends Fragment {
         });
 
         setBottomToolbar();
-        GpsRequest mRequest = new GpsRequest();
-        mRequest.setAccountID(GpsSdk.getAccountId());
-        mRequest.setUserID(GpsSdk.getUserId());
-        mRequest.setPassword(GpsSdk.getUserPassword());
-        mRequest.setMethod(Request.Method.POST);
-        mRequest.setUrl(GpsRequest.ADMIN_URL);
-        mRequest.setCommand(GpsRequest.CMD_GET_GROUPS);
+        Query mQuery = new Query();
+        mQuery.setAccountID(GpsSdk.getAccountId());
+        mQuery.setUserID(GpsSdk.getUserId());
+        mQuery.setPassword(GpsSdk.getUserPassword());
+        mQuery.setMethod(com.android.volley.Request.Method.POST);
+        mQuery.setUrl(Query.ADMIN_URL);
+        mQuery.setCommand(Query.CMD_GET_GROUPS);
         JSONObject params = Group.createGetParams();
-        mRequest.setParams(params);
-        mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+        mQuery.setParams(params);
+        mQuery.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 showProgress(false);
@@ -124,13 +123,11 @@ public class AdmGroup extends Fragment {
                 ArrayList<Group> groupsList = new ArrayList<>();
                 JSONArray mJSONArray = (JSONArray) mRes.getData();
                 for (int i = 0; i<mJSONArray.length(); i++){
-                    Group gr = null;
                     try {
-                        gr = new Group(mJSONArray.getJSONObject(i));
+                        groupsList.add((Group) mJSONArray.getJSONObject(i));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    groupsList.add(gr);
                 }
 
                 expListView.setClickable(true);
@@ -140,14 +137,14 @@ public class AdmGroup extends Fragment {
                 }
             }
         });
-        mRequest.setErrorHandler(new Response.ErrorListener() {
+        mQuery.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 showProgress(false);
                 Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-        mRequest.exec();
+        mQuery.exec();
         showProgress(true);
         return view;
     }
@@ -155,7 +152,7 @@ public class AdmGroup extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
     }
     private void setBottomToolbar(){
         TextView icAddGroup = (TextView) view.findViewById(R.id.ic_add);
@@ -309,8 +306,8 @@ public class AdmGroup extends Fragment {
                 g.setDisplayName(displayName);
                 g.setNotes(notes);
 
-                GpsRequest crtRequest = g.getRequestCreate();
-                crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                Query crtQuery = g.getRequestCreate();
+                crtQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -331,14 +328,14 @@ public class AdmGroup extends Fragment {
 
                     }
                 });
-                crtRequest.setErrorHandler(new Response.ErrorListener() {
+                crtQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                         Toast.makeText(getActivity(), getActivity().getResources().getText(R.string.failure_create_group), Toast.LENGTH_LONG).show();
                     }
                 });
-                crtRequest.exec();
+                crtQuery.exec();
                 showProgress(true);
             }
         });
@@ -380,8 +377,8 @@ public class AdmGroup extends Fragment {
                 g.setDisplayName(displayName);
                 g.setNotes(notes);
 
-                GpsRequest edtRequest = g.getRequestEdit();
-                edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                Query edtQuery = g.getRequestEdit();
+                edtQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -402,14 +399,14 @@ public class AdmGroup extends Fragment {
                     }
                 });
 
-                edtRequest.setErrorHandler(new Response.ErrorListener() {
+                edtQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                         Toast.makeText(getActivity(), getResources().getText(R.string.failure_create_group), Toast.LENGTH_LONG).show();
                     }
                 });
-                edtRequest.exec();
+                edtQuery.exec();
                 showProgress(true);
             }
         });
@@ -438,8 +435,8 @@ public class AdmGroup extends Fragment {
             @Override
             public void onClick(View v) {
                 g.setContext(getActivity());
-                GpsRequest deleteRequest = g.getRequestDelete();
-                deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                Query deleteQuery = g.getRequestDelete();
+                deleteQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -458,14 +455,14 @@ public class AdmGroup extends Fragment {
                         Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
-                deleteRequest.setErrorHandler(new Response.ErrorListener() {
+                deleteQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                         Toast.makeText(getActivity(), getText(R.string.failure_create_group), Toast.LENGTH_LONG).show();
                     }
                 });
-                deleteRequest.exec();
+                deleteQuery.exec();
                 showProgress(true);
             }
         });

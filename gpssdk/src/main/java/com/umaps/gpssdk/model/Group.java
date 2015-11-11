@@ -1,24 +1,11 @@
-package com.umaps.gpssdk;
+package com.umaps.gpssdk.model;
 
-import android.content.Context;
-
-import com.android.volley.Request;
-import com.umaps.gpssdk.Device;
-import com.umaps.gpssdk.GpsRequest;
-import com.umaps.gpssdk.GpsSdk;
-import com.umaps.gpssdk.StringTools;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by beou on 31/10/2014.
  */
-public class Group {
+public class Group extends GObject {
 
     private static final String ACCOUNT_ID          = "accountID";
     private static final String GROUP_ID            = "groupID";
@@ -26,65 +13,59 @@ public class Group {
     private static final String DISPLAY_NAME        = "displayName";
     private static final String DEVICE_COUNT        = "deviceCount";
     private static final String DEVICE_LIST         = "devicesList";
-    private static final String PUSHPIN_ID          = "pushpinID";
     private static final String NOTES               = "notes";
     private static final String LAST_UPDATE_TIME    = "lastUpdateTime";
     private static final String CREATION_TIME       = "creationTime";
 
-    private String accountId;
-    private String groupId;
-    private String description;
-    private String displayName;
-    private long lastUpdateTime;
-    private long creationTime;
-    private String notes;
-
-    Context context;
-
-    private String icon;
-    private int live = 0;
-    private int deviceCount = 0;
-
-    private ArrayList<Device> deviceArrayList;
-
-    public Group(JSONObject itemGroup){
-        try {
-            this.accountId      = itemGroup.has(ACCOUNT_ID)         ? itemGroup.getString(ACCOUNT_ID) : "";
-            this.groupId        = itemGroup.has(GROUP_ID)           ? itemGroup.getString(GROUP_ID) : "";
-            this.description    = itemGroup.has(DESCRIPTION)        ? itemGroup.getString(DESCRIPTION) : "";
-            this.displayName    = itemGroup.has(DISPLAY_NAME)       ? itemGroup.getString(DISPLAY_NAME) : "";
-            this.lastUpdateTime = itemGroup.has(LAST_UPDATE_TIME)   ? itemGroup.getLong(LAST_UPDATE_TIME) : 0L;
-            this.creationTime   = itemGroup.has(CREATION_TIME)      ? itemGroup.getLong(CREATION_TIME) : 0L;
-            this.deviceCount    = itemGroup.has(DEVICE_COUNT)       ? itemGroup.getInt(DEVICE_COUNT) : 0;
-            this.notes          = itemGroup.has(NOTES)              ? itemGroup.getString(NOTES) : "";
-            if (itemGroup.has(DEVICE_LIST)){
-                deviceArrayList = new ArrayList<Device>();
-                JSONArray dA = itemGroup.getJSONArray(DEVICE_LIST);
-                for (int i = 0; i< dA.length(); i++){
-                    Device d = new Device(dA.getJSONObject(i));
-                    deviceArrayList.add(d);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public void setAccount(String accountId) {
+        put(ACCOUNT_ID, accountId);
+    }
+    public String getAccount () {
+        return getString(ACCOUNT_ID);
+    }
+    public void setGroupId(String groupId) {
+        put(GROUP_ID, groupId);
+    }
+    public String getGroupId() {
+        return getString(GROUP_ID);
+    }
+    public void setDescription(String description) {
+        put(DESCRIPTION, description);
+    }
+    public String getDescription() {
+        return getString(DESCRIPTION);
+    }
+    public void setDisplayName(String displayName) {
+        put(DISPLAY_NAME, displayName);
+    }
+    public String getDisplayName () {
+        return getString(DISPLAY_NAME);
     }
 
-    public Group(Context context) {
-        this.context = context;
+    public void setDeviceCount(int count) {
+        put(DEVICE_COUNT, count);
+    }
+    public int getDeviceCount() {
+        return getInt(DEVICE_COUNT);
+    }
+    public void setDeviceList(List<GObject> list) {
+        put(DEVICE_LIST, list);
+    }
+    public List<GObject> getDeviceList() {
+        return getObjects(DEVICE_LIST);
     }
 
     public Group(String accountID, String groupId, String description,
                  String displayName, String icon, int live, int deviceCount){
-        this.setAccountId(accountID);
+        this.setAccount(accountID);
         this.setGroupId(groupId);
         this.setDescription(description);
         this.setDisplayName(displayName);
-        this.setIcon(icon);
-        this.setLive(live);
+        //this.setIcon(icon);
+        //this.setLive(live);
         this.setDeviceCount(deviceCount);
     }
-    public String getAccountId(){
+    /*public String getAccountId(){
         return (accountId!=null)?accountId:"";
     }
     public void setAccountId(String accountID){
@@ -156,25 +137,10 @@ public class Group {
 
     public void setDeviceArrayList(ArrayList<Device> deviceArrayList) {
         this.deviceArrayList = deviceArrayList;
-    }
+    }*/
 
-    public Context getContext() {
-        return context;
-    }
 
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
-    public int getLive() {
-        return live;
-    }
-
-    public void setLive(int live) {
-        this.live = live;
-    }
-
-    public static JSONObject createGetParams(){
+    /*public static JSONObject createGetParams(){
         JSONObject jsonParamsObject = new JSONObject();
         List<String> fields = new ArrayList<>();
         fields.add(ACCOUNT_ID);
@@ -246,5 +212,5 @@ public class Group {
         r.setUrl(GpsRequest.ADMIN_URL);
         r.setParams(buildParams());
         return r;
-    }
+    }*/
 }

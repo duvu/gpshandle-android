@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpssdk.Group;
+import com.umaps.gpssdk.model.Group;
 
 import java.util.ArrayList;
 

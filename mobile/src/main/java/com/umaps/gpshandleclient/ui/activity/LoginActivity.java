@@ -24,7 +24,7 @@ import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.model.ParseLoginEvent;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.Listener;
 import com.umaps.gpssdk.MyResponse;
@@ -117,7 +117,7 @@ public class LoginActivity extends FragmentActivity {
     //-- tokenRequest --> aclRequest --> accountRequest --> userRequest --> groupRequest
     private void getData() {
         //-- getToken
-        GpsRequest.getToken(new Listener<MyResponse>() {
+        Query.getToken(new Listener<MyResponse>() {
             @Override
             public void onResponse(MyResponse response) {
                 if (response.isError()) {

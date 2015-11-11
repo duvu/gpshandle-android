@@ -20,16 +20,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.Device;
+import com.umaps.gpssdk.model.Device;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -106,16 +105,16 @@ public class AdmDevice extends Fragment {
         });
         setBottomToolbar();
 
-        GpsRequest mRequest = new GpsRequest();
-        mRequest.setAccountID(GpsSdk.getAccountId());
-        mRequest.setUserID(GpsSdk.getUserId());
-        mRequest.setPassword(GpsSdk.getUserPassword());
-        mRequest.setMethod(Request.Method.POST);
-        mRequest.setUrl(GpsRequest.ADMIN_URL);
-        mRequest.setCommand(GpsRequest.CMD_GET_DEVICES);
+        Query mQuery = new Query();
+        mQuery.setAccountID(GpsSdk.getAccountId());
+        mQuery.setUserID(GpsSdk.getUserId());
+        mQuery.setPassword(GpsSdk.getUserPassword());
+        mQuery.setMethod(com.android.volley.Request.Method.POST);
+        mQuery.setUrl(Query.ADMIN_URL);
+        mQuery.setCommand(Query.CMD_GET_DEVICES);
         JSONObject params = Device.getParams();
-        mRequest.setParams(params);
-        mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+        mQuery.setParams(params);
+        mQuery.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 showProgress(false);
@@ -141,14 +140,14 @@ public class AdmDevice extends Fragment {
 
             }
         });
-        mRequest.setErrorHandler(new Response.ErrorListener() {
+        mQuery.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 showProgress(false);
                 Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-        mRequest.exec();
+        mQuery.exec();
         showProgress(true);
         return view;
     }
@@ -156,7 +155,7 @@ public class AdmDevice extends Fragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
     }
     /**
      * Shows the progress UI and hides the login form.
@@ -376,8 +375,8 @@ public class AdmDevice extends Fragment {
                 d.setGroupIDs(groupID);
                 d.setNotes(notes);
 
-                GpsRequest crtRequest = d.getRequestCreate();
-                crtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                Query crtQuery = d.getRequestCreate();
+                crtQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -398,14 +397,14 @@ public class AdmDevice extends Fragment {
 
                     }
                 });
-                crtRequest.setErrorHandler(new Response.ErrorListener() {
+                crtQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                         Toast.makeText(getActivity(), getActivity().getResources().getText(R.string.failure_create_device), Toast.LENGTH_LONG).show();
                     }
                 });
-                crtRequest.exec();
+                crtQuery.exec();
                 showProgress(true);
             }
         });
@@ -486,8 +485,8 @@ public class AdmDevice extends Fragment {
                 d.setGroupIDs(groupID);
                 d.setNotes(notes);
 
-                GpsRequest edtRequest = d.getRequestEdit();
-                edtRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                Query edtQuery = d.getRequestEdit();
+                edtQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -508,14 +507,14 @@ public class AdmDevice extends Fragment {
                     }
                 });
 
-                edtRequest.setErrorHandler(new Response.ErrorListener() {
+                edtQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                         Toast.makeText(getActivity(), getResources().getText(R.string.failure_create_device), Toast.LENGTH_LONG).show();
                     }
                 });
-                edtRequest.exec();
+                edtQuery.exec();
                 showProgress(true);
             }
         });
@@ -544,8 +543,8 @@ public class AdmDevice extends Fragment {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GpsRequest deleteRequest = d.getRequestDelete();
-                deleteRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+                Query deleteQuery = d.getRequestDelete();
+                deleteQuery.setResponseHandler(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         showProgress(false);
@@ -566,14 +565,14 @@ public class AdmDevice extends Fragment {
                         Toast.makeText(getActivity(), myResponse.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
-                deleteRequest.setErrorHandler(new Response.ErrorListener() {
+                deleteQuery.setErrorHandler(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showProgress(false);
                         Toast.makeText(getActivity(), getText(R.string.failure_create_device), Toast.LENGTH_LONG).show();
                     }
                 });
-                deleteRequest.exec();
+                deleteQuery.exec();
                 showProgress(true);
             }
         });
@@ -793,7 +792,7 @@ public class AdmDevice extends Fragment {
                 d.setActive(true);
             }
 
-            GpsRequest updateDevice = d.getRequestEdit();
+            Query updateDevice = d.getRequestEdit();
             updateDevice.setResponseHandler(new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {

@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
@@ -26,7 +25,7 @@ import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.util.GPSColors;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
 
@@ -44,7 +43,7 @@ public class RptEventCount extends Fragment {
     private HorizontalBarChart mChart;
     private View mBarProgress;
     private View mProgress;
-    private GpsRequest mRequest;
+    private Query mQuery;
 
     private static final String TAG_REQUEST = "rptEventCount";
     public static RptEventCount newInstance(){
@@ -70,16 +69,16 @@ public class RptEventCount extends Fragment {
         MyApplication mApplication = MyApplication.getInstance();
         Utils.init(getResources());
         mChart = (HorizontalBarChart) view.findViewById(R.id.event_count_chart);
-        mRequest = new GpsRequest();
-        mRequest.setAccountID(GpsSdk.getAccountId());
-        mRequest.setUserID(GpsSdk.getUserId());
-        mRequest.setPassword(GpsSdk.getUserPassword());
-        mRequest.setMethod(Request.Method.GET);
-        String url = String.format(GpsRequest.CHART_SUMMARY_URL,
+        mQuery = new Query();
+        mQuery.setAccountID(GpsSdk.getAccountId());
+        mQuery.setUserID(GpsSdk.getUserId());
+        mQuery.setPassword(GpsSdk.getUserPassword());
+        mQuery.setMethod(com.android.volley.Request.Method.GET);
+        String url = String.format(Query.CHART_SUMMARY_URL,
                 GpsSdk.getSessionToken(), GpsSdk.getSelectedGroup());
-        mRequest.setUrl(url);
+        mQuery.setUrl(url);
 
-        mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+        mQuery.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
@@ -154,20 +153,20 @@ public class RptEventCount extends Fragment {
 
             }
         });
-        mRequest.setErrorHandler(new Response.ErrorListener() {
+        mQuery.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, error.toString());
             }
         });
-        mRequest.exec();
+        mQuery.exec();
         showProgress(true);
         return view;
     }
     @Override
     public void onDetach(){
         super.onDetach();
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
     }
     /**
      * Shows the progress UI and hides the login form.

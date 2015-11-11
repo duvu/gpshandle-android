@@ -417,6 +417,7 @@ public class GpsSdk {
             return;
         }
         GpsSdk.context = context;
+        //--
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsSdk.context);
         GpsSdk.setAccountId     (prefs.getString    (ACCOUNT_ID         , ""));
         GpsSdk.setUserId        (prefs.getString    (USER_ID            , ""));
@@ -451,6 +452,9 @@ public class GpsSdk {
         GpsSdk.setAclReportParking      (prefs.getInt(ACL_REPORT_PARKING    , 0));
         GpsSdk.setAclReportSummary      (prefs.getInt(ACL_REPORT_SUMMARY    , 0));
     }
+
+
+
     public static final void saveInstanceState(){
         if (context == null) {
             //-- SDK has not been initialized yet

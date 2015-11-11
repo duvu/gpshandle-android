@@ -17,15 +17,14 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
 import com.umaps.gpssdk.MyResponse;
-import com.umaps.gpssdk.Account;
+import com.umaps.gpssdk.model.Account;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,7 +38,7 @@ import java.util.Date;
 public class AdmAccount extends Fragment {
     private static final String TAG = "AdmAccount";
 
-    private GpsRequest mRequest;
+    private Query mQuery;
     private static final String TAG_REQUEST = "admAccount";
     private View mBarProgress;
     private View mProgress;
@@ -85,16 +84,16 @@ public class AdmAccount extends Fragment {
         });
         setBottomToolbar();
 
-        mRequest = new GpsRequest();
-        mRequest.setAccountID(GpsSdk.getAccountId());
-        mRequest.setUserID(GpsSdk.getUserId());
-        mRequest.setPassword(GpsSdk.getUserPassword());
-        mRequest.setUrl(GpsRequest.ADMIN_URL);
-        mRequest.setMethod(Request.Method.POST);
-        mRequest.setCommand(GpsRequest.CMD_GET_AUTHORIZED_ACCOUNTS);
+        mQuery = new Query();
+        mQuery.setAccountID(GpsSdk.getAccountId());
+        mQuery.setUserID(GpsSdk.getUserId());
+        mQuery.setPassword(GpsSdk.getUserPassword());
+        mQuery.setUrl(Query.ADMIN_URL);
+        mQuery.setMethod(com.android.volley.Request.Method.POST);
+        mQuery.setCommand(Query.CMD_GET_AUTHORIZED_ACCOUNTS);
 
-        mRequest.setParams(Account.createParam());
-        mRequest.setResponseHandler(new Response.Listener<JSONObject>() {
+        mQuery.setParams(Account.createParam());
+        mQuery.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
@@ -112,21 +111,21 @@ public class AdmAccount extends Fragment {
                 showProgress(false);
             }
         });
-        mRequest.setErrorHandler(new Response.ErrorListener() {
+        mQuery.setErrorHandler(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
             }
         });
 
-        mRequest.exec();
+        mQuery.exec();
         showProgress(true);
         return view;
     }
     @Override
     public void onDetach(){
         super.onDetach();
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
     }
 
     private void setBottomToolbar(){

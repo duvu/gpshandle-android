@@ -9,7 +9,7 @@ import android.view.MenuItem;
 
 import com.umaps.gpshandleclient.MyApplication;
 import com.umaps.gpshandleclient.R;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 
 /**
  * GPSHandleClient
@@ -56,7 +56,7 @@ public class BaseActivity extends AppCompatActivity
 
     private void doLogout(){
         MyApplication.setIsSignedIn(false);
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
         startLoginActivity();
     }
 

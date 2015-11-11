@@ -3,10 +3,13 @@ package com.umaps.gpssdk;
 import android.content.Context;
 import android.util.Log;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.umaps.gpssdk.http.HttpQueue;
+import com.umaps.gpssdk.model.Account;
+import com.umaps.gpssdk.model.GObject;
+import com.umaps.gpssdk.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,12 +17,10 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
-import de.greenrobot.event.EventBus;
-
 /**
  * Created by beou on 03/06/2015.
  */
-public class GpsRequest {
+public class Query {
     private static final String TAG = "GpsRequest";
     public static final String BASE_URL                 = "https://apis.gpshandle.com:8443/ws";
     public static final String MAPPING_URL              = BASE_URL + "/monitor";
@@ -66,31 +67,47 @@ public class GpsRequest {
     public static final String CMD_UPDATE_USER                  = "updateUser";
     public static final String CMD_DELETE_USER                  = "deleteUser";
 
-    private static GpsRequest instance = null;
-    public static GpsRequest getInstance() {
+    //-- a query included:
+    //-- URL
+    //-- Command
+    //-- Method
+    //-- Params
+    private int method;
+    private String url;
+    private String command;
+    private GObject params;
+    public void FindInBackground(FindCallback callback) {
+
+    }
+    public void SaveInBackground(SaveCallback callback) {
+
+    }
+    public void DeleteInBackground(DeleteCallback callback) {
+
+    }
+
+    /*private static Query instance = null;
+    public static Query getInstance() {
         if (instance == null) {
-            instance = new GpsRequest();
+            instance = new Query();
         }
         return instance;
-    }
+    }*/
 
     private HttpQueue mQueue;
 
-    private int method;
-    private String url;
+
     private String tag;
 
     private String accountID;
     private String userID;
     private String password;
     private String locale = "en";
-    private String command;
-    private JSONObject params;
 
     private Response.Listener<JSONObject> responseHandler;
     private Response.ErrorListener errorHandler;
 
-    public GpsRequest() {
+    public Query() {
         mQueue = HttpQueue.getInstance(GpsSdk.getContext());
     }
 
@@ -98,21 +115,21 @@ public class GpsRequest {
         return method;
     }
 
-    public GpsRequest setMethod(int method) {
+    public Query setMethod(int method) {
         this.method = method;
         return this;
     }
-    public GpsRequest setPost(){
-        return setMethod(Request.Method.POST);
+    public Query setPost(){
+        return setMethod(com.android.volley.Request.Method.POST);
     }
-    public GpsRequest setGet() {
-        return setMethod(Request.Method.GET);
+    public Query setGet() {
+        return setMethod(com.android.volley.Request.Method.GET);
     }
-    public GpsRequest setDel() {
-        return setMethod(Request.Method.DELETE);
+    public Query setDel() {
+        return setMethod(com.android.volley.Request.Method.DELETE);
     }
-    public GpsRequest setPut() {
-        return setMethod(Request.Method.PUT);
+    public Query setPut() {
+        return setMethod(com.android.volley.Request.Method.PUT);
     }
 
     public String getUrl() {
@@ -230,7 +247,7 @@ public class GpsRequest {
     }
 
     public JSONObject getJson(){
-        if (method == Request.Method.POST) {
+        if (method == com.android.volley.Request.Method.POST) {
             JSONObject request = new JSONObject();
             try {
                 request.put(KEY_REQUEST, getRequestJson());
@@ -239,7 +256,7 @@ public class GpsRequest {
                 e.printStackTrace();
             }
             return request;
-        } else if (method == Request.Method.GET){
+        } else if (method == com.android.volley.Request.Method.GET){
             return null;
         }
         return null;
@@ -301,8 +318,8 @@ public class GpsRequest {
         cancel("common");
     }
 
-    private static GpsRequest getCommonRequest() {
-        GpsRequest r = new GpsRequest();
+    private static Query getCommonRequest() {
+        Query r = new Query();
         r.setAccountID(GpsSdk.getAccountId());
         r.setUserID(GpsSdk.getUserId());
         r.setPassword(GpsSdk.getUserPassword());
@@ -310,46 +327,46 @@ public class GpsRequest {
         return r;
     }
 
-    private static GpsRequest getAdminRequest() {
-        GpsRequest r = getCommonRequest();
+    private static Query getAdminRequest() {
+        Query r = getCommonRequest();
         r.setPost();
         r.setUrl(ADMIN_URL);
         return r;
     }
 
-    private static GpsRequest getMapRequest() {
-        GpsRequest r = getCommonRequest();
+    private static Query getMapRequest() {
+        Query r = getCommonRequest();
         r.setPost();
         r.setUrl(MAPPING_URL);
         r.setErrorHandler();
         return r;
     }
 
-    public static GpsRequest getAccountRequest() {
-        GpsRequest r = getAdminRequest();
+    public static Query getAccountRequest() {
+        Query r = getAdminRequest();
         r.setCommand(CMD_GET_ACCOUNT);
         r.setErrorHandler();
         return r;
     }
     //-- get request for user
-    public static GpsRequest getUserRequest() {
-        GpsRequest r = getAdminRequest();
+    public static Query getUserRequest() {
+        Query r = getAdminRequest();
         r.setCommand(CMD_GET_USERS);
         r.setParams(User.createParams());
         r.setErrorHandler();
         return r;
     }
 
-    public static GpsRequest getGroupRequest() {
-        GpsRequest r = getAdminRequest();
+    public static Query getGroupRequest() {
+        Query r = getAdminRequest();
         r.setCommand(CMD_GET_GROUPS);
-        r.setParams(Group.createGetParams());
+        //r.setParams(Group.createGetParams());
         r.setErrorHandler();
         return r;
     }
 
     public static void getGroup(final Listener<MyResponse> listener) {
-        GpsRequest r = getGroupRequest();
+        Query r = getGroupRequest();
         r.setResponseHandler(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -361,7 +378,7 @@ public class GpsRequest {
         r.exec();
     }
     public static void getUser(final Listener<MyResponse> listener) {
-        GpsRequest r = getAdminRequest();
+        Query r = getAdminRequest();
         r.setCommand(CMD_GET_USERS);
         r.setParams(User.createParams());
         r.setErrorHandler();
@@ -387,7 +404,7 @@ public class GpsRequest {
     }
 
     public static void getAccount(final Listener<MyResponse> listener) {
-        GpsRequest r = getAdminRequest();
+        Query r = getAdminRequest();
         r.setCommand(CMD_GET_ACCOUNT);
         r.setErrorHandler();
 
@@ -411,7 +428,7 @@ public class GpsRequest {
         r.exec();
     }
     public static void getAcls(final Listener<MyResponse> listener) {
-        GpsRequest r = getAdminRequest();
+        Query r = getAdminRequest();
         r.setCommand(CMD_GET_USER_ACL);
         JSONObject jsonParams = new JSONObject();
         r.setParams(jsonParams);
@@ -442,7 +459,7 @@ public class GpsRequest {
     }
 
     public static void getToken(final Listener<MyResponse> listener) {
-        GpsRequest r = getCommonRequest();
+        Query r = getCommonRequest();
         r.setUrl(TOKEN_URL);
         r.setPost();
         r.setErrorHandler();
@@ -469,24 +486,24 @@ public class GpsRequest {
 
         JSONObject params = new JSONObject();
         try {
-            params.put(GpsRequest.KEY_ACCOUNT_ID, GpsSdk.getAccountId());
-            params.put(GpsRequest.KEY_USER_ID, GpsSdk.getUserId());
-            params.put(GpsRequest.KEY_PASSWORD, GpsSdk.getUserPassword());
-            params.put(GpsRequest.KEY_LOCALE, Locale.getDefault().getLanguage());
+            params.put(Query.KEY_ACCOUNT_ID, GpsSdk.getAccountId());
+            params.put(Query.KEY_USER_ID, GpsSdk.getUserId());
+            params.put(Query.KEY_PASSWORD, GpsSdk.getUserPassword());
+            params.put(Query.KEY_LOCALE, Locale.getDefault().getLanguage());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         r.exec(params);
     }
 
-    public static GpsRequest getFleetRequest(Context context, String groupId) {
-        GpsRequest r = getMapRequest();
+    public static Query getFleetRequest(Context context, String groupId) {
+        Query r = getMapRequest();
         r.setCommand(CMD_GET_MAP_FLEET);
         r.setParams(getFleetParams(groupId));
         return r;
     }
-    public static GpsRequest geMapsRequest(Context context, String deviceId, long from, long to) {
-        GpsRequest r = getMapRequest();
+    public static Query geMapsRequest(Context context, String deviceId, long from, long to) {
+        Query r = getMapRequest();
         r.setCommand(CMD_GET_MAP_DEVICE);
         r.setParams(getMapDeviceParams(deviceId, from, to));
         r.setErrorHandler();

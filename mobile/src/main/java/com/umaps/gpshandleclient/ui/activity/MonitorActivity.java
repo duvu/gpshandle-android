@@ -4,7 +4,6 @@ package com.umaps.gpshandleclient.ui.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,29 +14,18 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
 import com.umaps.gpshandleclient.R;
 import com.umaps.gpshandleclient.event.UpdateEvent;
-import com.umaps.gpshandleclient.model.ParseGroup;
 import com.umaps.gpshandleclient.ui.fragment.MapFragment;
 import com.umaps.gpshandleclient.util.EBus;
 import com.umaps.gpssdk.GpsSdk;
-
-import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
@@ -125,8 +113,12 @@ public class MonitorActivity extends BaseActivity{
         //-- set toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        TextView txtCurrentGroup = (TextView) findViewById(R.id.txt_current_group);
+        TextView txtCurrentGroupSize = (TextView) findViewById(R.id.txt_current_group_size);
+        txtCurrentGroup.setText(String.valueOf(GpsSdk.getSelectedGroup()));
+        //txtCurrentGroupSize.setText(String.valueOf(GpsSdk.));
         //add group to spinner
-        final Spinner sp = (Spinner) toolbar.findViewById(R.id.spinner_group);
+        /*final Spinner sp = (Spinner) toolbar.findViewById(R.id.spinner_group);
         sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -143,9 +135,9 @@ public class MonitorActivity extends BaseActivity{
             public void onNothingSelected(AdapterView<?> parent) {
                 //no op
             }
-        });
+        });*/
 
-        ParseQuery<ParseGroup> query = ParseQuery.getQuery(ParseGroup.class);
+        /*ParseQuery<ParseGroup> query = ParseQuery.getQuery(ParseGroup.class);
         query.fromLocalDatastore();
         query.setLimit(100);
         onUpdating(true);
@@ -160,7 +152,7 @@ public class MonitorActivity extends BaseActivity{
                 sp.setAdapter(adapter);
                 sp.setSelection(GpsSdk.getGroupPosition());
             }
-        });
+        });*/
     }
 
     private void SetBulbStatus(boolean started) {
@@ -209,7 +201,7 @@ public class MonitorActivity extends BaseActivity{
 
 
 
-    private class GroupSpinner extends BaseAdapter {
+    /*private class GroupSpinner extends BaseAdapter {
         private LayoutInflater mInflater;
         private int mResource;
         private List<ParseGroup> items;
@@ -257,5 +249,5 @@ public class MonitorActivity extends BaseActivity{
     private class ViewHolder {
         TextView name;
         TextView size;
-    }
+    }*/
 }

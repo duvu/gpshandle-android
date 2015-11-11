@@ -19,9 +19,9 @@ import com.umaps.gpshandleclient.event.UpdateEvent;
 import com.umaps.gpshandleclient.util.EBus;
 import com.umaps.gpshandleclient.util.PagerAdapter;
 import com.umaps.gpshandleclient.util.StringTools;
-import com.umaps.gpssdk.GpsRequest;
+import com.umaps.gpssdk.Query;
 import com.umaps.gpssdk.GpsSdk;
-import com.umaps.gpssdk.Group;
+import com.umaps.gpssdk.model.Group;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,7 +45,7 @@ public class ReportPager extends GenericViewFragment {
     private View mBarProgress;
     private View mProgress;
 
-    private GpsRequest mRequestGetGroup;
+    private Query mQueryGetGroup;
     ArrayList<Group> groupsList;
     MyApplication mApplication;
     private Typeface mTf;
@@ -84,7 +84,7 @@ public class ReportPager extends GenericViewFragment {
     @Override
     public void onDetach(){
         super.onDetach();
-        GpsRequest.getInstance().cancelAll();
+        Query.getInstance().cancelAll();
     }
     public void updateAllFragment() {
         List<Fragment> fragments = getFragments();
