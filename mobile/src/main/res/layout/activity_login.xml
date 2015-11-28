@@ -9,7 +9,6 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/base_color_inverse"
     tools:context=".ui.LoginActivity">
     <!-- Login progress -->
     <LinearLayout
@@ -39,13 +38,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-<!--                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/base_color"
-                    android:text="@string/account_name"/>-->
                 <LinearLayout
                     android:id="@+id/txt_account"
                     android:layout_width="match_parent"
@@ -57,7 +49,6 @@
                         android:id="@+id/ic_account"
                         android:textSize="32sp"
                         android:layout_marginLeft="10dp"
-                        android:textColor="@color/base_color"
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
@@ -65,23 +56,11 @@
                         android:id="@+id/edt_account"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColorHint="@color/base_color_light"
-                        android:background="@drawable/noborder"
-                        android:textColor="@color/base_color"
                         android:hint="@string/hint_account_name"
                         android:padding="10dp"
+                        android:background="@drawable/noborder"
                         android:singleLine="true"/>
                 </LinearLayout>
-<!--
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:textSize="16dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/base_color"
-                    android:text="@string/user_name"/>
--->
                 <LinearLayout
                     android:id="@+id/txt_user"
                     android:layout_width="match_parent"
@@ -94,7 +73,6 @@
                         android:textSize="32sp"
                         android:layout_marginLeft="10dp"
                         android:layout_gravity="center"
-                        android:textColor="@color/base_color"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                     <EditText
@@ -102,23 +80,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
-                        android:textColorHint="@color/base_color_light"
                         android:background="@drawable/noborder"
-                        android:textColor="@color/base_color"
                         android:singleLine="true"
                         android:hint="@string/hint_user_name"/>
                 </LinearLayout>
-<!--
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16dp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="15dp"
-                    android:textColor="@color/base_color"
-                    android:text="@string/password"/>
--->
-
                 <LinearLayout
                     android:id="@+id/txt_password"
                     android:layout_width="match_parent"
@@ -131,7 +96,6 @@
                         android:textSize="32sp"
                         android:layout_marginLeft="10dp"
                         android:layout_gravity="center"
-                        android:textColor="@color/base_color"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                     <EditText
@@ -139,8 +103,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
-                        android:textColorHint="@color/base_color_light"
-                        android:textColor="@color/base_color"
                         android:background="@drawable/noborder"
                         android:hint="@string/hint_password"
                         android:singleLine="true"
@@ -153,15 +115,12 @@
                     android:layout_marginTop="16dp"
                     android:textStyle="bold"
                     android:layout_gravity="center"
-                    android:textColor="@color/text_color_white"
-                    android:background="@drawable/button"
                     android:text="@string/button_login" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textSize="10sp"
-                    android:textColor="@color/base_color"
                     android:text="@string/copyright"/>
             </LinearLayout>
         </LinearLayout>
